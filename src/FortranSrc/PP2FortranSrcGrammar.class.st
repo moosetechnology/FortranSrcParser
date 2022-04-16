@@ -4,13 +4,10 @@ Class {
 	#instVars : [
 		'any',
 		'programFile',
-		'programUnitList',
 		'metaInfo',
 		'miVersion',
 		'miFilename',
-		'string',
 		'miParameters',
-		'identifier',
 		'programFileBody',
 		'programUnit',
 		'puMain',
@@ -23,7 +20,27 @@ Class {
 		'prefixSuffix',
 		'subroutineArguments',
 		'subroutineBody',
-		'subPrograms'
+		'subPrograms',
+		'position',
+		'tkOpenParen',
+		'tkNothing',
+		'tkString',
+		'tkNumber',
+		'tkCloseParen',
+		'tkIdentifier',
+		'tkComma',
+		'emptyTuple',
+		'tkOpenSquare',
+		'tkCloseSquare',
+		'tkJust',
+		'tkAList',
+		'expression',
+		'expValue',
+		'value',
+		'valVariable',
+		'block',
+		'blComment',
+		'comment'
 	],
 	#category : #FortranSrc
 }
@@ -34,34 +51,64 @@ PP2FortranSrcGrammar >> any [
 
 ]
 
-{ #category : #token }
-PP2FortranSrcGrammar >> identifier [
-	^#word asPParser plus token trim
+{ #category : #'grammar-subroutine' }
+PP2FortranSrcGrammar >> blComment [
+	^ 'BlComment' asPParser trim , emptyTuple , srcSpan , comment
+]
+
+{ #category : #'grammar-subroutine' }
+PP2FortranSrcGrammar >> block [
+	^ "blStatement / blForAll / blIf / blCase / blDo / blDoWhile / blAssociate / blInterface /" blComment
 ]
 
 { #category : #grammar }
+PP2FortranSrcGrammar >> comment [
+	^ tkOpenParen , 'Comment' asPParser trim, tkString , tkCloseParen
+]
+
+{ #category : #grammar }
+PP2FortranSrcGrammar >> emptyTuple [
+	^ tkOpenParen , tkCloseParen
+]
+
+{ #category : #grammar }
+PP2FortranSrcGrammar >> expValue [
+	^ 'ExpValue' asPParser trim , emptyTuple , srcSpan , value
+]
+
+{ #category : #grammar }
+PP2FortranSrcGrammar >> expression [
+	^ expValue "/ expBinary / expUnary / expSubscript / expDataRef / expFunctionalCall / expImpliedDo / expInitialisation / expReturnSpec"
+]
+
+{ #category : #'grammar-metaInfo' }
 PP2FortranSrcGrammar >> metaInfo [
-	^ '(' asPParser trim ,  'MetaInfo' asPParser trim , '{' asPParser trim , miParameters , '}' asPParser trim , ')' asPParser trim
+	^ tkOpenParen ,  'MetaInfo' asPParser trim , '{' asPParser trim , (miParameters delimitedBy: tkComma) , '}' asPParser trim , tkCloseParen
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-metaInfo' }
 PP2FortranSrcGrammar >> miFilename [
-	^ 'miFilename' asPParser trim , '=' asPParser trim , string
+	^ 'miFilename' asPParser trim , '=' asPParser trim , tkString
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-metaInfo' }
 PP2FortranSrcGrammar >> miParameters [
-	^(miVersion / miFilename) , ( ',' asPParser trim , miParameters) optional
+	^ miVersion / miFilename
+]
+
+{ #category : #'grammar-metaInfo' }
+PP2FortranSrcGrammar >> miVersion [
+	^ 'miVersion' asPParser trim , '=' asPParser trim , tkIdentifier
 ]
 
 { #category : #grammar }
-PP2FortranSrcGrammar >> miVersion [
-	^ 'miVersion' asPParser trim , '=' asPParser trim , identifier
+PP2FortranSrcGrammar >> position [
+	^ tkOpenParen , tkNumber , ':' asPParser , tkNumber, tkCloseParen
 ]
 
 { #category : #grammar }
 PP2FortranSrcGrammar >> prefixSuffix [
-	^any
+	^ tkOpenParen , tkNothing, tkComma , tkNothing , tkCloseParen
 ]
 
 { #category : #grammar }
@@ -71,52 +118,47 @@ PP2FortranSrcGrammar >> programFile [
 
 { #category : #grammar }
 PP2FortranSrcGrammar >> programFileBody [
-	^ '[' asPParser trim , programUnitList , ']' asPParser trim 
+	^ tkOpenSquare , (programUnit delimitedBy: tkComma) optional , tkCloseSquare 
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> programUnit [
-	^ puMain / puModule / puSubroutine / puFunction / puBlockData / puComment
+	^ "puMain / puModule /" puSubroutine "/ puFunction / puBlockData" / puComment
 ]
 
-{ #category : #grammar }
-PP2FortranSrcGrammar >> programUnitList [
-	^ programUnit , ( ',' asPParser trim , programUnit) star
-]
-
-{ #category : #grammar }
+{ #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puBlockData [
 	^any
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puComment [
-	^any
+	^ 'PUComment' asPParser trim , emptyTuple , srcSpan , comment
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puFunction [
 	^any
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puMain [
 	^any
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puModule [
 	^any
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puSubroutine [
-	^'PUSubroutine' asPParser trim , '()' asPParser trim , srcSpan , prefixSuffix , string , subroutineArguments , subroutineBody , subPrograms
+	^'PUSubroutine' asPParser trim , emptyTuple , srcSpan , prefixSuffix , tkString , subroutineArguments , subroutineBody , subPrograms
 ]
 
 { #category : #grammar }
 PP2FortranSrcGrammar >> srcSpan [
-	^any
+	^ position , '-' asPParser , position
 ]
 
 { #category : #accessing }
@@ -124,22 +166,84 @@ PP2FortranSrcGrammar >> start [
 	^programFile
 ]
 
+{ #category : #'grammar-subroutine' }
+PP2FortranSrcGrammar >> subPrograms [
+	^ tkNothing
+]
+
+{ #category : #'grammar-subroutine' }
+PP2FortranSrcGrammar >> subroutineArguments [
+	^ tkOpenParen , tkJust , tkAList , emptyTuple , srcSpan , tkOpenSquare , ( expression separatedBy: tkComma) optional , tkCloseSquare , tkCloseParen
+]
+
+{ #category : #'grammar-subroutine' }
+PP2FortranSrcGrammar >> subroutineBody [
+	^ tkOpenSquare , (block separatedBy: tkComma) optional , tkCloseSquare
+]
+
 { #category : #token }
-PP2FortranSrcGrammar >> string [
+PP2FortranSrcGrammar >> tkAList [
+	^ 'AList' asPParser trim
+]
+
+{ #category : #token }
+PP2FortranSrcGrammar >> tkCloseParen [
+	^ ')' asPParser trim
+]
+
+{ #category : #token }
+PP2FortranSrcGrammar >> tkCloseSquare [
+	^ ']' asPParser trim
+]
+
+{ #category : #token }
+PP2FortranSrcGrammar >> tkComma [
+	^ ',' asPParser trim
+]
+
+{ #category : #token }
+PP2FortranSrcGrammar >> tkIdentifier [
+	^#word asPParser plus token trim
+]
+
+{ #category : #token }
+PP2FortranSrcGrammar >> tkJust [
+	^ 'Just' asPParser trim
+]
+
+{ #category : #token }
+PP2FortranSrcGrammar >> tkNothing [
+	^ 'Nothing' asPParser trim
+]
+
+{ #category : #token }
+PP2FortranSrcGrammar >> tkNumber [
+	^ #digit asPParser plus flatten trim
+]
+
+{ #category : #token }
+PP2FortranSrcGrammar >> tkOpenParen [
+	^ '(' asPParser trim
+]
+
+{ #category : #token }
+PP2FortranSrcGrammar >> tkOpenSquare [
+	^ '[' asPParser trim
+]
+
+{ #category : #token }
+PP2FortranSrcGrammar >> tkString [
 	^ ($" asPParser , ('\"' asPParser / $" asPParser negate) star , $" asPParser) trim
 ]
 
 { #category : #grammar }
-PP2FortranSrcGrammar >> subPrograms [
-	^any
+PP2FortranSrcGrammar >> valVariable [
+	^ 'ValVariable' asPParser trim , tkString 
 ]
 
 { #category : #grammar }
-PP2FortranSrcGrammar >> subroutineArguments [
-	^any
-]
-
-{ #category : #grammar }
-PP2FortranSrcGrammar >> subroutineBody [
-	^any
+PP2FortranSrcGrammar >> value [
+	^ tkOpenParen ,
+	( "valInteger / valReal / valComplex / valString / valBoz / valHollerith /" valVariable "/ valIntrinsic / valLogical / valOperator / valAssignment / valType / valStar / valColon") ,
+	 tkCloseParen
 ]
