@@ -142,6 +142,52 @@ PP2FortranSrcGrammarTest >> testDimensionDeclarator [
 ]
 
 { #category : #'tests-expression' }
+PP2FortranSrcGrammarTest >> testExpBinary [
+	self
+		parse: 'ExpBinary ()
+	(157:45)-(157:52)
+	Addition
+	(ExpValue ()
+		(157:45)-(157:47)
+		(ValVariable "var"))
+	(ExpValue ()
+		(157:52)-(157:52)
+		(ValInteger "4" Nothing))'
+		rule: #expBinary
+]
+
+{ #category : #'tests-expression' }
+PP2FortranSrcGrammarTest >> testExpSubscript [
+	self
+		parse: 'ExpSubscript ()
+	(157:45)-(157:50)
+	(ExpValue ()
+		(157:45)-(157:47)
+		(ValVariable "var"))
+	(AList ()
+		(157:49)-(157:49)
+		[IxSingle ()
+			(157:49)-(157:49)
+			Nothing
+			(ExpValue ()
+				(157:49)-(157:49)
+				(ValInteger "2" Nothing))])'
+		rule: #expSubscript
+]
+
+{ #category : #'tests-expression' }
+PP2FortranSrcGrammarTest >> testExpUnary [
+	self
+		parse: 'ExpUnary ()
+	(99:14)-(99:18)
+	Minus
+	(ExpValue ()
+		(99:15)-(99:18)
+		(ValInteger "0002" Nothing))'
+		rule: #expUnary
+]
+
+{ #category : #'tests-expression' }
 PP2FortranSrcGrammarTest >> testExpValue [
 	self
 		parse: 'ExpValue ()
@@ -188,6 +234,34 @@ PP2FortranSrcGrammarTest >> testImpRange [
 	"a"
 	"z"'
 		rule: #impRange
+]
+
+{ #category : #'tests-expression' }
+PP2FortranSrcGrammarTest >> testIxRange [
+	self
+		parse: 'IxRange ()
+	(157:45)-(157:72)
+	(Just ExpValue ()
+		(157:45)-(157:47)
+		(ValVariable "var1"))
+	(Just ExpValue ()
+		(157:64)-(157:64)
+		(ValInteger "2"
+			Nothing))
+	Nothing'
+		rule: #ixRange
+]
+
+{ #category : #'tests-expression' }
+PP2FortranSrcGrammarTest >> testIxSingle [
+	self
+		parse: 'IxSingle ()
+	(72:23)-(72:23)
+	Nothing
+	(ExpValue ()
+		(72:23)-(72:23)
+		(ValInteger "1" Nothing))'
+		rule: #ixSingle
 ]
 
 { #category : #'tests-metaInfo' }

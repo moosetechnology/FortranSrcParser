@@ -48,7 +48,15 @@ Class {
 		'intent',
 		'declaratorType',
 		'commonGroup',
-		'valInteger'
+		'valInteger',
+		'ixSingle',
+		'ixRange',
+		'expSubscript',
+		'index',
+		'expBinary',
+		'expUnary',
+		'unaryOp',
+		'binaryOp'
 	],
 	#category : #FortranSrc
 }
@@ -90,6 +98,28 @@ PP2FortranSrcGrammar >> baseType [
   / (self token: 'ClassStar')
   / ((self token: 'ClassCustom') , tkString)
   / (self token: 'TypeByte')
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcGrammar >> binaryOp [
+	^ (self token: 'Addition')
+  / (self token: 'Subtraction')
+  / (self token: 'Multiplication')
+  / (self token: 'Division')
+  / (self token: 'Exponentiation')
+  / (self token: 'Concatenation')
+  / (self token: 'GT')
+  / (self token: 'GTE')
+  / (self token: 'LT')
+  / (self token: 'LTE')
+  / (self token: 'EQ')
+  / (self token: 'NE')
+  / (self token: 'Or')
+  / (self token: 'XOr')
+  / (self token: 'And')
+  / (self token: 'Equivalent')
+  / (self token: 'NotEquivalent')
+  / ((self token: 'BinCustom') , tkString)
 ]
 
 { #category : #'grammar-block' }
@@ -149,6 +179,21 @@ PP2FortranSrcGrammar >> emptyTuple [
 ]
 
 { #category : #'grammar-expression' }
+PP2FortranSrcGrammar >> expBinary [
+	^ (self prelude: 'ExpBinary') , binaryOp , (self parens: expression) , (self parens: expression)
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcGrammar >> expSubscript [
+	^ (self prelude: 'ExpSubscript') , (self parens: expression) , (self justAList: index)
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcGrammar >> expUnary [
+	^ (self prelude: 'ExpUnary') , unaryOp , (self parens: expression)
+]
+
+{ #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expValue [
 
 	^ (self prelude: 'ExpValue') , (self parens: value)
@@ -156,7 +201,10 @@ PP2FortranSrcGrammar >> expValue [
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expression [
-	^ expValue "/ expBinary / expUnary / expSubscript / expDataRef / expFunctionalCall / expImpliedDo / expInitialisation / expReturnSpec"
+	^ expValue /
+	expBinary / 
+	expUnary /
+	expSubscript "/ expDataRef / expFunctionalCall / expImpliedDo / expInitialisation / expReturnSpec"
 ]
 
 { #category : #'grammar-helper' }
@@ -191,10 +239,25 @@ PP2FortranSrcGrammar >> impRange [
 	^ (self prelude: 'ImpRange') , tkString , tkString
 ]
 
+{ #category : #'grammar-expression' }
+PP2FortranSrcGrammar >> index [
+	^ ixSingle / ixRange
+]
+
 { #category : #grammar }
 PP2FortranSrcGrammar >> intent [
 
 	^ (self token: 'In') / (self token: 'Out') / (self token: 'InOut')
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcGrammar >> ixRange [
+	^ (self prelude: 'IxRange') , (self maybe: expression) , (self maybe: expression) , (self maybe: expression)
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcGrammar >> ixSingle [
+	^ (self prelude: 'IxSingle') , (self maybe: tkString) , (self parens: expression)
 ]
 
 { #category : #'grammar-helper' }
@@ -391,6 +454,14 @@ PP2FortranSrcGrammar >> token: aString [
 PP2FortranSrcGrammar >> typeSpec [
 
 	^ (self prelude: 'TypeSpec') , baseType , (self maybe: selector)
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcGrammar >> unaryOp [
+	^ (self token: 'Plus') /
+	(self token: 'Minus') /
+	(self token: 'Not') /
+	((self token: 'UnCustom') , tkString)
 ]
 
 { #category : #'grammar-expression' }
