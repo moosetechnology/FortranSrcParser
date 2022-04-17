@@ -41,6 +41,32 @@ PP2FortranSrcGrammarTest >> testBlComment [
 ]
 
 { #category : #tests }
+PP2FortranSrcGrammarTest >> testBlStatement [
+	self
+		parse: 'BlStatement ()
+	(62:7)-(62:18)
+	Nothing
+	(StDeclaration ()
+		(62:7)-(62:18)
+		(TypeSpec ()
+			(62:7)-(62:13)
+			TypeInteger
+			Nothing)
+		Nothing
+		(AList ()
+			(62:15)-(62:18)
+			[Declarator ()
+				(62:15)-(62:18)
+				(ExpValue ()
+					(62:15)-(62:18)
+					(ValVariable "lstg"))
+				ScalarDecl
+				Nothing
+				Nothing]))'
+		rule: #blStatement
+]
+
+{ #category : #tests }
 PP2FortranSrcGrammarTest >> testComment [
 	self
 		parse: '(Comment "     some comment  ")'
@@ -195,6 +221,61 @@ PP2FortranSrcGrammarTest >> testPosition [
 ]
 
 { #category : #tests }
+PP2FortranSrcGrammarTest >> testProgramFileEmpty [
+
+	self
+		parse: 'ProgramFile (MetaInfo
+	{miVersion = Fortran77,
+	miFilename = "emptyFile.f"})
+	[]'
+		rule: #programFile
+]
+
+{ #category : #tests }
+PP2FortranSrcGrammarTest >> testProgramFilePUComment [
+
+	self
+		parse: 'ProgramFile (MetaInfo
+	{miVersion = Fortran77,
+	miFilename = "singleComment.f"})
+	[PUComment  ()
+	(4:1)-(4:19)
+	(Comment "== entrees ==")]'
+		rule: #programFile
+]
+
+{ #category : #tests }
+PP2FortranSrcGrammarTest >> testProgramFilePUSubRoutine [
+
+	self
+		parse: 'ProgramFile (MetaInfo
+	{miVersion = Fortran77,
+	miFilename = "singleSubroutine.f"})
+	[PUSubroutine ()
+	(1:7)-(302:9)
+	(Nothing, Nothing)
+	"stgbrk"
+	(Just AList ()
+		(2:8)-(3:19)
+		[ExpValue ()
+			(3:14)-(3:19)
+			(ValVariable "status")])
+	[]
+	Nothing]'
+		rule: #programFile
+]
+
+{ #category : #tests }
+PP2FortranSrcGrammarTest >> testPuComment [
+
+	self
+		parse: 'PUComment  ()
+	(4:1)-(4:19)
+	(Comment "== entrees ==")'
+		rule: #puComment
+]
+
+{ #category : #tests }
 PP2FortranSrcGrammarTest >> testPuSubroutine [
 	self
 		parse: 'PUSubroutine ()
@@ -255,6 +336,29 @@ PP2FortranSrcGrammarTest >> testStCommon [
 						   Nothing
 						   Nothing])])'
 		rule: #statement
+]
+
+{ #category : #tests }
+PP2FortranSrcGrammarTest >> testStDeclaration [
+	self
+		parse: 'StDeclaration ()
+	(62:7)-(62:18)
+	(TypeSpec ()
+		(62:7)-(62:13)
+		TypeInteger
+		Nothing)
+	Nothing
+	(AList ()
+		(62:15)-(62:18)
+		[Declarator ()
+			(62:15)-(62:18)
+			(ExpValue ()
+				(62:15)-(62:18)
+				(ValVariable "lstg"))
+			ScalarDecl
+			Nothing
+			Nothing])'
+		rule: #stDeclaration
 ]
 
 { #category : #tests }

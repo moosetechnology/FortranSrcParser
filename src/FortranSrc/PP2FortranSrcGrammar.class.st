@@ -8,7 +8,6 @@ Class {
 		'miVersion',
 		'miFilename',
 		'miParameters',
-		'programFileBody',
 		'programUnit',
 		'puMain',
 		'puModule',
@@ -105,7 +104,7 @@ PP2FortranSrcGrammar >> blComment [
 { #category : #grammar }
 PP2FortranSrcGrammar >> blStatement [
 
-	^ (self prelude: 'BlStatement') , label , (self parens: statement)
+	^ (self prelude: 'BlStatement') , (self maybe: label) , (self parens: statement)
 ]
 
 { #category : #'grammar-subroutine' }
@@ -277,13 +276,7 @@ PP2FortranSrcGrammar >> prelude: aString aList: aRule [
 { #category : #grammar }
 PP2FortranSrcGrammar >> programFile [
 
-	^ (self token: 'ProgramFile') , metaInfo , programFileBody
-]
-
-{ #category : #grammar }
-PP2FortranSrcGrammar >> programFileBody [
-
-	^ self parens: (programUnit delimitedBy: tkComma) optional
+	^ (self token: 'ProgramFile') , metaInfo , (self haskellList: programUnit)
 ]
 
 { #category : #'grammar-programUnit' }
@@ -340,7 +333,7 @@ PP2FortranSrcGrammar >> srcSpan [
 { #category : #grammar }
 PP2FortranSrcGrammar >> stDeclaration [
 
-	^ (self prelude: 'StDeclaration') , typeSpec
+	^ (self prelude: 'StDeclaration') , (self parens: typeSpec)
 	  , (self maybe: (self justAList: attribute)) , (self justAList: declarator)
 ]
 
