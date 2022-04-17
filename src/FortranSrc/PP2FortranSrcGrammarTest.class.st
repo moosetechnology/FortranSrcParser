@@ -35,6 +35,46 @@ PP2FortranSrcGrammarTest >> testExpValue [
 ]
 
 { #category : #tests }
+PP2FortranSrcGrammarTest >> testImpCharacter [
+
+	self
+		parse: 'ImpCharacter ()
+	(52:25)-(52:27)
+	"a"'
+		rule: #impCharacter
+]
+
+{ #category : #tests }
+PP2FortranSrcGrammarTest >> testImpList [
+
+	self
+		parse: 'ImpList ()
+	(52:16)-(52:28)
+	(TypeSpec ()
+		(52:16)-(52:22)
+		TypeLogical
+		Nothing)
+	(AList ()
+		(52:25)-(52:27)
+		[ImpRange ()
+			(52:25)-(52:27)
+			"a"
+			"z"])'
+		rule: #impList
+]
+
+{ #category : #tests }
+PP2FortranSrcGrammarTest >> testImpRange [
+
+	self
+		parse: 'ImpRange ()
+	(52:25)-(52:27)
+	"a"
+	"z"'
+		rule: #impRange
+]
+
+{ #category : #tests }
 PP2FortranSrcGrammarTest >> testMetaInfo [
 	self
 		parse: '(MetaInfo
@@ -111,15 +151,11 @@ PP2FortranSrcGrammarTest >> testStringWithDoubleQuote [
 
 { #category : #tests }
 PP2FortranSrcGrammarTest >> testSubRoutineArguments [
+
 	self
 		parse: '(Just AList ()
 	(2:8)-(3:19)
-	[ExpValue ()
-		(2:8)-(2:12)
-		(ValVariable "alist"),
-	ExpValue ()
-		(2:14)-(2:19)
-		(ValVariable "splist")])'
+	[])'
 		rule: #subroutineArguments
 ]
 
