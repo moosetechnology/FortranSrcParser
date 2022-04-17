@@ -31,7 +31,7 @@ PP2FortranSrcGrammarTest >> testAttribute [
 	self parse: 'AttrVolatile () (1:5)-(1:10)' rule: #attribute
 ]
 
-{ #category : #tests }
+{ #category : #'tests-block' }
 PP2FortranSrcGrammarTest >> testBlComment [
 	self
 		parse: 'BlComment ()
@@ -40,7 +40,7 @@ PP2FortranSrcGrammarTest >> testBlComment [
 		rule: #blComment
 ]
 
-{ #category : #tests }
+{ #category : #'tests-block' }
 PP2FortranSrcGrammarTest >> testBlStatement [
 	self
 		parse: 'BlStatement ()
@@ -59,7 +59,7 @@ PP2FortranSrcGrammarTest >> testBlStatement [
 				(62:15)-(62:18)
 				(ExpValue ()
 					(62:15)-(62:18)
-					(ValVariable "lstg"))
+					(ValVariable "var"))
 				ScalarDecl
 				Nothing
 				Nothing]))'
@@ -73,7 +73,7 @@ PP2FortranSrcGrammarTest >> testComment [
 		rule: #comment
 ]
 
-{ #category : #tests }
+{ #category : #'tests-declaration' }
 PP2FortranSrcGrammarTest >> testCommonGroup [
 
 	self
@@ -81,21 +81,21 @@ PP2FortranSrcGrammarTest >> testCommonGroup [
 			(64:13)-(65:55)
 			(Just ExpValue ()
 			      (64:13)-(64:20)
-			      (ValVariable "ooocom"))
+			      (ValVariable "value"))
 			(AList ()
 			       (64:21)-(65:55)
 			       [Declarator ()
 			       		   (64:21)-(64:23)
 						   (ExpValue ()
 						   (64:21)-(64:23)
-						   (ValVariable "oot"))
+						   (ValVariable "val"))
 						   ScalarDecl
 						   Nothing
 						   Nothing])'
 		rule: #commonGroup
 ]
 
-{ #category : #tests }
+{ #category : #'tests-declaration' }
 PP2FortranSrcGrammarTest >> testDeclarator [
 
 	self
@@ -103,14 +103,14 @@ PP2FortranSrcGrammarTest >> testDeclarator [
 	(62:15)-(62:18)
 	(ExpValue ()
 		(62:15)-(62:18)
-		(ValVariable "lstg"))
+		(ValVariable "val"))
 	ScalarDecl
 	Nothing
 	Nothing'
 		rule: #declarator
 ]
 
-{ #category : #tests }
+{ #category : #'tests-declaration' }
 PP2FortranSrcGrammarTest >> testDeclaratorType [
 	self
 		parse: 'ScalarDecl'
@@ -128,7 +128,7 @@ PP2FortranSrcGrammarTest >> testDeclaratorType [
 		rule: #declaratorType
 ]
 
-{ #category : #tests }
+{ #category : #'tests-declaration' }
 PP2FortranSrcGrammarTest >> testDimensionDeclarator [
 
 	self
@@ -141,7 +141,7 @@ PP2FortranSrcGrammarTest >> testDimensionDeclarator [
 		rule: #dimensionDeclarator
 ]
 
-{ #category : #tests }
+{ #category : #'tests-expression' }
 PP2FortranSrcGrammarTest >> testExpValue [
 	self
 		parse: 'ExpValue ()
@@ -150,7 +150,7 @@ PP2FortranSrcGrammarTest >> testExpValue [
 		rule: #expValue
 ]
 
-{ #category : #tests }
+{ #category : #'tests-declaration' }
 PP2FortranSrcGrammarTest >> testImpCharacter [
 
 	self
@@ -160,7 +160,7 @@ PP2FortranSrcGrammarTest >> testImpCharacter [
 		rule: #impCharacter
 ]
 
-{ #category : #tests }
+{ #category : #'tests-declaration' }
 PP2FortranSrcGrammarTest >> testImpList [
 
 	self
@@ -179,7 +179,7 @@ PP2FortranSrcGrammarTest >> testImpList [
 		rule: #impList
 ]
 
-{ #category : #tests }
+{ #category : #'tests-declaration' }
 PP2FortranSrcGrammarTest >> testImpRange [
 
 	self
@@ -190,37 +190,37 @@ PP2FortranSrcGrammarTest >> testImpRange [
 		rule: #impRange
 ]
 
-{ #category : #tests }
+{ #category : #'tests-metaInfo' }
 PP2FortranSrcGrammarTest >> testMetaInfo [
 	self
 		parse: '(MetaInfo
 	{miVersion = Fortran77,
-	miFilename = "stgbrk.f"})'
+	miFilename = "sourceFile.f"})'
 		rule: #metaInfo
 ]
 
-{ #category : #tests }
+{ #category : #'tests-metaInfo' }
 PP2FortranSrcGrammarTest >> testMiFilename [
 	self
-		parse: 'miFilename = "somefile.f"'
+		parse: 'miFilename = "sourceFile.f"'
 		rule: #miFilename
 ]
 
-{ #category : #tests }
+{ #category : #'tests-metaInfo' }
 PP2FortranSrcGrammarTest >> testMiVersion [
 	self
 		parse: 'miVersion = Fortran77'
 		rule: #miVersion
 ]
 
-{ #category : #tests }
+{ #category : #'tests-programUnit' }
 PP2FortranSrcGrammarTest >> testPosition [
 	self
 		parse: '(1:7)'
 		rule: #position
 ]
 
-{ #category : #tests }
+{ #category : #'tests-programUnit' }
 PP2FortranSrcGrammarTest >> testProgramFileEmpty [
 
 	self
@@ -231,7 +231,7 @@ PP2FortranSrcGrammarTest >> testProgramFileEmpty [
 		rule: #programFile
 ]
 
-{ #category : #tests }
+{ #category : #'tests-programUnit' }
 PP2FortranSrcGrammarTest >> testProgramFilePUComment [
 
 	self
@@ -244,7 +244,7 @@ PP2FortranSrcGrammarTest >> testProgramFilePUComment [
 		rule: #programFile
 ]
 
-{ #category : #tests }
+{ #category : #'tests-programUnit' }
 PP2FortranSrcGrammarTest >> testProgramFilePUSubRoutine [
 
 	self
@@ -252,20 +252,20 @@ PP2FortranSrcGrammarTest >> testProgramFilePUSubRoutine [
 	{miVersion = Fortran77,
 	miFilename = "singleSubroutine.f"})
 	[PUSubroutine ()
-	(1:7)-(302:9)
-	(Nothing, Nothing)
-	"stgbrk"
-	(Just AList ()
-		(2:8)-(3:19)
-		[ExpValue ()
-			(3:14)-(3:19)
-			(ValVariable "status")])
-	[]
-	Nothing]'
+		(1:7)-(302:9)
+		(Nothing, Nothing)
+		"subrtn"
+		(Just AList ()
+			(2:8)-(3:19)
+			[ExpValue ()
+				(3:14)-(3:19)
+				(ValVariable "status")])
+		[]
+		Nothing]'
 		rule: #programFile
 ]
 
-{ #category : #tests }
+{ #category : #'tests-programUnit' }
 PP2FortranSrcGrammarTest >> testPuComment [
 
 	self
@@ -275,13 +275,13 @@ PP2FortranSrcGrammarTest >> testPuComment [
 		rule: #puComment
 ]
 
-{ #category : #tests }
+{ #category : #'tests-programUnit' }
 PP2FortranSrcGrammarTest >> testPuSubroutine [
 	self
 		parse: 'PUSubroutine ()
 	(1:7)-(302:9)
 	(Nothing, Nothing)
-	"stgbrk"
+	"subrtn"
 	(Just AList ()
 		(2:8)-(3:19)
 		[ExpValue ()
@@ -292,7 +292,7 @@ PP2FortranSrcGrammarTest >> testPuSubroutine [
 		rule: #puSubroutine
 ]
 
-{ #category : #tests }
+{ #category : #'tests-declaration' }
 PP2FortranSrcGrammarTest >> testSelector [
 
 	self
@@ -305,14 +305,14 @@ PP2FortranSrcGrammarTest >> testSelector [
 		rule: #selector
 ]
 
-{ #category : #tests }
+{ #category : #'tests-programUnit' }
 PP2FortranSrcGrammarTest >> testSrcSpan [
 	self
 		parse: '(1:7)-(302:9)'
 		rule: #srcSpan
 ]
 
-{ #category : #tests }
+{ #category : #'tests-statement' }
 PP2FortranSrcGrammarTest >> testStCommon [
 
 	self
@@ -324,21 +324,21 @@ PP2FortranSrcGrammarTest >> testStCommon [
 			(64:13)-(65:55)
 			(Just ExpValue ()
 			      (64:13)-(64:20)
-			      (ValVariable "ooocom"))
+			      (ValVariable "val1"))
 			(AList ()
 			       (64:21)-(65:55)
 			       [Declarator ()
 			       		   (64:21)-(64:23)
 						   (ExpValue ()
 						   (64:21)-(64:23)
-						   (ValVariable "oot"))
+						   (ValVariable "val2"))
 						   ScalarDecl
 						   Nothing
 						   Nothing])])'
 		rule: #statement
 ]
 
-{ #category : #tests }
+{ #category : #'tests-statement' }
 PP2FortranSrcGrammarTest >> testStDeclaration [
 	self
 		parse: 'StDeclaration ()
@@ -354,14 +354,14 @@ PP2FortranSrcGrammarTest >> testStDeclaration [
 			(62:15)-(62:18)
 			(ExpValue ()
 				(62:15)-(62:18)
-				(ValVariable "lstg"))
+				(ValVariable "var"))
 			ScalarDecl
 			Nothing
 			Nothing])'
 		rule: #stDeclaration
 ]
 
-{ #category : #tests }
+{ #category : #'tests-statement' }
 PP2FortranSrcGrammarTest >> testStImplicit [
 	"not a realistic input, but the content of the AList is ImpList which is already tested"
 
@@ -374,55 +374,28 @@ PP2FortranSrcGrammarTest >> testStImplicit [
 		rule: #statement
 ]
 
-{ #category : #tests }
-PP2FortranSrcGrammarTest >> testStringEmpty [
+{ #category : #'tests-token' }
+PP2FortranSrcGrammarTest >> testTkStringEmpty [
 	self
 		parse: '""'
 		rule: #tkString
 ]
 
-{ #category : #tests }
-PP2FortranSrcGrammarTest >> testStringSimple [
+{ #category : #'tests-token' }
+PP2FortranSrcGrammarTest >> testTkStringSimple [
 	self
 		parse: '"a simple string"'
 		rule: #tkString
 ]
 
-{ #category : #tests }
-PP2FortranSrcGrammarTest >> testStringWithDoubleQuote [
+{ #category : #'tests-token' }
+PP2FortranSrcGrammarTest >> testTkStringWithDoubleQuote [
 	self
 		parse: '"A \"string\" inside a string"'
 		rule: #tkString
 ]
 
-{ #category : #tests }
-PP2FortranSrcGrammarTest >> testSubRoutineArguments [
-
-	self
-		parse: '(Just AList ()
-	(2:8)-(3:19)
-	[])'
-		rule: #subroutineArguments
-]
-
-{ #category : #tests }
-PP2FortranSrcGrammarTest >> testSubroutineBody [
-	self
-		parse: '[BlComment ()
-	(4:1)-(4:19)
-	(Comment "     some comment  ")
-	]'
-		rule: #subroutineBody
-]
-
-{ #category : #tests }
-PP2FortranSrcGrammarTest >> testSubroutineBodyEmpty [
-	self
-		parse: '[]'
-		rule: #subroutineBody
-]
-
-{ #category : #tests }
+{ #category : #'tests-declaration' }
 PP2FortranSrcGrammarTest >> testTypeSpec [
 
 	self
@@ -460,22 +433,16 @@ PP2FortranSrcGrammarTest >> testTypeSpec [
 		rule: #typeSpec.
 ]
 
-{ #category : #tests }
+{ #category : #'tests-expression' }
 PP2FortranSrcGrammarTest >> testValInteger [
 	self
 		parse: 'ValInteger "42" Nothing'
 		rule: #value
 ]
 
-{ #category : #tests }
+{ #category : #'tests-expression' }
 PP2FortranSrcGrammarTest >> testValVariable [
 	self
 		parse: 'ValVariable "status"'
 		rule: #value
-]
-
-{ #category : #tests }
-PP2FortranSrcGrammarTest >> testValue [
-
-	self parse: 'ValVariable "status"' rule: #value
 ]

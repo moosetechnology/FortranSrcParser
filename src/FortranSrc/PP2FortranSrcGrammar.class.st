@@ -17,9 +17,6 @@ Class {
 		'puComment',
 		'srcSpan',
 		'prefixSuffix',
-		'subroutineArguments',
-		'subroutineBody',
-		'subPrograms',
 		'position',
 		'tkNothing',
 		'tkString',
@@ -79,7 +76,7 @@ PP2FortranSrcGrammar >> attribute [
 	  / (self prelude: 'AttrVolatile')
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> baseType [
 
 	^ (self token: 'TypeInteger')
@@ -95,19 +92,19 @@ PP2FortranSrcGrammar >> baseType [
   / (self token: 'TypeByte')
 ]
 
-{ #category : #'grammar-subroutine' }
+{ #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blComment [
 
 	^ (self prelude: 'BlComment') , comment
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blStatement [
 
 	^ (self prelude: 'BlStatement') , (self maybe: label) , (self parens: statement)
 ]
 
-{ #category : #'grammar-subroutine' }
+{ #category : #'grammar-block' }
 PP2FortranSrcGrammar >> block [
 	^ blStatement / "blForAll / blIf / blCase / blDo / blDoWhile / blAssociate / blInterface /" blComment
 ]
@@ -118,12 +115,12 @@ PP2FortranSrcGrammar >> comment [
 	^ self parens: (self token: 'Comment') , tkString
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> commonGroup [
 	^ (self prelude: 'CommonGroup') , (self maybe: expression) , (self justAList: declarator)
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> declarator [
 
 	^ (self prelude: 'Declarator') , (self parens: expression)
@@ -131,7 +128,7 @@ PP2FortranSrcGrammar >> declarator [
 	  , (self maybe: expression)
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> declaratorType [
 
 	^ (self token: 'ScalarDecl')
@@ -139,7 +136,7 @@ PP2FortranSrcGrammar >> declaratorType [
 	  (self parens: (self token: 'ArrayDecl') , (self justAList: dimensionDeclarator))
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> dimensionDeclarator [
 
 	^ (self prelude: 'DimensionDeclarator') , (self maybe: expression) , (self maybe: expression)
@@ -151,44 +148,44 @@ PP2FortranSrcGrammar >> emptyTuple [
 	^ self token: '()'
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expValue [
 
 	^ (self prelude: 'ExpValue') , (self parens: value)
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expression [
 	^ expValue "/ expBinary / expUnary / expSubscript / expDataRef / expFunctionalCall / expImpliedDo / expInitialisation / expReturnSpec"
 ]
 
-{ #category : #'grammar-subroutine' }
+{ #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> haskellList: aRule [
 
 	^ (self token: '[') , (aRule separatedBy: tkComma) optional
 	  , (self token: ']')
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> impCharacter [
 
 	^ (self prelude: 'ImpCharacter') , tkString
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> impElement [
 
 	^ impCharacter / impRange
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> impList [
 
 	^ (self prelude: 'ImpList') , (self parens: typeSpec) 
 	  , (self justAList: impElement)
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> impRange [
 
 	^ (self prelude: 'ImpRange') , tkString , tkString
@@ -200,11 +197,10 @@ PP2FortranSrcGrammar >> intent [
 	^ (self token: 'In') / (self token: 'Out') / (self token: 'InOut')
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> justAList: aRule [
-	"parses: (Just AList ...) and: (AList ...)"
-	^ self parens: (self token: 'Just') optional , (self token: 'AList')
-	  , emptyTuple , srcSpan , (self haskellList: aRule)
+	"(Just AList ...) | (AList ...)"
+	^ self parens: (self token: 'Just') optional , (self prelude: 'AList') , (self haskellList: aRule)
 ]
 
 { #category : #grammar }
@@ -212,7 +208,7 @@ PP2FortranSrcGrammar >> label [
 	^ tkNothing
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> maybe: aRule [
 	"Maybe  -> Nothing / (Just aRule)"
 	^ tkNothing / (self parens: (self token: 'Just') , aRule)
@@ -243,37 +239,37 @@ PP2FortranSrcGrammar >> miVersion [
 	^ (self token: 'miVersion') , (self token: '=') , tkIdentifier
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> parens: aRule [
 
 	^ (self token: '(') , aRule , (self token: ')')
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> position [
 
 	^ self parens: tkNumber , (self token: ':') , tkNumber
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> prefixSuffix [
 
 	^ self parens: tkNothing , tkComma , tkNothing
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> prelude: aString [
 
 	^ aString asPParser trim , emptyTuple , srcSpan
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> prelude: aString aList: aRule [
 
 	^ (self prelude: aString) , (self justAList: aRule)
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> programFile [
 
 	^ (self token: 'ProgramFile') , metaInfo , (self haskellList: programUnit)
@@ -313,24 +309,24 @@ PP2FortranSrcGrammar >> puModule [
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puSubroutine [
 
-	^ (self prelude:
-		  'PUSubroutine') , prefixSuffix , tkString , subroutineArguments
-		  , subroutineBody , subPrograms
+	^ (self prelude: 'PUSubroutine') , prefixSuffix , tkString ,
+		((self token: 'Nothing') / (self justAList: expression)) ,
+		(self haskellList: block) , (self maybe: programUnit)
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> selector [
 
 	^ (self prelude: 'Selector') , (self maybe: expression) , (self maybe: expression)
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> srcSpan [
 
 	^ position , (self token: '-') , position
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> stDeclaration [
 
 	^ (self prelude: 'StDeclaration') , (self parens: typeSpec)
@@ -342,7 +338,7 @@ PP2FortranSrcGrammar >> start [
 	^programFile
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> statement [
 
 	^ stDeclaration /
@@ -351,27 +347,11 @@ PP2FortranSrcGrammar >> statement [
 	(self prelude: 'StAllocatable' aList: declarator) /
 	" stAsynchronous / stPointer / stTarget / stValue / stVolatile / stData / stAutomatic / ststatic / stNamelist / stParameter / stExternal / stIntrinsic"
 	(self prelude: 'StCommon' aList: commonGroup) /
-	"stEquivalence / stFormat /"
+	(self prelude: 'StEquivalence' aList: (self justAList: expression)) /
+	" stFormat /"
 	(self prelude: 'StImplicit' aList: impList)
 	
 	" stEntry / stInclude / stDo / stDoWhile / stEnddo / stCycle / stExit / stIfLogical / stIfArithmetic / stSelectCase / stCase / stEndcase / stFunction / stExpressionAssign / stPointerAssign / stLabelAssign / stGotoUnconditional / stGotoAssigned / stGotoComputed / stCall / stReturn / stContinue / ststop / stPause / stRead / stRead2 / stWrite / stPrint / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum / stFormatBogus"
-]
-
-{ #category : #'grammar-subroutine' }
-PP2FortranSrcGrammar >> subPrograms [
-	^ tkNothing
-]
-
-{ #category : #'grammar-subroutine' }
-PP2FortranSrcGrammar >> subroutineArguments [
-
-	^ self justAList: expression
-]
-
-{ #category : #'grammar-subroutine' }
-PP2FortranSrcGrammar >> subroutineBody [
-
-	^ self haskellList: block
 ]
 
 { #category : #token }
@@ -407,25 +387,25 @@ PP2FortranSrcGrammar >> token: aString [
 	^  aString asPParser trim
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> typeSpec [
 
 	^ (self prelude: 'TypeSpec') , baseType , (self maybe: selector)
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> valInteger [
 
 	^ (self token: 'ValInteger') , tkString , tkNothing
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> valVariable [
 
 	^ (self token: 'ValVariable') , tkString
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> value [
 
 	^ valVariable / valInteger "/ valReal / valComplex / valString / valBoz / valHollerith /" "/ valIntrinsic / valLogical / valOperator / valAssignment / valType / valStar / valColon"
