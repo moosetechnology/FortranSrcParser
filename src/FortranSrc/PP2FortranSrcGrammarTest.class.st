@@ -463,6 +463,23 @@ PP2FortranSrcGrammarTest >> testStImplicit [
 		rule: #statement
 ]
 
+{ #category : #'tests-statement' }
+PP2FortranSrcGrammarTest >> testStReturn [
+
+	self
+		parse: 'StReturn () (301:7)-(301:12) Nothing'
+		rule: #statement.
+
+	"not sure the input is correct '(Just ExpValue ...)'"
+	self
+		parse: 'StReturn ()
+	(301:7)-(301:12)
+	(Just ExpValue ()
+		(300:44)-(300:46)
+		(ValVariable "var"))'
+		rule: #statement
+]
+
 { #category : #'tests-token' }
 PP2FortranSrcGrammarTest >> testTkStringEmpty [
 	self

@@ -415,17 +415,19 @@ PP2FortranSrcGrammar >> start [
 { #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> statement [
 
-	^ stDeclaration /
-	"stStructure / stIntent / stOptional / stPublic / stPrivate / stProtected / stSave / "
-	(self prelude: 'StDimension' aList: declarator) /
-	(self prelude: 'StAllocatable' aList: declarator) /
-	" stAsynchronous / stPointer / stTarget / stValue / stVolatile / stData / stAutomatic / ststatic / stNamelist / stParameter / stExternal / stIntrinsic"
-	(self prelude: 'StCommon' aList: commonGroup) /
-	(self prelude: 'StEquivalence' aList: (self aList: expression)) /
-	" stFormat /"
-	(self prelude: 'StImplicit' maybe: (self aList: impList))
+	^ stDeclaration
+	"/ stStructure / stIntent / stOptional / stPublic / stPrivate / stProtected / stSave"
+	/ (self prelude: 'StDimension' aList: declarator)
+	/ (self prelude: 'StAllocatable' aList: declarator)
+	"/ stAsynchronous / stPointer / stTarget / stValue / stVolatile / stData / stAutomatic / ststatic / stNamelist / stParameter / stExternal / stIntrinsic"
+	/ (self prelude: 'StCommon' aList: commonGroup)
+	/ (self prelude: 'StEquivalence' aList: (self aList: expression))
+	"/ stFormat"
+	/ (self prelude: 'StImplicit' maybe: (self aList: impList))
 	
-	" stEntry / stInclude / stDo / stDoWhile / stEnddo / stCycle / stExit / stIfLogical / stIfArithmetic / stSelectCase / stCase / stEndcase / stFunction / stExpressionAssign / stPointerAssign / stLabelAssign / stGotoUnconditional / stGotoAssigned / stGotoComputed / stCall / stReturn / stContinue / ststop / stPause / stRead / stRead2 / stWrite / stPrint / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum / stFormatBogus"
+	"/ stEntry / stInclude / stDo / stDoWhile / stEnddo / stCycle / stExit / stIfLogical / stIfArithmetic / stSelectCase / stCase / stEndcase / stFunction / stExpressionAssign / stPointerAssign / stLabelAssign / stGotoUnconditional / stGotoAssigned / stGotoComputed / stCall"
+	/ (self prelude: 'StReturn' maybe: expression)
+	" / stContinue / ststop / stPause / stRead / stRead2 / stWrite / stPrint / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum / stFormatBogus"
 ]
 
 { #category : #token }
