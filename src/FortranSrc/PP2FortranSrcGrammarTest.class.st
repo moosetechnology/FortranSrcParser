@@ -147,6 +147,19 @@ PP2FortranSrcGrammarTest >> testBlStatement [
 		rule: #blStatement
 ]
 
+{ #category : #'tests-block' }
+PP2FortranSrcGrammarTest >> testBlStatementContinue [
+	self
+		parse: 'BlStatement ()
+	(135:2)-(135:18)
+	(Just ExpValue ()
+		(135:2)-(135:4)
+		(ValInteger "100" Nothing))
+	(StContinue ()
+		(135:11)-(135:18))'
+		rule: #blStatement
+]
+
 { #category : #tests }
 PP2FortranSrcGrammarTest >> testComment [
 	self

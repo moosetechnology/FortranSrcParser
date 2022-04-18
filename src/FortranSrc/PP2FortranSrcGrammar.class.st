@@ -31,7 +31,6 @@ Class {
 		'blComment',
 		'comment',
 		'blStatement',
-		'label',
 		'statement',
 		'impList',
 		'typeSpec',
@@ -63,10 +62,16 @@ Class {
 		'blDo',
 		'doSpecification',
 		'expFunctionCall',
-		'blIf'
+		'blIf',
+		'lastPos'
 	],
 	#category : #FortranSrc
 }
+
+{ #category : #accessing }
+PP2FortranSrcGrammar class >> ignoredNames [
+	^super ignoredNames , #(lastPos)
+]
 
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> aList: aRule [
@@ -170,7 +175,7 @@ PP2FortranSrcGrammar >> blIf [
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blStatement [
 
-	^ (self prelude: 'BlStatement') , (self maybe: label) , (self parens: statement)
+	^ (self prelude: 'BlStatement') , (self maybe: expression) , (self parens: statement)
 ]
 
 { #category : #'grammar-block' }
@@ -183,7 +188,7 @@ PP2FortranSrcGrammar >> block [
 	/ blComment
 ]
 
-{ #category : #grammar }
+{ #category : #'grammar-block' }
 PP2FortranSrcGrammar >> comment [
 
 	^ self parens: (self token: 'Comment') , tkString
@@ -300,6 +305,12 @@ PP2FortranSrcGrammar >> index [
 	^ ixSingle / ixRange
 ]
 
+{ #category : #initialization }
+PP2FortranSrcGrammar >> initialize [
+	super initialize.
+	lastPos := {(0 @ 0) . (0 @ 0)}
+]
+
 { #category : #grammar }
 PP2FortranSrcGrammar >> intent [
 
@@ -321,9 +332,9 @@ PP2FortranSrcGrammar >> justAList: aRule [
 	^ self parens: (self token: 'Just') , (self aList: aRule)
 ]
 
-{ #category : #grammar }
-PP2FortranSrcGrammar >> label [
-	^ tkNothing
+{ #category : #accessing }
+PP2FortranSrcGrammar >> lastPos [
+	^lastPos 
 ]
 
 { #category : #'grammar-helper' }
@@ -370,7 +381,7 @@ PP2FortranSrcGrammar >> parens: aRule [
 	^ (self token: '(') , aRule , (self token: ')')
 ]
 
-{ #category : #'grammar-programUnit' }
+{ #category : #grammar }
 PP2FortranSrcGrammar >> position [
 
 	^ self parens: tkNumber , (self token: ':') , tkNumber
@@ -451,10 +462,19 @@ PP2FortranSrcGrammar >> selector [
 	^ (self prelude: 'Selector') , (self maybe: expression) , (self maybe: expression)
 ]
 
-{ #category : #'grammar-programUnit' }
+{ #category : #grammar }
 PP2FortranSrcGrammar >> srcSpan [
 
 	^ position , (self token: '-') , position
+		==> [ :nodes || line col|
+			line := nodes first second first asInteger.
+			col := nodes first second third asInteger.
+			(lastPos first x < line)
+			ifTrue: [ lastPos := { (line @ col) . nodes third second} ] 
+			ifFalse: [ ((lastPos first x = line) and: [lastPos first y < col])
+				ifTrue: [lastPos := { (line @ col) . nodes third second}] ].
+			nodes
+		]
 ]
 
 { #category : #'grammar-statement' }
@@ -497,7 +517,8 @@ PP2FortranSrcGrammar >> statement [
 	" / stPointerAssign / stLabelAssign / stGotoUnconditional / stGotoAssigned / stGotoComputed"
 	/ stCall
 	/ (self prelude: 'StReturn' maybe: expression)
-	" / stContinue / ststop / stPause / stRead / stRead2 / stWrite / stPrint / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum / stFormatBogus"
+	/ (self prelude: 'StContinue')
+	"/ ststop / stPause / stRead / stRead2 / stWrite / stPrint / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum / stFormatBogus"
 ]
 
 { #category : #token }
