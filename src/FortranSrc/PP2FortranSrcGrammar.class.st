@@ -27,7 +27,6 @@ Class {
 		'expression',
 		'expValue',
 		'value',
-		'valVariable',
 		'block',
 		'blComment',
 		'comment',
@@ -56,7 +55,11 @@ Class {
 		'expBinary',
 		'expUnary',
 		'unaryOp',
-		'binaryOp'
+		'binaryOp',
+		'stExpressionAssign',
+		'stCall',
+		'argument',
+		'argumentExpression'
 	],
 	#category : #FortranSrc
 }
@@ -71,6 +74,17 @@ PP2FortranSrcGrammar >> aList: aRule [
 PP2FortranSrcGrammar >> any [
 	^ #any asPParser token trim
 
+]
+
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> argument [
+	^ (self prelude: 'Argument') , (self maybe: tkString) , (self parens: argumentExpression)
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcGrammar >> argumentExpression [
+	^ ((self token: 'ArgExpr') , (self parens: expression))
+	/ ((self prelude: 'ArgExprVar') , tkString)
 ]
 
 { #category : #grammar }
@@ -207,10 +221,10 @@ PP2FortranSrcGrammar >> expValue [
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expression [
-	^ expValue /
-	expBinary / 
-	expUnary /
-	expSubscript "/ expDataRef / expFunctionalCall / expImpliedDo / expInitialisation / expReturnSpec"
+	^ expValue
+	/ expBinary
+	/ expUnary
+	/ expSubscript "/ expDataRef / expFunctionalCall / expImpliedDo / expInitialisation / expReturnSpec"
 ]
 
 { #category : #'grammar-helper' }
@@ -401,10 +415,20 @@ PP2FortranSrcGrammar >> srcSpan [
 ]
 
 { #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stCall [
+	^ ((self prelude: 'StCall') , (self parens: expression) , (self maybe: (self aList:  argument)))
+]
+
+{ #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> stDeclaration [
 
 	^ (self prelude: 'StDeclaration') , (self parens: typeSpec)
 	  , (self maybe: (self aList: attribute)) , (self parens: (self aList: declarator))
+]
+
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stExpressionAssign [
+	^ ((self prelude: 'StExpressionAssign') , (self parens: expression) , (self parens: expression))
 ]
 
 { #category : #accessing }
@@ -425,7 +449,10 @@ PP2FortranSrcGrammar >> statement [
 	"/ stFormat"
 	/ (self prelude: 'StImplicit' maybe: (self aList: impList))
 	
-	"/ stEntry / stInclude / stDo / stDoWhile / stEnddo / stCycle / stExit / stIfLogical / stIfArithmetic / stSelectCase / stCase / stEndcase / stFunction / stExpressionAssign / stPointerAssign / stLabelAssign / stGotoUnconditional / stGotoAssigned / stGotoComputed / stCall"
+	"/ stEntry / stInclude / stDo / stDoWhile / stEnddo / stCycle / stExit / stIfLogical / stIfArithmetic / stSelectCase / stCase / stEndcase / stFunction"
+	/ stExpressionAssign
+	" / stPointerAssign / stLabelAssign / stGotoUnconditional / stGotoAssigned / stGotoComputed"
+	/ stCall
 	/ (self prelude: 'StReturn' maybe: expression)
 	" / stContinue / ststop / stPause / stRead / stRead2 / stWrite / stPrint / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum / stFormatBogus"
 ]
@@ -484,13 +511,18 @@ PP2FortranSrcGrammar >> valInteger [
 ]
 
 { #category : #'grammar-expression' }
-PP2FortranSrcGrammar >> valVariable [
-
-	^ (self token: 'ValVariable') , tkString
-]
-
-{ #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> value [
 
-	^ valVariable / valInteger "/ valReal / valComplex / valString / valBoz / valHollerith /" "/ valIntrinsic / valLogical / valOperator / valAssignment / valType / valStar / valColon"
+	^ valInteger
+	"/ valReal / valComplex"
+	/ ((self token: 'ValString') , tkString)
+	"/ valBoz"
+	/ ((self token: 'ValHollerith') , tkString)
+	/ ((self token: 'ValVariable') , tkString)
+	/ ((self token: 'ValIntrinsic') , tkString)
+	"/ valLogical"
+	/ ((self token: 'ValOperator') , tkString)
+	"/ valAssignment"
+	/ ((self token: 'ValType') , tkString)
+	"/ valStar / valColon"
 ]

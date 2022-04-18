@@ -9,6 +9,27 @@ PP2FortranSrcGrammarTest >> parserClass [
 	^ PP2FortranSrcGrammar
 ]
 
+{ #category : #'tests-statement' }
+PP2FortranSrcGrammarTest >> testArgument [
+	self
+		parse: 'Argument ()
+	(98:22)-(98:22)
+	Nothing
+	(ArgExpr (ExpValue ()
+		(98:22)-(98:22)
+		(ValInteger "0" Nothing)))'
+		rule: #argument
+]
+
+{ #category : #'tests-expression' }
+PP2FortranSrcGrammarTest >> testArgumentExpression [
+	self
+		parse: 'ArgExpr (ExpValue ()
+	(98:22)-(98:22)
+	(ValInteger "0" Nothing))' 
+		rule: #argumentExpression
+]
+
 { #category : #tests }
 PP2FortranSrcGrammarTest >> testAttribute [
 
@@ -387,6 +408,25 @@ PP2FortranSrcGrammarTest >> testSrcSpan [
 ]
 
 { #category : #'tests-statement' }
+PP2FortranSrcGrammarTest >> testStCall [
+	self
+		parse: 'StCall ()
+	(98:7)-(98:54)
+	(ExpValue ()
+		(98:11)-(98:16)
+		(ValVariable "ooowin"))
+	(Just AList ()
+		(98:17)-(98:54)
+		[Argument ()
+			(98:18)-(98:20)
+			Nothing
+			(ArgExpr (ExpValue ()
+				(98:18)-(98:20)
+				(ValVariable "var1")))])'
+		rule: #stCall
+]
+
+{ #category : #'tests-statement' }
 PP2FortranSrcGrammarTest >> testStCommon [
 
 	self
@@ -448,6 +488,22 @@ PP2FortranSrcGrammarTest >> testStEquivalence [
 						    (72:18)-(72:46)
 						    []])'
 		rule: #statement
+]
+
+{ #category : #'tests-statement' }
+PP2FortranSrcGrammarTest >> testStExpressionAssign [
+
+	self
+		parse: 'StExpressionAssign ()
+	(95:7)-(95:14)
+	(ExpValue ()
+		(95:7)-(95:12)
+		(ValVariable "status"))
+	(ExpValue ()
+		(95:14)-(95:14)
+		(ValInteger "0" Nothing))'
+		rule: #statement.
+
 ]
 
 { #category : #'tests-statement' }
@@ -543,6 +599,13 @@ PP2FortranSrcGrammarTest >> testTypeSpec [
 PP2FortranSrcGrammarTest >> testValInteger [
 	self
 		parse: 'ValInteger "42" Nothing'
+		rule: #value
+]
+
+{ #category : #'tests-expression' }
+PP2FortranSrcGrammarTest >> testValString [
+	self
+		parse: 'ValString "a string"'
 		rule: #value
 ]
 
