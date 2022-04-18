@@ -59,7 +59,10 @@ Class {
 		'stExpressionAssign',
 		'stCall',
 		'argument',
-		'argumentExpression'
+		'argumentExpression',
+		'blDo',
+		'doSpecification',
+		'expFunctionCall'
 	],
 	#category : #FortranSrc
 }
@@ -149,6 +152,11 @@ PP2FortranSrcGrammar >> blComment [
 ]
 
 { #category : #'grammar-block' }
+PP2FortranSrcGrammar >> blDo [
+	^(self prelude: 'BlDo') , (self maybe: expression) , (self maybe: tkString) , (self maybe: expression) , (self maybe: doSpecification) , (self haskellList: block) , (self maybe: expression)
+]
+
+{ #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blStatement [
 
 	^ (self prelude: 'BlStatement') , (self maybe: label) , (self parens: statement)
@@ -156,7 +164,10 @@ PP2FortranSrcGrammar >> blStatement [
 
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> block [
-	^ blStatement / "blForAll / blIf / blCase / blDo / blDoWhile / blAssociate / blInterface /" blComment
+	^ blStatement "/ blForAll / blIf / blCase"
+	/ blDo
+	" / blDoWhile / blAssociate / blInterface"
+	/ blComment
 ]
 
 { #category : #grammar }
@@ -192,6 +203,11 @@ PP2FortranSrcGrammar >> dimensionDeclarator [
 	^ (self prelude: 'DimensionDeclarator') , (self maybe: expression) , (self maybe: expression)
 ]
 
+{ #category : #'grammar-block' }
+PP2FortranSrcGrammar >> doSpecification [
+	^ (self prelude: 'DoSpecification') , (self parens: statement) , (self parens: expression) , (self maybe: expression)
+]
+
 { #category : #grammar }
 PP2FortranSrcGrammar >> emptyTuple [
 
@@ -201,6 +217,11 @@ PP2FortranSrcGrammar >> emptyTuple [
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expBinary [
 	^ (self prelude: 'ExpBinary') , binaryOp , (self parens: expression) , (self parens: expression)
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcGrammar >> expFunctionCall [
+	^ (self prelude: 'ExpFunctionCall') , (self parens: expression) , (self maybe: (self aList: argument))
 ]
 
 { #category : #'grammar-expression' }
@@ -224,7 +245,9 @@ PP2FortranSrcGrammar >> expression [
 	^ expValue
 	/ expBinary
 	/ expUnary
-	/ expSubscript "/ expDataRef / expFunctionalCall / expImpliedDo / expInitialisation / expReturnSpec"
+	/ expSubscript "/ expDataRef"
+	/ expFunctionCall
+	"/ expImpliedDo / expInitialisation / expReturnSpec"
 ]
 
 { #category : #'grammar-helper' }

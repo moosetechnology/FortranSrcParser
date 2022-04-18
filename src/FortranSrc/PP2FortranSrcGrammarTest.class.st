@@ -62,6 +62,39 @@ PP2FortranSrcGrammarTest >> testBlComment [
 ]
 
 { #category : #'tests-block' }
+PP2FortranSrcGrammarTest >> testBlDo [
+	self
+		parse: 'BlDo ()
+	(116:7)-(288:11)
+	Nothing
+	Nothing
+	(Just ExpValue ()
+		(116:9)-(116:13)
+		(ValInteger "99999" Nothing))
+	(Just DoSpecification ()
+		(116:14)-(116:48)
+		(StExpressionAssign ()
+			(116:14)-(116:17)
+			(ExpValue ()
+				(116:14)-(116:15)
+				(ValVariable "var1"))
+			(ExpValue ()
+				(116:17)-(116:17)
+			(ValInteger "1" Nothing)))
+		(ExpValue ()
+			(116:19)-(116:24)
+			(ValVariable "var2"))
+		Nothing)
+		[BlComment ()
+			   (117:1)-(117:31)
+			   (Comment "do body")]
+		(Just ExpValue ()
+			(289:1)-(289:5)
+			(ValInteger "99999" Nothing))'
+		rule: #blDo
+]
+
+{ #category : #'tests-block' }
 PP2FortranSrcGrammarTest >> testBlStatement [
 	self
 		parse: 'BlStatement ()
@@ -162,6 +195,26 @@ PP2FortranSrcGrammarTest >> testDimensionDeclarator [
 		rule: #dimensionDeclarator
 ]
 
+{ #category : #'tests-block' }
+PP2FortranSrcGrammarTest >> testDoSpecification [
+	self
+		parse: 'DoSpecification ()
+	(116:14)-(116:48)
+	(StExpressionAssign ()
+		(116:14)-(116:17)
+		(ExpValue ()
+			(116:14)-(116:15)
+			(ValVariable "var1"))
+		(ExpValue ()
+			(116:17)-(116:17)
+		(ValInteger "1" Nothing)))
+	(ExpValue ()
+		(116:19)-(116:24)
+		(ValVariable "var2"))
+	Nothing'
+		rule: #doSpecification
+]
+
 { #category : #'tests-expression' }
 PP2FortranSrcGrammarTest >> testExpBinary [
 	self
@@ -175,6 +228,25 @@ PP2FortranSrcGrammarTest >> testExpBinary [
 		(157:52)-(157:52)
 		(ValInteger "4" Nothing))'
 		rule: #expBinary
+]
+
+{ #category : #'tests-expression' }
+PP2FortranSrcGrammarTest >> testExpFunctionCall [
+	self
+		parse: 'ExpFunctionCall ()
+	(118:10)-(118:47)
+	(ExpValue ()
+		(118:10)-(118:12)
+		(ValIntrinsic "abs"))
+	(Just AList ()
+		(118:14)-(118:46)
+		[Argument ()
+			(118:14)-(118:46)
+			Nothing
+			(ArgExpr (ExpValue ()
+				(118:14)-(118:19)
+				(ValVariable "var")))])'
+		rule: #expFunctionCall
 ]
 
 { #category : #'tests-expression' }
