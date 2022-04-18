@@ -436,6 +436,21 @@ PP2FortranSrcGrammarTest >> testStDeclaration [
 ]
 
 { #category : #'tests-statement' }
+PP2FortranSrcGrammarTest >> testStEquivalence [
+	"not a realistic input, but the content of [] is #expression, already tested"
+
+	self
+		parse: 'StEquivalence ()
+					 (72:7)-(72:46)
+					 (AList ()
+						(72:18)-(72:46)
+						[AList ()
+						    (72:18)-(72:46)
+						    []])'
+		rule: #statement
+]
+
+{ #category : #'tests-statement' }
 PP2FortranSrcGrammarTest >> testStImplicit [
 	"not a realistic input, but the content of the AList is ImpList which is already tested"
 

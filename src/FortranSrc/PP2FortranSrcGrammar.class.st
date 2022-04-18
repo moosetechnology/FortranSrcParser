@@ -61,6 +61,12 @@ Class {
 	#category : #FortranSrc
 }
 
+{ #category : #'grammar-helper' }
+PP2FortranSrcGrammar >> aList: aRule [
+
+	^ (self prelude: 'AList') , (self haskellList: aRule)
+]
+
 { #category : #token }
 PP2FortranSrcGrammar >> any [
 	^ #any asPParser token trim
@@ -147,7 +153,7 @@ PP2FortranSrcGrammar >> comment [
 
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> commonGroup [
-	^ (self prelude: 'CommonGroup') , (self maybe: expression) , (self justAList: declarator)
+	^ (self prelude: 'CommonGroup') , (self maybe: expression) , (self parens: (self aList: declarator))
 ]
 
 { #category : #'grammar-declaration' }
@@ -163,7 +169,7 @@ PP2FortranSrcGrammar >> declaratorType [
 
 	^ (self token: 'ScalarDecl')
 	  /
-	  (self parens: (self token: 'ArrayDecl') , (self justAList: dimensionDeclarator))
+	  (self parens: (self token: 'ArrayDecl') , (self parens: (self aList: dimensionDeclarator)))
 ]
 
 { #category : #'grammar-declaration' }
@@ -185,7 +191,7 @@ PP2FortranSrcGrammar >> expBinary [
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expSubscript [
-	^ (self prelude: 'ExpSubscript') , (self parens: expression) , (self justAList: index)
+	^ (self prelude: 'ExpSubscript') , (self parens: expression) , (self parens: (self aList: index))
 ]
 
 { #category : #'grammar-expression' }
@@ -230,7 +236,7 @@ PP2FortranSrcGrammar >> impElement [
 PP2FortranSrcGrammar >> impList [
 
 	^ (self prelude: 'ImpList') , (self parens: typeSpec) 
-	  , (self justAList: impElement)
+	  , (self parens: (self aList: impElement))
 ]
 
 { #category : #'grammar-declaration' }
@@ -262,8 +268,7 @@ PP2FortranSrcGrammar >> ixSingle [
 
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> justAList: aRule [
-	"(Just AList ...) | (AList ...)"
-	^ self parens: (self token: 'Just') optional , (self prelude: 'AList') , (self haskellList: aRule)
+	^ self parens: (self token: 'Just') , (self aList: aRule)
 ]
 
 { #category : #grammar }
@@ -329,7 +334,13 @@ PP2FortranSrcGrammar >> prelude: aString [
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> prelude: aString aList: aRule [
 
-	^ (self prelude: aString) , (self justAList: aRule)
+	^ (self prelude: aString) , (self parens: (self aList: aRule))
+]
+
+{ #category : #'grammar-helper' }
+PP2FortranSrcGrammar >> prelude: aString maybe: aRule [
+
+	^ (self prelude: aString) , (self maybe: aRule)
 ]
 
 { #category : #'grammar-programUnit' }
@@ -393,7 +404,7 @@ PP2FortranSrcGrammar >> srcSpan [
 PP2FortranSrcGrammar >> stDeclaration [
 
 	^ (self prelude: 'StDeclaration') , (self parens: typeSpec)
-	  , (self maybe: (self justAList: attribute)) , (self justAList: declarator)
+	  , (self maybe: (self aList: attribute)) , (self parens: (self aList: declarator))
 ]
 
 { #category : #accessing }
@@ -410,9 +421,9 @@ PP2FortranSrcGrammar >> statement [
 	(self prelude: 'StAllocatable' aList: declarator) /
 	" stAsynchronous / stPointer / stTarget / stValue / stVolatile / stData / stAutomatic / ststatic / stNamelist / stParameter / stExternal / stIntrinsic"
 	(self prelude: 'StCommon' aList: commonGroup) /
-	(self prelude: 'StEquivalence' aList: (self justAList: expression)) /
+	(self prelude: 'StEquivalence' aList: (self aList: expression)) /
 	" stFormat /"
-	(self prelude: 'StImplicit' aList: impList)
+	(self prelude: 'StImplicit' maybe: (self aList: impList))
 	
 	" stEntry / stInclude / stDo / stDoWhile / stEnddo / stCycle / stExit / stIfLogical / stIfArithmetic / stSelectCase / stCase / stEndcase / stFunction / stExpressionAssign / stPointerAssign / stLabelAssign / stGotoUnconditional / stGotoAssigned / stGotoComputed / stCall / stReturn / stContinue / ststop / stPause / stRead / stRead2 / stWrite / stPrint / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum / stFormatBogus"
 ]
