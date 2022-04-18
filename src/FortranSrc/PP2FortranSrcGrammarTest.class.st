@@ -95,6 +95,33 @@ PP2FortranSrcGrammarTest >> testBlDo [
 ]
 
 { #category : #'tests-block' }
+PP2FortranSrcGrammarTest >> testBlIf [
+	self
+		parse: 'BlIf ()
+	(126:9)-(283:13)
+	Nothing
+	Nothing
+	[Just ExpBinary ()
+		(126:12)-(126:19)
+		EQ
+		(ExpValue ()
+			(126:12)-(126:14)
+			(ValVariable "lxs"))
+		(ExpValue ()
+			(126:19)-(126:19)
+			(ValInteger "0" Nothing)),
+		Nothing]
+	[[BlComment ()
+		(127:1)-(127:44)
+		(Comment "	 then part")],
+	[BlComment ()
+		(130:1)-(130:50)
+		(Comment "	 else part")]]
+	Nothing'
+		rule: #blIf
+]
+
+{ #category : #'tests-block' }
 PP2FortranSrcGrammarTest >> testBlStatement [
 	self
 		parse: 'BlStatement ()

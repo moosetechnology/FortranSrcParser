@@ -62,7 +62,8 @@ Class {
 		'argumentExpression',
 		'blDo',
 		'doSpecification',
-		'expFunctionCall'
+		'expFunctionCall',
+		'blIf'
 	],
 	#category : #FortranSrc
 }
@@ -157,6 +158,16 @@ PP2FortranSrcGrammar >> blDo [
 ]
 
 { #category : #'grammar-block' }
+PP2FortranSrcGrammar >> blIf [
+	^ (self prelude: 'BlIf')
+	, (self maybe: expression)
+	, (self maybe: tkString)
+	, (self haskellList: (self maybeNoParens: expression))
+	, (self haskellList: (self haskellList: block))
+	, (self maybe: expression)
+]
+
+{ #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blStatement [
 
 	^ (self prelude: 'BlStatement') , (self maybe: label) , (self parens: statement)
@@ -164,7 +175,9 @@ PP2FortranSrcGrammar >> blStatement [
 
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> block [
-	^ blStatement "/ blForAll / blIf / blCase"
+	^ blStatement "/ blForAll"
+	/ blIf
+	"/ blCase"
 	/ blDo
 	" / blDoWhile / blAssociate / blInterface"
 	/ blComment
@@ -317,6 +330,13 @@ PP2FortranSrcGrammar >> label [
 PP2FortranSrcGrammar >> maybe: aRule [
 	"Maybe  -> Nothing / (Just aRule)"
 	^ tkNothing / (self parens: (self token: 'Just') , aRule)
+]
+
+{ #category : #'grammar-helper' }
+PP2FortranSrcGrammar >> maybeNoParens: aRule [
+	"a special #maybe: that does not put parentheses around 'Just aRule'
+	notably when it is in a haskell list"
+	^ tkNothing / ((self token: 'Just') , aRule)
 ]
 
 { #category : #'grammar-metaInfo' }
@@ -507,7 +527,7 @@ PP2FortranSrcGrammar >> tkString [
 	^ ($" asPParser , ('\"' asPParser / $" asPParser negate) star , $" asPParser) trim
 ]
 
-{ #category : #token }
+{ #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> token: aString [
 
 	^  aString asPParser trim
