@@ -63,7 +63,8 @@ Class {
 		'doSpecification',
 		'expFunctionCall',
 		'blIf',
-		'lastPos'
+		'lastPos',
+		'stIfLogical'
 	],
 	#category : #FortranSrc
 }
@@ -137,10 +138,10 @@ PP2FortranSrcGrammar >> binaryOp [
   / (self token: 'Division')
   / (self token: 'Exponentiation')
   / (self token: 'Concatenation')
-  / (self token: 'GT')
   / (self token: 'GTE')
-  / (self token: 'LT')
+  / (self token: 'GT')
   / (self token: 'LTE')
+  / (self token: 'LT')
   / (self token: 'EQ')
   / (self token: 'NE')
   / (self token: 'Or')
@@ -159,7 +160,13 @@ PP2FortranSrcGrammar >> blComment [
 
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blDo [
-	^(self prelude: 'BlDo') , (self maybe: expression) , (self maybe: tkString) , (self maybe: expression) , (self maybe: doSpecification) , (self haskellList: block) , (self maybe: expression)
+	^(self prelude: 'BlDo')
+	, (self maybe: expression)
+	, (self maybe: tkString)
+	, (self maybe: expression)
+	, (self maybe: doSpecification)
+	, (self haskellList: block)
+	, (self maybe: expression)
 ]
 
 { #category : #'grammar-block' }
@@ -175,7 +182,9 @@ PP2FortranSrcGrammar >> blIf [
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blStatement [
 
-	^ (self prelude: 'BlStatement') , (self maybe: expression) , (self parens: statement)
+	^ (self prelude: 'BlStatement')
+	, (self maybe: expression)
+	, (self parens: statement)
 ]
 
 { #category : #'grammar-block' }
@@ -223,10 +232,13 @@ PP2FortranSrcGrammar >> dimensionDeclarator [
 
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> doSpecification [
-	^ (self prelude: 'DoSpecification') , (self parens: statement) , (self parens: expression) , (self maybe: expression)
+	^ (self prelude: 'DoSpecification')
+	, (self parens: statement)
+	, (self parens: expression)
+	, (self maybe: expression)
 ]
 
-{ #category : #grammar }
+{ #category : #token }
 PP2FortranSrcGrammar >> emptyTuple [
 
 	^ self token: '()'
@@ -234,7 +246,10 @@ PP2FortranSrcGrammar >> emptyTuple [
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expBinary [
-	^ (self prelude: 'ExpBinary') , binaryOp , (self parens: expression) , (self parens: expression)
+	^ (self prelude: 'ExpBinary')
+	, binaryOp
+	, (self parens: expression)
+	, (self parens: expression)
 ]
 
 { #category : #'grammar-expression' }
@@ -494,6 +509,13 @@ PP2FortranSrcGrammar >> stExpressionAssign [
 	^ ((self prelude: 'StExpressionAssign') , (self parens: expression) , (self parens: expression))
 ]
 
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stIfLogical [
+	^ (self prelude: 'StIfLogical')
+	, (self parens: expression)
+	, (self parens: statement)
+]
+
 { #category : #accessing }
 PP2FortranSrcGrammar >> start [
 	^programFile
@@ -512,9 +534,13 @@ PP2FortranSrcGrammar >> statement [
 	"/ stFormat"
 	/ (self prelude: 'StImplicit' maybe: (self aList: impList))
 	
-	"/ stEntry / stInclude / stDo / stDoWhile / stEnddo / stCycle / stExit / stIfLogical / stIfArithmetic / stSelectCase / stCase / stEndcase / stFunction"
+	"/ stEntry / stInclude / stDo / stDoWhile / stEnddo / stCycle / stExit "
+	/ stIfLogical
+	" / stIfArithmetic / stSelectCase / stCase / stEndcase / stFunction"
 	/ stExpressionAssign
-	" / stPointerAssign / stLabelAssign / stGotoUnconditional / stGotoAssigned / stGotoComputed"
+	" / stPointerAssign / stLabelAssign"
+	/ ((self prelude: 'StGotoUnconditional'), (self parens: expression ))
+	" / stGotoAssigned / stGotoComputed"
 	/ stCall
 	/ (self prelude: 'StReturn' maybe: expression)
 	/ (self prelude: 'StContinue')

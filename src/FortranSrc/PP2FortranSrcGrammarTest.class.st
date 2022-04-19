@@ -271,6 +271,21 @@ PP2FortranSrcGrammarTest >> testExpBinary [
 ]
 
 { #category : #'tests-expression' }
+PP2FortranSrcGrammarTest >> testExpBinaryLTE [
+	self
+		parse: 'ExpBinary ()
+	(144:10)-(144:47)
+	LTE
+	(ExpValue ()
+		(144:10)-(144:10)
+		(ValVariable "i"))
+	(ExpValue ()
+		(144:16)-(144:21)
+		(ValVariable "oo_006"))'
+		rule: #expBinary
+]
+
+{ #category : #'tests-expression' }
 PP2FortranSrcGrammarTest >> testExpFunctionCall [
 	self
 		parse: 'ExpFunctionCall ()
@@ -616,6 +631,45 @@ PP2FortranSrcGrammarTest >> testStExpressionAssign [
 		(ValInteger "0" Nothing))'
 		rule: #statement.
 
+]
+
+{ #category : #'tests-statement' }
+PP2FortranSrcGrammarTest >> testStGotoUnconditional [
+
+	self
+		parse: 'StGotoUnconditional ()
+	(172:17)-(172:24)
+	(ExpValue ()
+		(172:22)-(172:24)
+		(ValInteger "120"
+			Nothing))'
+		rule: #statement
+]
+
+{ #category : #'tests-statement' }
+PP2FortranSrcGrammarTest >> testStIfLogical [
+
+	self
+		parse: 'StIfLogical ()
+	(163:19)-(163:40)
+	(ExpBinary ()
+		(163:22)-(163:31)
+		EQ
+		(ExpValue ()
+			(163:22)-(163:25)
+			(ValVariable "var"))
+		(ExpValue ()
+			(163:31)-(163:31)
+			(ValInteger "1" Nothing)))
+	(StExpressionAssign ()
+		(163:33)-(163:40)
+		(ExpValue ()
+			(163:33)-(163:36)
+			(ValVariable "var"))
+		(ExpValue ()
+			(163:38)-(163:40)
+			(ValVariable "var2")))'
+		rule: #statement
 ]
 
 { #category : #'tests-statement' }
