@@ -368,8 +368,10 @@ PP2FortranSrcGrammar >> maybeNoParens: aRule [
 { #category : #'grammar-metaInfo' }
 PP2FortranSrcGrammar >> metaInfo [
 
-	^ self parens: (self token: 'MetaInfo') , (self token: '{')
-	  , (miParameters delimitedBy: tkComma) , (self token: '}')
+	^ self parens: (self token: 'MetaInfo')
+	, (self token: '{')
+	, (miParameters delimitedBy: tkComma)
+	, (self token: '}')
 	  
 ]
 
