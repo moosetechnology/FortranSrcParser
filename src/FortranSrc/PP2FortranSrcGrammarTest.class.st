@@ -6,7 +6,7 @@ Class {
 
 { #category : #accessing }
 PP2FortranSrcGrammarTest >> parserClass [
-	^ PP2FortranSrcGrammar
+	^ PP2FortranSrcParser
 ]
 
 { #category : #'tests-statement' }
