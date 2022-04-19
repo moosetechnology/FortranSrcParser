@@ -2,7 +2,7 @@ Class {
 	#name : #FamixFortranProgramFile,
 	#superclass : #Object,
 	#instVars : [
-		'name',
+		'filename',
 		'body'
 	],
 	#category : #FortranSrc
@@ -21,13 +21,13 @@ FamixFortranProgramFile >> body: anObject [
 ]
 
 { #category : #accessing }
-FamixFortranProgramFile >> name [
+FamixFortranProgramFile >> filename [
 
-	^ name
+	^ filename
 ]
 
 { #category : #accessing }
-FamixFortranProgramFile >> name: anObject [
+FamixFortranProgramFile >> filename: anObject [
 
-	name := anObject
+	filename := anObject
 ]
