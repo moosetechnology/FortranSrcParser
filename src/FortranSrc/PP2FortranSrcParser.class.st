@@ -10,7 +10,7 @@ PP2FortranSrcParser >> argument [
 
 	^ super argument
 	==> [ :nodes |
-			1halt.
+			nodes
 		 ]
 ]
 
@@ -174,7 +174,7 @@ PP2FortranSrcParser >> stCall [
 
 	^ super stCall
 	==> [ :nodes |
-			1halt.
+			nodes
 		 ]
 ]
 
@@ -184,7 +184,7 @@ PP2FortranSrcParser >> stDeclaration [
 
 	^ super stDeclaration
 	==> [ :nodes |
-			1halt.
+			nodes
 		 ]
 ]
 
@@ -194,7 +194,7 @@ PP2FortranSrcParser >> stExpressionAssign [
 
 	^ super stExpressionAssign
 	==> [ :nodes |
-			1halt.
+			nodes
 		 ]
 ]
 
@@ -204,7 +204,7 @@ PP2FortranSrcParser >> stIfLogical [
 
 	^ super stIfLogical
 	==> [ :nodes |
-			1halt.
+			nodes
 		 ]
 ]
 
@@ -234,7 +234,7 @@ PP2FortranSrcParser >> statement [
 	
 	^ super statement
 	==> [ :nodes |
-			1halt.
+			nodes
 		 ]
 ]
 

@@ -1,12 +1,12 @@
 Class {
 	#name : #PP2FortranSrcGrammarTest,
 	#superclass : #PP2CompositeNodeTest,
-	#category : #FortranSrc
+	#category : #'FortranSrc-Tests'
 }
 
 { #category : #accessing }
 PP2FortranSrcGrammarTest >> parserClass [
-	^ PP2FortranSrcParser
+	^ PP2FortranSrcGrammar 
 ]
 
 { #category : #'tests-statement' }
