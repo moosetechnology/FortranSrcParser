@@ -66,7 +66,7 @@ Class {
 		'lastPos',
 		'stIfLogical'
 	],
-	#category : #FortranSrc
+	#category : #'FortranSrc-Parser'
 }
 
 { #category : #accessing }

@@ -8,7 +8,7 @@ Class {
 		'body',
 		'subProgram'
 	],
-	#category : #FortranSrc
+	#category : #'FortranSrc-Uncategorized'
 }
 
 { #category : #accessing }

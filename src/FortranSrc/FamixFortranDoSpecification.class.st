@@ -1,5 +1,5 @@
 Class {
 	#name : #FamixFortranDoSpecification,
 	#superclass : #Object,
-	#category : #FortranSrc
+	#category : #'FortranSrc-Uncategorized'
 }

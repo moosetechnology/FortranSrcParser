@@ -5,7 +5,7 @@ Class {
 		'positions',
 		'comments'
 	],
-	#category : #FortranSrc
+	#category : #'FortranSrc-Uncategorized'
 }
 
 { #category : #accessing }

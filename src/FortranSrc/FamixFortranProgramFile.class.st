@@ -5,7 +5,7 @@ Class {
 		'filename',
 		'body'
 	],
-	#category : #FortranSrc
+	#category : #'FortranSrc-Uncategorized'
 }
 
 { #category : #accessing }

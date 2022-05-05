@@ -6,7 +6,7 @@ Class {
 		'label',
 		'statements'
 	],
-	#category : #FortranSrc
+	#category : #'FortranSrc-Uncategorized'
 }
 
 { #category : #accessing }

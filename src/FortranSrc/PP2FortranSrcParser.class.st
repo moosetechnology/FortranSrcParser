@@ -1,7 +1,7 @@
 Class {
 	#name : #PP2FortranSrcParser,
 	#superclass : #PP2FortranSrcGrammar,
-	#category : #FortranSrc
+	#category : #'FortranSrc-Parser'
 }
 
 { #category : #'grammar-statement' }

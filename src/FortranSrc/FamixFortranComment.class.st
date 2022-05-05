@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'comment'
 	],
-	#category : #FortranSrc
+	#category : #'FortranSrc-Uncategorized'
 }
 
 { #category : #accessing }
