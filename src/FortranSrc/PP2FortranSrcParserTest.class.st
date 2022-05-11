@@ -87,6 +87,34 @@ PP2FortranSrcParserTest >> testPuSubroutine [
 ]
 
 { #category : #tests }
+PP2FortranSrcParserTest >> testPuSubroutineWithParameters [
+
+	self
+		parse: 'PUSubroutine ()
+	(1:7)-(302:9)
+	(Nothing, Nothing)
+	"stgbrk"
+	(Just AList ()
+		(2:8)-(3:19)
+		[ExpValue ()
+			(2:8)-(2:12)
+			(ValVariable "alist"),
+		ExpValue ()
+			(2:14)-(2:19)
+			(ValVariable "splist"),
+		ExpValue ()
+			(3:8)-(3:12)
+			(ValVariable "rlist"),
+		ExpValue ()
+			(3:14)-(3:19)
+			(ValVariable "status")])
+	[]
+	Nothing'
+		rule: #puSubroutine.
+	
+]
+
+{ #category : #tests }
 PP2FortranSrcParserTest >> testSubroutine [
 
 	self
