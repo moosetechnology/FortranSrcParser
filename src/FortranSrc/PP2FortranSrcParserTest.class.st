@@ -35,7 +35,7 @@ PP2FortranSrcParserTest >> testHaskellListNotEmpty [
 	self assert: list size equals: 3
 ]
 
-{ #category : #tests }
+{ #category : #'tests-programUnit' }
 PP2FortranSrcParserTest >> testProgramFileEmpty [
 
 	self
@@ -55,11 +55,11 @@ PP2FortranSrcParserTest >> testProgramFileEmpty [
 				value
 		equals: 'Fortran77'.
 
-	"self
+	self
 		assert:
 			(parser model allWithType: FamixFortranProgramFile) first filename
 				value
-		equals: 'emptyFile.f'."
+		equals: '"emptyFile.f"'.
 		
 	self assertEmpty:
 		(parser model allWithType: FamixFortranProgramFile) first
