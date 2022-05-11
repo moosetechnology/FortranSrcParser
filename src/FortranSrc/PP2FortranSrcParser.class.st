@@ -1,8 +1,18 @@
 Class {
 	#name : #PP2FortranSrcParser,
 	#superclass : #PP2FortranSrcGrammar,
+	#instVars : [
+		'stack',
+		'model'
+	],
 	#category : #'FortranSrc-Parser'
 }
+
+{ #category : #accessing }
+PP2FortranSrcParser class >> ignoredNames [
+
+	^ super ignoredNames , #( stack model )
+]
 
 { #category : #'grammar-statement' }
 PP2FortranSrcParser >> argument [
@@ -99,25 +109,31 @@ PP2FortranSrcParser >> doSpecification [
 		 ]
 ]
 
+{ #category : #initialization }
+PP2FortranSrcParser >> initialize [
+	super initialize.
+	
+	stack := Stack new.
+	model := FamixFortranModel new.
+]
+
 { #category : #'grammar-metaInfo' }
 PP2FortranSrcParser >> metaInfo [
+
 	"self parens: (self token: 'MetaInfo') , (self token: '{') , (miParameters delimitedBy: tkComma) , (self token: '}')
 	  "
-	^ super metaInfo 
-	==> [ :nodes |
-		String withAll: (nodes second third detect: [ :each | each isAssociation and: [ each key = 'miFilename' ] ])
-			value second
-	]
+
+	^ super metaInfo
+	  ==> [ :nodes | 
+	  (nodes second third select: [ :each | each isAssociation ]) asDictionary ]
 ]
 
 { #category : #'grammar-metaInfo' }
 PP2FortranSrcParser >> miFilename [
 
 	"(self token: 'miFilename') , (self token: '=') , tkString"
-	^ super miFilename 
-	==> [ :nodes |
-		nodes first -> nodes third
-	]
+
+	^ super miFilename ==> [ :nodes | nodes first -> nodes third ]
 ]
 
 { #category : #'grammar-metaInfo' }
@@ -139,33 +155,40 @@ PP2FortranSrcParser >> miVersion [
 	]
 ]
 
+{ #category : #accessing }
+PP2FortranSrcParser >> model [
+
+	^ model
+]
+
+{ #category : #accessing }
+PP2FortranSrcParser >> model: anObject [
+
+	model := anObject
+]
+
 { #category : #'grammar-programUnit' }
 PP2FortranSrcParser >> programFile [
 
 	"(self token: 'ProgramFile') , metaInfo , (self haskellList: programUnit)"
-	^ super programFile 
-	==> [ :nodes |
-		FamixFortranProgramFile new
-			filename: nodes second;
-			body: nodes third ;
-			yourself
-	]
+
+	^ super programFile ==> [ :nodes | 
+	  stack push: (FamixFortranProgramFile new
+				mooseModel: model;
+			   version: (nodes second at: 'miVersion' ifAbsent: [ '' ]);
+			   "filename: (nodes second at: 'miFilename' ifAbsent: [ '' ] );"
+				   yourself) ]
 ]
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcParser >> puSubroutine [
-   "(self prelude: 'PUSubroutine') , prefixSuffix , tkString , ((self token: 'Nothing') / (self justAList: expression)) , (self haskellList: block) , (self maybe: programUnit)"
-	
-	^ super puSubroutine
-	==> [ :nodes |
-			FamixFortranPUSubroutine new
-				position: nodes third;
-				name: (String withAll: nodes fifth second);
-				arguments: nodes sixth;
-				body: nodes seventh;
-				subProgram: nodes eighth;
-				yourself
-		 ] 
+
+	"(self prelude: 'PUSubroutine') , prefixSuffix , tkString , ((self token: 'Nothing') / (self justAList: expression)) , (self haskellList: block) , (self maybe: programUnit)"
+
+	^ super puSubroutine ==> [ :nodes | 
+	  stack push: (FamixFortranSubroutine new
+		  parent: stack top;
+		  yourself)]
 ]
 
 { #category : #'grammar-statement' }
@@ -206,6 +229,12 @@ PP2FortranSrcParser >> stIfLogical [
 	==> [ :nodes |
 			nodes
 		 ]
+]
+
+{ #category : #'accessing - tests' }
+PP2FortranSrcParser >> stack [
+
+	^ stack
 ]
 
 { #category : #'grammar-statement' }

@@ -64,7 +64,12 @@ Class {
 		'expFunctionCall',
 		'blIf',
 		'lastPos',
-		'stIfLogical'
+		'stIfLogical',
+		'forallHeader',
+		'blForAll',
+		'blCase',
+		'blDoWhile',
+		'blAssociate'
 	],
 	#category : #'FortranSrc-Parser'
 }
@@ -161,6 +166,26 @@ PP2FortranSrcGrammar >> binaryOp [
 ]
 
 { #category : #'grammar-block' }
+PP2FortranSrcGrammar >> blAssociate [
+
+	^ (self prelude: 'BlAssociate') , (self maybe: expression)
+	  , (self maybe: tkString) , (self maybe: expression)
+	  , (self justAList: (self justATuple: expression and: expression)) , (self haskellList: block)
+	  , (self maybe: expression)
+]
+
+{ #category : #'grammar-block' }
+PP2FortranSrcGrammar >> blCase [
+	^ (self prelude: 'BlCase')
+	, (self maybe: expression)
+	, (self maybe: tkString)
+	, (self parens: expression)
+	, (self maybe: (self parens: (self aList: index)))
+	, (self haskellList: (self haskellList: block))
+	, (self maybe: expression)
+]
+
+{ #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blComment [
 
 	^ (self prelude: 'BlComment')
@@ -174,6 +199,25 @@ PP2FortranSrcGrammar >> blDo [
 	, (self maybe: tkString)
 	, (self maybe: expression)
 	, (self maybe: doSpecification)
+	, (self haskellList: block)
+	, (self maybe: expression)
+]
+
+{ #category : #'grammar-block' }
+PP2FortranSrcGrammar >> blDoWhile [
+
+	^ (self prelude: 'BlDoWhile') , (self maybe: expression)
+	  , (self maybe: tkString) , (self maybe: expression)
+	  , (self parens: expression) , (self haskellList: block)
+	  , (self maybe: expression)
+]
+
+{ #category : #'grammar-block' }
+PP2FortranSrcGrammar >> blForAll [
+	^ (self prelude: 'BlForall')
+	, (self maybe: expression)
+	, (self maybe: tkString)
+	, (self parens: forallHeader)
 	, (self haskellList: block)
 	, (self maybe: expression)
 ]
@@ -198,12 +242,10 @@ PP2FortranSrcGrammar >> blStatement [
 
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> block [
-	^ blStatement "/ blForAll"
-	/ blIf
-	"/ blCase"
-	/ blDo
-	" / blDoWhile / blAssociate / blInterface"
-	/ blComment
+
+	^ blStatement / blIf / blDo / blComment / blForAll
+	/ blCase
+	/ blDoWhile / blAssociate "/ blInterface"
 ]
 
 { #category : #'grammar-block' }
@@ -305,6 +347,14 @@ PP2FortranSrcGrammar >> expression [
 	"/ expImpliedDo / expInitialisation / expReturnSpec"
 ]
 
+{ #category : #'grammar-block' }
+PP2FortranSrcGrammar >> forallHeader [
+
+	^ (self haskellList:
+		   tkString , (self parens: expression) , (self parens: expression) , (self maybe: expression))
+	  , (self maybe: expression)
+]
+
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> haskellList: aRule [
 
@@ -369,6 +419,13 @@ PP2FortranSrcGrammar >> justAList: aRule [
 	^ self parens: (self token: 'Just') , (self aList: aRule)
 ]
 
+{ #category : #'grammar-helper' }
+PP2FortranSrcGrammar >> justATuple: aRule1 and: aRule2 [
+
+	^ self parens:
+		  (self token: 'Just') , (self aList: aRule1) , (self aList: aRule2)
+]
+
 { #category : #accessing }
 PP2FortranSrcGrammar >> lastPos [
 	^lastPos 
@@ -400,7 +457,7 @@ PP2FortranSrcGrammar >> metaInfo [
 { #category : #'grammar-metaInfo' }
 PP2FortranSrcGrammar >> miFilename [
 
-	^ (self token: 'miFilename') , (self token: '=') , tkString
+	^ (self token: 'miFilename') , (self token: '=') , tkString token
 ]
 
 { #category : #'grammar-metaInfo' }
@@ -458,36 +515,48 @@ PP2FortranSrcGrammar >> programFile [
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> programUnit [
-	^ "puMain / puModule /" puSubroutine "/ puFunction / puBlockData" / puComment
+	^ puMain / puModule / puSubroutine / puFunction / puBlockData / puComment
 ]
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puBlockData [
-	^any
+	^ (self prelude: 'PUBlockData')
+	, (self maybe: tkString)
+	, (self haskellList: block)
 ]
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puComment [
 
-	^ (self prelude: 'PUComment') , comment
+	^ (self prelude: 'PUComment') ,  comment
 ]
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puFunction [
-	^ any
+	^ (self prelude: 'PUFunction')
+	, (self maybe: typeSpec)
+	, prefixSuffix
+	, tkString
+	, ((self token: 'Nothing') / (self justAList: expression))
+	, (self maybe: expression)
+	, (self haskellList: block)
+	, (self maybe: programUnit)
 ]
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puMain [
 	^ (self prelude: 'PUMain')
-	, tkString
+	, (self maybe: tkString)
 	, (self haskellList: block)
 	, (self maybe: programUnit)
 ]
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puModule [
-	^ any
+	^ (self prelude: 'PUModule')
+	, tkString
+	, (self haskellList: block)
+	, (self maybe: programUnit)
 ]
 
 { #category : #'grammar-programUnit' }
