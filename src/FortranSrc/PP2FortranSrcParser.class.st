@@ -196,7 +196,7 @@ PP2FortranSrcParser >> programFile [
 	  prog := FamixFortranProgramFile new
 		          mooseModel: model;
 		          version: (nodes second at: 'miVersion' ifAbsent: [ '' ]);
-		          "filename: (nodes second at: 'miFilename' ifAbsent: [ '' ] );"
+		          filename: (nodes second at: 'miFilename' ifAbsent: [ '' ] );
 			          yourself.
 			nodes third do: [ :progUnit | prog addProgramUnit: progUnit ] ]
 ]
