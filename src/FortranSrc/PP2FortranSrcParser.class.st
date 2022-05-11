@@ -109,6 +109,17 @@ PP2FortranSrcParser >> doSpecification [
 		 ]
 ]
 
+{ #category : #'grammar-helper' }
+PP2FortranSrcParser >> haskellList: aRule [
+
+	"(self token: '[') , (aRule separatedBy: tkComma) optional
+	  , (self token: ']')"
+
+	^ (super haskellList: aRule)
+	  ==> [ :nodes | 
+	  nodes second ifNil: [ #(  ) ] ifNotNil: [ nodes second select: [:node | node isArray ] thenCollect: [ :array | array second ]]]
+]
+
 { #category : #initialization }
 PP2FortranSrcParser >> initialize [
 	super initialize.
@@ -173,11 +184,13 @@ PP2FortranSrcParser >> programFile [
 	"(self token: 'ProgramFile') , metaInfo , (self haskellList: programUnit)"
 
 	^ super programFile ==> [ :nodes | 
-	  stack push: (FamixFortranProgramFile new
-				mooseModel: model;
-			   version: (nodes second at: 'miVersion' ifAbsent: [ '' ]);
-			   "filename: (nodes second at: 'miFilename' ifAbsent: [ '' ] );"
-				   yourself) ]
+	  | prog |
+	  prog := FamixFortranProgramFile new
+		          mooseModel: model;
+		          version: (nodes second at: 'miVersion' ifAbsent: [ '' ]);
+		          "filename: (nodes second at: 'miFilename' ifAbsent: [ '' ] );"
+			          yourself.
+			nodes third do: [ :progUnit | prog addProgramUnit: progUnit ] ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -187,8 +200,10 @@ PP2FortranSrcParser >> puSubroutine [
 
 	^ super puSubroutine ==> [ :nodes | 
 	  stack push: (FamixFortranSubroutine new
-		  parent: stack top;
-		  yourself)]
+			   mooseModel: model;
+			   name: nodes third value;
+			   container: stack top;
+			   yourself) ]
 ]
 
 { #category : #'grammar-statement' }
@@ -265,11 +280,4 @@ PP2FortranSrcParser >> statement [
 	==> [ :nodes |
 			nodes
 		 ]
-]
-
-{ #category : #token }
-PP2FortranSrcParser >> tkStringTmp [
-	self flag: #FIXME. "Erreur de parsing"
-	^ super tkString
-	==> [ :nodes | String withAll: nodes second ]
 ]

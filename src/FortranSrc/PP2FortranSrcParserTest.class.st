@@ -10,6 +10,22 @@ PP2FortranSrcParserTest >> parserClass [
 ]
 
 { #category : #tests }
+PP2FortranSrcParserTest >> testHaskellList [
+
+	| list |
+	list := self parse: '[]' rule: #haskellListOfString.
+	self assertEmpty: list.
+]
+
+{ #category : #tests }
+PP2FortranSrcParserTest >> testHaskellListNotEmpty [
+
+	| list |
+	list := self parse: '["aa", "bb", "cc"]' rule: #haskellListOfString.
+	self assert: list size equals: 3
+]
+
+{ #category : #tests }
 PP2FortranSrcParserTest >> testProgramFileEmpty [
 
 	self
@@ -28,10 +44,14 @@ PP2FortranSrcParserTest >> testProgramFileEmpty [
 			(parser model allWithType: FamixFortranProgramFile) first version
 				value
 		equals: 'Fortran77'.
-		
+
 	"self
 		assert:
 			(parser model allWithType: FamixFortranProgramFile) first filename
 				value
 		equals: 'emptyFile.f'."
+		
+	self assertEmpty:
+		(parser model allWithType: FamixFortranProgramFile) first
+			programUnits
 ]

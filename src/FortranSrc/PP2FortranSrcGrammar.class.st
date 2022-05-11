@@ -69,7 +69,8 @@ Class {
 		'blForAll',
 		'blCase',
 		'blDoWhile',
-		'blAssociate'
+		'blAssociate',
+		'haskellListOfString'
 	],
 	#category : #'FortranSrc-Parser'
 }
@@ -362,6 +363,14 @@ PP2FortranSrcGrammar >> haskellList: aRule [
 	  , (self token: ']')
 ]
 
+{ #category : #'grammar-tests' }
+PP2FortranSrcGrammar >> haskellListOfString [
+
+	"rule to test method #haskellList:"
+
+	^ self haskellList: tkString
+]
+
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> impCharacter [
 
@@ -561,12 +570,10 @@ PP2FortranSrcGrammar >> puModule [
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puSubroutine [
-	^ (self prelude: 'PUSubroutine')
-	, prefixSuffix
-	, tkString
-	, ((self token: 'Nothing') / (self justAList: expression))
-	, (self haskellList: block)
-	, (self maybe: programUnit)
+
+	^ (self prelude: 'PUSubroutine') , prefixSuffix , tkString token
+	  , ((self token: 'Nothing') / (self justAList: expression))
+	  , (self haskellList: block) , (self maybe: programUnit)
 ]
 
 { #category : #'grammar-declaration' }
@@ -676,7 +683,9 @@ PP2FortranSrcGrammar >> tkNumber [
 
 { #category : #token }
 PP2FortranSrcGrammar >> tkString [
-	^ ($" asPParser , ('\"' asPParser / $" asPParser negate) star , $" asPParser) trim
+
+	^ ($" asPParser , ('\"' asPParser / $" asPParser negate) star token
+	   , $" asPParser) trim
 ]
 
 { #category : #'grammar-helper' }
