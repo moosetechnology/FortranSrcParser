@@ -109,6 +109,14 @@ PP2FortranSrcParser >> doSpecification [
 		 ]
 ]
 
+{ #category : #'grammar-programUnit' }
+PP2FortranSrcParser >> expression [
+	"expValue / expBinary / expUnary / expSubscript / expFunctionCall / expDataRef
+	/ expImpliedDo / expInitialisation / expReturnSpec"
+	
+	^ super expression ==> [ :nodes | 1halt. ]
+]
+
 { #category : #'grammar-helper' }
 PP2FortranSrcParser >> haskellList: aRule [
 
@@ -196,14 +204,17 @@ PP2FortranSrcParser >> programFile [
 { #category : #'grammar-programUnit' }
 PP2FortranSrcParser >> puSubroutine [
 
+	"#prelude: return 3 nodes."
+
 	"(self prelude: 'PUSubroutine') , prefixSuffix , tkString , ((self token: 'Nothing') / (self justAList: expression)) , (self haskellList: block) , (self maybe: programUnit)"
 
 	^ super puSubroutine ==> [ :nodes | 
-	  stack push: (FamixFortranSubroutine new
-			   mooseModel: model;
-			   name: nodes third value;
-			   container: stack top;
-			   yourself) ]
+	  | subroutine |
+	  subroutine := FamixFortranSubroutine new
+		                mooseModel: model;
+		                name: nodes fifth value;
+		                yourself.
+	  nodes sixth isToken ifFalse: [ 1 halt ] ]
 ]
 
 { #category : #'grammar-statement' }
