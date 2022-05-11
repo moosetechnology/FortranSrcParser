@@ -109,7 +109,7 @@ PP2FortranSrcParser >> doSpecification [
 		 ]
 ]
 
-{ #category : #'grammar-programUnit' }
+{ #category : #'grammar-expression' }
 PP2FortranSrcParser >> expression [
 	"expValue / expBinary / expUnary / expSubscript / expFunctionCall / expDataRef
 	/ expImpliedDo / expInitialisation / expReturnSpec"
