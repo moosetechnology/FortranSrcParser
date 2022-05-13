@@ -61,16 +61,6 @@ PP2FortranSrcParserTest >> testExpValueVariable [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testFunction [
-
-	| ast |
-	ast := self 
-		parse: ''
-		rule: #puFunction.
-	1halt.
-]
-
-{ #category : #tests }
 PP2FortranSrcParserTest >> testHaskellList [
 
 	| list |

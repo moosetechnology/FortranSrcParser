@@ -204,7 +204,7 @@ PP2FortranSrcParser >> puSubroutine [
 		                mooseModel: model;
 		                name: nodes fifth value trim;
 		                yourself.
-	  1 halt.
+
 	  nodes sixth = 'Nothing' ifFalse: [ 
 		  nodes sixth second do: [ :node | 
 			  | parameter |
