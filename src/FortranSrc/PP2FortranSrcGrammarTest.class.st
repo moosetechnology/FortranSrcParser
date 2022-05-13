@@ -144,7 +144,8 @@ PP2FortranSrcGrammarTest >> testBlStatement [
 				ScalarDecl
 				Nothing
 				Nothing]))'
-		rule: #blStatement
+		rule: #blStatement.
+
 ]
 
 { #category : #'tests-block' }
@@ -164,7 +165,8 @@ PP2FortranSrcGrammarTest >> testBlStatementContinue [
 PP2FortranSrcGrammarTest >> testComment [
 	self
 		parse: '(Comment "     some comment  ")'
-		rule: #comment
+		rule: #comment.
+
 ]
 
 { #category : #'tests-declaration' }
@@ -332,7 +334,8 @@ PP2FortranSrcGrammarTest >> testExpUnary [
 	(ExpValue ()
 		(99:15)-(99:18)
 		(ValInteger "0002" Nothing))'
-		rule: #expUnary
+		rule: #expUnary.
+
 ]
 
 { #category : #'tests-expression' }
@@ -341,7 +344,8 @@ PP2FortranSrcGrammarTest >> testExpValue [
 		parse: 'ExpValue ()
 	(3:14)-(3:19)
 	(ValVariable "status")'
-		rule: #expValue
+		rule: #expValue.
+
 ]
 
 { #category : #'tests-declaration' }

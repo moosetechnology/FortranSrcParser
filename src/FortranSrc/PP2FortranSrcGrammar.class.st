@@ -252,8 +252,7 @@ PP2FortranSrcGrammar >> block [
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> comment [
 
-	^ self parens: (self token: 'Comment')
-	, tkString
+	^ self parens: (self token: 'Comment') , tkString
 ]
 
 { #category : #'grammar-declaration' }
@@ -466,7 +465,7 @@ PP2FortranSrcGrammar >> metaInfo [
 { #category : #'grammar-metaInfo' }
 PP2FortranSrcGrammar >> miFilename [
 
-	^ (self token: 'miFilename') , (self token: '=') , tkString token
+	^ (self token: 'miFilename') , (self token: '=') , tkString
 ]
 
 { #category : #'grammar-metaInfo' }
@@ -684,14 +683,15 @@ PP2FortranSrcGrammar >> tkNumber [
 { #category : #token }
 PP2FortranSrcGrammar >> tkString [
 
-	^ ($" asPParser , ('\"' asPParser / $" asPParser negate) star token
-	   , $" asPParser) trim
+	^ $" asPParser
+	  , ('\"' asPParser / $" asPParser negate) star flatten
+	  , $" asPParser
 ]
 
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> token: aString [
 
-	^  aString asPParser trim
+	^  aString asPParser flatten trim
 ]
 
 { #category : #'grammar-declaration' }
@@ -718,15 +718,15 @@ PP2FortranSrcGrammar >> valInteger [
 PP2FortranSrcGrammar >> value [
 
 	^ valInteger
+	  / ((self token: 'ValString') , tkString)
+	  / ((self token: 'ValHollerith') , tkString)
+	  / ((self token: 'ValVariable') , tkString)
+	  / ((self token: 'ValIntrinsic') , tkString)
+	  / ((self token: 'ValOperator') , tkString)
+	  / ((self token: 'ValType') , tkString)
 	"/ valReal / valComplex"
-	/ ((self token: 'ValString') , tkString)
 	"/ valBoz"
-	/ ((self token: 'ValHollerith') , tkString)
-	/ ((self token: 'ValVariable') , tkString)
-	/ ((self token: 'ValIntrinsic') , tkString)
 	"/ valLogical"
-	/ ((self token: 'ValOperator') , tkString)
 	"/ valAssignment"
-	/ ((self token: 'ValType') , tkString)
 	"/ valStar / valColon"
 ]

@@ -10,13 +10,64 @@ PP2FortranSrcParserTest >> parserClass [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testExpValue [
+PP2FortranSrcParserTest >> testBlComment [
+	| ast |
+	ast := self
+		parse: 'BlComment ()
+	(4:1)-(4:19)
+	(Comment "     some comment  ")'
+		rule: #blComment.
 
-	self
-		parse: 'ExpValue ()
+	self 
+		assert: ast second second value equals: '     some comment  '
+]
+
+{ #category : #tests }
+PP2FortranSrcParserTest >> testComment [
+
+	| ast |
+	ast := self parse: '(Comment "some comment")' rule: #comment.
+
+	self assert: ast first value equals: 'Comment'.
+	self assert: ast second value equals: 'some comment'
+]
+
+{ #category : #tests }
+PP2FortranSrcParserTest >> testExpValueString [
+
+	| ast |
+	ast := self
+		       parse: 'ExpValue ()
+	(3:14)-(3:19)
+	(ValString "a string")'
+		       rule: #expValue.
+
+	self assert: ast second equals: 'ValString'.
+	self assert: ast third equals: 'a string'
+]
+
+{ #category : #tests }
+PP2FortranSrcParserTest >> testExpValueVariable [
+
+	| ast |
+	ast := self
+		       parse: 'ExpValue ()
 	(3:14)-(3:19)
 	(ValVariable "status")'
-		rule: #expValue.
+		       rule: #expValue.
+
+	self assert: ast second equals: 'ValVariable'.
+	self assert: ast third equals: 'status'
+]
+
+{ #category : #tests }
+PP2FortranSrcParserTest >> testFunction [
+
+	| ast |
+	ast := self 
+		parse: ''
+		rule: #puFunction.
+	1halt.
 ]
 
 { #category : #tests }
@@ -32,13 +83,17 @@ PP2FortranSrcParserTest >> testHaskellListNotEmpty [
 
 	| list |
 	list := self parse: '["aa", "bb", "cc"]' rule: #haskellListOfString.
-	self assert: list size equals: 3
+	self assert: list size equals: 3.
+	self assert: list first equals: 'aa'.
+	self assert: list second  equals: 'bb'.
+	self assert: list third equals: 'cc'
 ]
 
 { #category : #'tests-programUnit' }
 PP2FortranSrcParserTest >> testProgramFileEmpty [
 
-	self
+	| ast |
+	ast := self
 		parse: 'ProgramFile (MetaInfo
 	{miVersion = Fortran77,
 	miFilename = "emptyFile.f"})
@@ -57,20 +112,20 @@ PP2FortranSrcParserTest >> testProgramFileEmpty [
 
 	self
 		assert:
-			(parser model allWithType: FamixFortranProgramFile) first filename
+			(parser model allWithType: FamixFortranProgramFile) first filename second
 				value
-		equals: '"emptyFile.f"'.
+		equals: 'emptyFile.f'.
 		
 	self assertEmpty:
 		(parser model allWithType: FamixFortranProgramFile) first
 			programUnits
 ]
 
-{ #category : #tests }
+{ #category : #'tests-programUnit' }
 PP2FortranSrcParserTest >> testPuSubroutine [
 
-	self
-		parse: 'PUSubroutine ()
+	| ast |
+	ast := self parse: 'PUSubroutine ()
 	(1:7)-(302:9)
 	(Nothing, Nothing)
 	"subrtn"
@@ -79,11 +134,78 @@ PP2FortranSrcParserTest >> testPuSubroutine [
 		[ExpValue ()
 			(3:14)-(3:19)
 			(ValVariable "status")])
+		[]
+	Nothing'
+		rule: #puSubroutine.
+
+	self
+		assert:
+			(parser model allWithType: FamixFortranSubroutine) first name value
+		equals: '"subrtn"'.
+
+	self assert:
+		(parser model allWithType: FamixFortranSubroutine) first parameters size equals: 1.
+
+"	self assertCollection: ((parser model allWithType: FamixFortranSubroutine) first
+			parameters collect: [ :param | param name ]) hasSameElements: #(status)."
+
+	self assertEmpty:
+		(parser model allWithType: FamixFortranSubroutine) first
+			programUnits
+]
+
+{ #category : #'tests-programUnit' }
+PP2FortranSrcParserTest >> testPuSubroutineWithComment [
+
+	| ast |
+	ast := self parse: 'PUSubroutine ()
+	(49:7)-(144:9)
+	(Nothing, Nothing)
+	"test01"
+	Nothing
+	[BlComment ()
+		(4:1)-(4:19)
+		(Comment "     some comment  ")]
+	Nothing'
+		rule: #puSubroutine.
+
+	self
+		assert:
+			(parser model allWithType: FamixFortranSubroutine) first name value
+		equals: '"test01"'.
+
+	self assertEmpty:
+		(parser model allWithType: FamixFortranSubroutine) first parameters.
+
+	self assertEmpty:
+		(parser model allWithType: FamixFortranSubroutine) first
+			programUnits
+]
+
+{ #category : #'tests-programUnit' }
+PP2FortranSrcParserTest >> testPuSubroutineWithNoParameter [
+
+	| ast |
+	ast := self parse: 'PUSubroutine ()
+	(49:7)-(144:9)
+	(Nothing, Nothing)
+	"test01"
+	Nothing
 	[]
 	Nothing'
 		rule: #puSubroutine.
-	
-	
+
+	self
+		assert:
+			(parser model allWithType: FamixFortranSubroutine) first name value
+		equals: '"test01"'.
+
+	self assertEmpty:
+		(parser model allWithType: FamixFortranSubroutine) first parameters.
+
+	self assertEmpty:
+		(parser model allWithType: FamixFortranSubroutine) first
+			programUnits
 ]
 
 { #category : #tests }
@@ -111,5 +233,38 @@ PP2FortranSrcParserTest >> testPuSubroutineWithParameters [
 	[]
 	Nothing'
 		rule: #puSubroutine.
+
+	self
+		assert:
+			(parser model allWithType: FamixFortranSubroutine) first name
+				value
+		equals: '"stgbrk"'.
 	
+	self assert:
+		(parser model allWithType: FamixFortranSubroutine) first
+			parameters size equals: 4.
+
+"	self assertCollection: ((parser model allWithType: FamixFortranSubroutine) first
+			parameters collect: [ :param | param name ]) hasSameElements: #(alist splist rlist status)."
+
+	self assertEmpty:
+		(parser model allWithType: FamixFortranSubroutine) first
+			programUnits
+	
+]
+
+{ #category : #'tests-programUnit' }
+PP2FortranSrcParserTest >> testSrcSpan [
+	| ast |
+	ast := self
+		parse: '(1:7)-(302:9)'
+		rule: #srcSpan.
+	
+	self assertCollection: ast hasSameElements: {1@7 . 302@9}.
+
+	ast := self
+		parse: '(2:8)-(3:19)'
+		rule: #srcSpan.
+	
+	self assertCollection: ast hasSameElements: {2@8 . 3@19}
 ]

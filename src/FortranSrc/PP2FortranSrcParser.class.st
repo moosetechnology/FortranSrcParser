@@ -14,6 +14,40 @@ PP2FortranSrcParser class >> ignoredNames [
 	^ super ignoredNames , #( stack model )
 ]
 
+{ #category : #'as yet unclassified' }
+PP2FortranSrcParser class >> pp2FortranSrcDebug [
+	| methodsLink |
+	<script>
+
+	Transcript open.
+
+	methodsLink := MetaLink new. "A first example of a Metalink.
+Here, we want the class, the name of the method and the arguments it takes"
+	methodsLink metaObject: [ :receiver :selector :args | receiver trace.
+        ' ' trace.
+        selector trace.
+        ' ' trace.
+        args traceCr ].
+	methodsLink selector: #value:value:value:. "i can just use context instead of receiver and selector"
+	methodsLink arguments: #( receiver selector arguments ).
+	methodsLink control: #before. "We install the metalink on every method of a collection of classes we give"
+	^ (({ 
+		    PP2FortranSrcGrammar.
+		    PP2FortranSrcParser } collect: #methods) flattened collect: #ast) 
+		  do: [ :node | node link: methodsLink ]
+]
+
+{ #category : #'grammar-helper' }
+PP2FortranSrcParser >> aList: aRule [
+
+	"(self prelude: 'AList') , (self haskellList: aRule)"
+
+	^ (super aList: aRule) ==> [ :nodes |
+	  { 
+		  nodes third.
+		  nodes fourth } ]
+]
+
 { #category : #'grammar-statement' }
 PP2FortranSrcParser >> argument [
 	"(self prelude: 'Argument') , (self maybe: tkString) , (self parens: argumentExpression)"
@@ -27,94 +61,33 @@ PP2FortranSrcParser >> argument [
 { #category : #'grammar-block' }
 PP2FortranSrcParser >> blComment [
 
-	"(self prelude: 'BlComment') , comment"
-	
-	^ super blComment
-	==> [ :nodes |
-			FamixFortranBlComment new
-				positions: nodes third;
-				comments: nodes fourth;
-				yourself
-		 ]
-]
+	" (self prelude: 'BlComment')
+	, comment"
 
-{ #category : #'grammar-block' }
-PP2FortranSrcParser >> blDo [
-	"(self prelude: 'BlDo') , (self maybe: expression) , (self maybe: tkString) , (self maybe: expression) , (self maybe: doSpecification) , (self haskellList: block) , (self maybe: expression)"
-	
-	^ super blDo
-	==> [ :nodes |
-			FamixFortranBlDo new
-				yourself
-		 ]
-]
-
-{ #category : #'grammar-block' }
-PP2FortranSrcParser >> blIf [
-	" (self prelude: 'BlIf') , (self maybe: expression) , (self maybe: tkString) , (self haskellList: (self maybeNoParens: expression))	, (self haskellList: (self haskellList: block)) , (self maybe: expression)"
-
-	^ super blIf
-	==> [ :nodes |
-			FamixFortranBlIf new
-				yourself
-		 ]
-]
-
-{ #category : #'grammar-block' }
-PP2FortranSrcParser >> blStatement [
-
-	"(self prelude: 'BlStatement') , (self maybe: expression) , (self parens: statement)"
-	
-	^ super blStatement
-	==> [ :nodes |
-			FamixFortranBlStatement new
-				positions: nodes third;
-				label: nodes fourth;
-				statements: nodes fifth;
-				yourself 
-		 ]
-]
-
-{ #category : #'grammar-block' }
-PP2FortranSrcParser >> block1 [
-	"blStatement ""/ blForAll"" / blIf ""/ blCase"" / blDo "" / blDoWhile / blAssociate / blInterface"" / blComment"
-
-	^ super block
-	==> [ :nodes |
-			FamixFortranBlock new
-				yourself
-		 ]
+	^ super blComment ==> [ :nodes | {nodes third . nodes fourth} ]
 ]
 
 { #category : #'grammar-block' }
 PP2FortranSrcParser >> comment [
+
 	"self parens: (self token: 'Comment') , tkString"
-	^ super comment
-	==> [ :nodes |
-			FamixFortranComment new
-				comment: (nodes second second second joinUsing: '')
-				yourself
-		 ]
+
+	^ super comment ==> [ :nodes |
+	  { 
+		  nodes second first value.
+		  nodes second second second value } ]
 ]
 
-{ #category : #'grammar-block' }
-PP2FortranSrcParser >> doSpecification [
-	"(self prelude: 'DoSpecification') , (self parens: statement) , (self parens: expression) , (self maybe: expression)"
+{ #category : #accessing }
+PP2FortranSrcParser >> expValue [
 
-	^ super doSpecification
-	==> [ :nodes|
-			FamixFortranDoSpecification new
-				yourself
-				
-		 ]
-]
+	"(self prelude: 'ExpValue') , (self parens: value)"
 
-{ #category : #'grammar-expression' }
-PP2FortranSrcParser >> expression [
-	"expValue / expBinary / expUnary / expSubscript / expFunctionCall / expDataRef
-	/ expImpliedDo / expInitialisation / expReturnSpec"
-	
-	^ super expression ==> [ :nodes | 1halt. ]
+	^ super expValue ==> [ :nodes |
+	  { 
+		  nodes third.
+		  nodes fourth second first.
+		  nodes fourth second second second } ]
 ]
 
 { #category : #'grammar-helper' }
@@ -123,17 +96,29 @@ PP2FortranSrcParser >> haskellList: aRule [
 	"(self token: '[') , (aRule separatedBy: tkComma) optional
 	  , (self token: ']')"
 
-	^ (super haskellList: aRule)
-	  ==> [ :nodes | 
-	  nodes second ifNil: [ #(  ) ] ifNotNil: [ nodes second select: [:node | node isArray ] thenCollect: [ :array | array second ]]]
+	^ (super haskellList: aRule) ==> [ :nodes |
+	  nodes second ifNil: [ #(  ) ] ifNotNil: [ 
+		  nodes second
+			  select: [ :node | node isArray ]
+			  thenCollect: [ :array | array second ] ] ]
 ]
 
 { #category : #initialization }
 PP2FortranSrcParser >> initialize [
+
 	super initialize.
-	
+
 	stack := Stack new.
-	model := FamixFortranModel new.
+	model := FamixFortranModel new
+]
+
+{ #category : #'grammar-helper' }
+PP2FortranSrcParser >> justAList: aRule [
+
+	"self parens: (self token: 'Just') , (self aList: aRule)"
+
+	^ (super justAList: aRule) ==> [ :nodes |
+	  nodes second second ]
 ]
 
 { #category : #'grammar-metaInfo' }
@@ -191,14 +176,14 @@ PP2FortranSrcParser >> programFile [
 
 	"(self token: 'ProgramFile') , metaInfo , (self haskellList: programUnit)"
 
-	^ super programFile ==> [ :nodes | 
-	  | prog |
+	^ super programFile ==> [ :nodes | | prog |
 	  prog := FamixFortranProgramFile new
 		          mooseModel: model;
 		          version: (nodes second at: 'miVersion' ifAbsent: [ '' ]);
-		          filename: (nodes second at: 'miFilename' ifAbsent: [ '' ] );
-			          yourself.
-			nodes third do: [ :progUnit | prog addProgramUnit: progUnit ] ]
+		          filename: (nodes second at: 'miFilename' ifAbsent: [ '' ]);
+		          yourself.
+
+	  nodes third do: [ :progUnit | prog addProgramUnit: progUnit ] ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -206,15 +191,37 @@ PP2FortranSrcParser >> puSubroutine [
 
 	"#prelude: return 3 nodes."
 
-	"(self prelude: 'PUSubroutine') , prefixSuffix , tkString , ((self token: 'Nothing') / (self justAList: expression)) , (self haskellList: block) , (self maybe: programUnit)"
+	" (self prelude: 'PUSubroutine')
+	, prefixSuffix
+	, tkString
+	, ((self token: 'Nothing') / (self justAList: expression))
+	, (self haskellList: block)
+	, (self maybe: programUnit)"
 
 	^ super puSubroutine ==> [ :nodes | 
 	  | subroutine |
 	  subroutine := FamixFortranSubroutine new
 		                mooseModel: model;
-		                name: nodes fifth value;
+		                name: nodes fifth value trim;
 		                yourself.
-	  nodes sixth isToken ifFalse: [ 1 halt ] ]
+	  1 halt.
+	  nodes sixth = 'Nothing' ifFalse: [ 
+		  nodes sixth second do: [ :node | 
+			  | parameter |
+			  parameter := FamixFortranParameter new
+				               name: node value;
+				               yourself.
+			  subroutine addParameter: parameter ] ].
+	  self flag: #FIXME "Comment traiter si j'ai des instructions et/ou commentaire dans un block ? les differencier" ]
+]
+
+{ #category : #accessing }
+PP2FortranSrcParser >> srcSpan [
+
+	"position , (self token: '-') , position"
+	^ super srcSpan ==> [ :nodes |
+			{(nodes first second first asNumber)@(nodes first second last asNumber) . (nodes last second first asNumber) @ (nodes last second last asNumber) }
+		]
 ]
 
 { #category : #'grammar-statement' }
