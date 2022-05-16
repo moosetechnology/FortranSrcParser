@@ -78,15 +78,15 @@ PP2FortranSrcParser >> comment [
 		  nodes second second second value } ]
 ]
 
-{ #category : #accessing }
+{ #category : #'grammar-expression' }
 PP2FortranSrcParser >> expValue [
 
 	"(self prelude: 'ExpValue') , (self parens: value)"
 
-	^ super expValue ==> [ :nodes |
+	^ super expValue ==> [ :nodes | 
 	  { 
-		  nodes third.
 		  nodes fourth second first.
+		  nodes third.
 		  nodes fourth second second second } ]
 ]
 
@@ -96,11 +96,11 @@ PP2FortranSrcParser >> haskellList: aRule [
 	"(self token: '[') , (aRule separatedBy: tkComma) optional
 	  , (self token: ']')"
 
-	^ (super haskellList: aRule) ==> [ :nodes |
-	  nodes second ifNil: [ #(  ) ] ifNotNil: [ 
-		  nodes second
-			  select: [ :node | node isArray ]
-			  thenCollect: [ :array | array second ] ] ]
+	^ (super haskellList: aRule) ==> [ :nodes | 
+	  nodes second
+		  ifNil: [ #(  ) ]
+		  ifNotNil: [ 
+		  nodes second select: #isArray ] ]
 ]
 
 { #category : #initialization }
@@ -206,10 +206,10 @@ PP2FortranSrcParser >> puSubroutine [
 		                yourself.
 
 	  nodes sixth = 'Nothing' ifFalse: [ 
-		  nodes sixth second do: [ :node | 
+		  nodes sixth second do: [ :node |
 			  | parameter |
 			  parameter := FamixFortranParameter new
-				               name: node value;
+				               name: node third value;
 				               yourself.
 			  subroutine addParameter: parameter ] ].
 	  self flag: #FIXME "Comment traiter si j'ai des instructions et/ou commentaire dans un block ? les differencier" ]

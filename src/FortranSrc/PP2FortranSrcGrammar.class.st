@@ -385,14 +385,15 @@ PP2FortranSrcGrammar >> impElement [
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> impList [
 
-	^ (self prelude: 'ImpList') , (self parens: typeSpec) 
-	  , (self parens: (self aList: impElement))
+	^ (self prelude: 'ImpList') , (self parens: typeSpec)
+	       , (self parens: (self aList: impElement))
 ]
 
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> impRange [
 
-	^ (self prelude: 'ImpRange') , tkString , tkString
+	^ (self prelude: 'ImpRange') , tkString , #space asPParser star
+	  , tkString
 ]
 
 { #category : #'grammar-expression' }
@@ -666,7 +667,8 @@ PP2FortranSrcGrammar >> tkComma [
 
 { #category : #token }
 PP2FortranSrcGrammar >> tkIdentifier [
-	^#word asPParser plus token trim
+
+	^ #word asPParser plus flatten trim
 ]
 
 { #category : #token }

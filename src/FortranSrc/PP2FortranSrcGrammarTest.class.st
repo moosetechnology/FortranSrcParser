@@ -374,6 +374,20 @@ PP2FortranSrcGrammarTest >> testImpList [
 			(52:25)-(52:27)
 			"a"
 			"z"])'
+		rule: #impList.
+
+	self
+		parse: 'ImpList ()
+	(52:16)-(52:28)
+	(TypeSpec ()
+		(52:16)-(52:22)
+		TypeLogical
+		Nothing)
+	(AList ()
+		(52:25)-(52:27)
+		[ImpCharacter ()
+			(52:25)-(52:27)
+			"a"])'
 		rule: #impList
 ]
 

@@ -42,7 +42,7 @@ PP2FortranSrcParserTest >> testExpValueString [
 	(ValString "a string")'
 		       rule: #expValue.
 
-	self assert: ast second equals: 'ValString'.
+	self assert: ast first equals: 'ValString'.
 	self assert: ast third equals: 'a string'
 ]
 
@@ -56,7 +56,7 @@ PP2FortranSrcParserTest >> testExpValueVariable [
 	(ValVariable "status")'
 		       rule: #expValue.
 
-	self assert: ast second equals: 'ValVariable'.
+	self assert: ast first equals: 'ValVariable'.
 	self assert: ast third equals: 'status'
 ]
 
@@ -74,9 +74,9 @@ PP2FortranSrcParserTest >> testHaskellListNotEmpty [
 	| list |
 	list := self parse: '["aa", "bb", "cc"]' rule: #haskellListOfString.
 	self assert: list size equals: 3.
-	self assert: list first equals: 'aa'.
-	self assert: list second  equals: 'bb'.
-	self assert: list third equals: 'cc'
+	self assert: list first second equals: 'aa'.
+	self assert: list second second  equals: 'bb'.
+	self assert: list third second equals: 'cc'
 ]
 
 { #category : #'tests-programUnit' }
@@ -115,7 +115,8 @@ PP2FortranSrcParserTest >> testProgramFileEmpty [
 PP2FortranSrcParserTest >> testPuSubroutine [
 
 	| ast |
-	ast := self parse: 'PUSubroutine ()
+	ast := self
+		       parse: 'PUSubroutine ()
 	(1:7)-(302:9)
 	(Nothing, Nothing)
 	"subrtn"
@@ -126,18 +127,21 @@ PP2FortranSrcParserTest >> testPuSubroutine [
 			(ValVariable "status")])
 		[]
 	Nothing'
-		rule: #puSubroutine.
+		       rule: #puSubroutine.
 
 	self
 		assert:
-			(parser model allWithType: FamixFortranSubroutine) first name value
+		(parser model allWithType: FamixFortranSubroutine) first name value
 		equals: '"subrtn"'.
 
-	self assert:
-		(parser model allWithType: FamixFortranSubroutine) first parameters size equals: 1.
+	self
+		assert:
+			(parser model allWithType: FamixFortranSubroutine) first parameters
+				size
+		equals: 1.
 
-"	self assertCollection: ((parser model allWithType: FamixFortranSubroutine) first
-			parameters collect: [ :param | param name ]) hasSameElements: #(status)."
+	self assertCollection: ((parser model allWithType: FamixFortranSubroutine) first
+			parameters collect: [ :param | param name ]) hasSameElements: #(status).
 
 	self assertEmpty:
 		(parser model allWithType: FamixFortranSubroutine) first
@@ -199,7 +203,7 @@ PP2FortranSrcParserTest >> testPuSubroutineWithNoParameter [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testPuSubroutineWithParameters [
+PP2FortranSrcParserTest >> testPuSubroutineWithSeveralParameters [
 
 	self
 		parse: 'PUSubroutine ()
@@ -226,21 +230,21 @@ PP2FortranSrcParserTest >> testPuSubroutineWithParameters [
 
 	self
 		assert:
-			(parser model allWithType: FamixFortranSubroutine) first name
-				value
+		(parser model allWithType: FamixFortranSubroutine) first name value
 		equals: '"stgbrk"'.
-	
-	self assert:
-		(parser model allWithType: FamixFortranSubroutine) first
-			parameters size equals: 4.
 
-"	self assertCollection: ((parser model allWithType: FamixFortranSubroutine) first
-			parameters collect: [ :param | param name ]) hasSameElements: #(alist splist rlist status)."
+	self
+		assert:
+			(parser model allWithType: FamixFortranSubroutine) first parameters
+				size
+		equals: 4.
+
+	self assertCollection: ((parser model allWithType: FamixFortranSubroutine) first
+			parameters collect: [ :param | param name ]) hasSameElements: #(alist splist rlist status).
 
 	self assertEmpty:
 		(parser model allWithType: FamixFortranSubroutine) first
 			programUnits
-	
 ]
 
 { #category : #'tests-programUnit' }
