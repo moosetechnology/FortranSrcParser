@@ -64,7 +64,13 @@ PP2FortranSrcParser >> blComment [
 	" (self prelude: 'BlComment')
 	, comment"
 
-	^ super blComment ==> [ :nodes | {nodes third . nodes fourth} ]
+	^ super blComment ==> [ :nodes | 
+	  1 halt.
+	  comment := FamixFortranComment
+		             new content: nodes;
+		             "{ 
+		  nodes third.
+		  nodes fourth }"yourself ]
 ]
 
 { #category : #'grammar-block' }
@@ -72,10 +78,15 @@ PP2FortranSrcParser >> comment [
 
 	"self parens: (self token: 'Comment') , tkString"
 
-	^ super comment ==> [ :nodes |
-	  { 
+	^ super comment ==> [ :nodes | 
+	  | com |
+	  com := FamixFortranComment new
+		         content: nodes second second second value;
+		         yourself.
+	  1 halt
+	  "{ 
 		  nodes second first value.
-		  nodes second second second value } ]
+		  nodes second second second value }" ]
 ]
 
 { #category : #'grammar-expression' }
@@ -176,14 +187,15 @@ PP2FortranSrcParser >> programFile [
 
 	"(self token: 'ProgramFile') , metaInfo , (self haskellList: programUnit)"
 
-	^ super programFile ==> [ :nodes | | prog |
+	^ super programFile ==> [ :nodes | 
+	  | prog |
 	  prog := FamixFortranProgramFile new
 		          mooseModel: model;
 		          version: (nodes second at: 'miVersion' ifAbsent: [ '' ]);
 		          filename: (nodes second at: 'miFilename' ifAbsent: [ '' ]);
 		          yourself.
-
-	  nodes third do: [ :progUnit | prog addProgramUnit: progUnit ] ]
+	  nodes third do: [ :progUnit | 
+		  prog addProgramUnit: progUnit ] ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -204,15 +216,16 @@ PP2FortranSrcParser >> puSubroutine [
 		                mooseModel: model;
 		                name: nodes fifth value trim;
 		                yourself.
-
 	  nodes sixth = 'Nothing' ifFalse: [ 
-		  nodes sixth second do: [ :node |
+		  nodes sixth second do: [ :node | 
 			  | parameter |
 			  parameter := FamixFortranParameter new
 				               name: node third value;
 				               yourself.
 			  subroutine addParameter: parameter ] ].
-	  self flag: #FIXME "Comment traiter si j'ai des instructions et/ou commentaire dans un block ? les differencier" ]
+	  nodes seventh do: [ :body | 
+		  1 halt.
+		  body ] ]
 ]
 
 { #category : #accessing }

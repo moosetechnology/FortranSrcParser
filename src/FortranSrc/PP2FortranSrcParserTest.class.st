@@ -14,7 +14,7 @@ PP2FortranSrcParserTest >> setUp [
 
 	super setUp.
 	parser := self parserInstance.
-	parser model: FamixFortranModel new.
+	parser model: FamixFortranModel new
 ]
 
 { #category : #tests }
@@ -35,9 +35,11 @@ PP2FortranSrcParserTest >> testComment [
 
 	| ast |
 	ast := self parse: '(Comment "some comment")' rule: #comment.
+	1halt.
 
-	self assert: ast first value equals: 'Comment'.
-	self assert: ast second value equals: 'some comment'
+	self
+		assert: (parser model allWithType: FamixFortranComment) first value
+		equals: 'some comment'
 ]
 
 { #category : #tests }
@@ -120,6 +122,38 @@ PP2FortranSrcParserTest >> testProgramFileEmpty [
 ]
 
 { #category : #'tests-programUnit' }
+PP2FortranSrcParserTest >> testProgramFileNoEmpty [
+
+	| ast |
+	ast := self
+		       parse: 'ProgramFile (MetaInfo
+	{miVersion = Fortran77,
+	miFilename = "emptyFile.f"})
+	[]'
+		       rule: #programFile.
+
+	self
+		assert: (parser model allWithType: FamixFortranProgramFile) size
+		equals: 1.
+
+	self
+		assert:
+			(parser model allWithType: FamixFortranProgramFile) first version
+				value
+		equals: 'Fortran77'.
+
+	self
+		assert:
+			(parser model allWithType: FamixFortranProgramFile) first filename
+				second value
+		equals: 'emptyFile.f'.
+
+	self assertEmpty:
+		(parser model allWithType: FamixFortranProgramFile) first
+			programUnits
+]
+
+{ #category : #'tests-programUnit' }
 PP2FortranSrcParserTest >> testPuSubroutine [
 
 	| ast |
@@ -148,8 +182,11 @@ PP2FortranSrcParserTest >> testPuSubroutine [
 				size
 		equals: 1.
 
-	self assertCollection: ((parser model allWithType: FamixFortranSubroutine) first
-			parameters collect: [ :param | param name ]) hasSameElements: #(status).
+	self
+		assertCollection:
+			((parser model allWithType: FamixFortranSubroutine) first
+				 parameters collect: [ :param | param name ])
+		hasSameElements: #( status ).
 
 	self assertEmpty:
 		(parser model allWithType: FamixFortranSubroutine) first
@@ -164,18 +201,21 @@ PP2FortranSrcParserTest >> testPuSubroutineWithComment [
 		       parse: 'PUSubroutine ()
 	(49:7)-(144:9)
 	(Nothing, Nothing)
-	"test01"
+	"stgbrk"
 	Nothing
 	[BlComment ()
-		(4:1)-(4:19)
-		(Comment "     some comment  ")]
+		(14:1)-(14:72)
+		(Comment " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
+	BlComment ()
+		(15:1)-(15:1)
+		(Comment "")]
 	Nothing'
 		       rule: #puSubroutine.
 
 	self
 		assert:
 		(parser model allWithType: FamixFortranSubroutine) first name value
-		equals: '"test01"'.
+		equals: '"stgbrk"'.
 
 	self assertEmpty:
 		(parser model allWithType: FamixFortranSubroutine) first parameters.
