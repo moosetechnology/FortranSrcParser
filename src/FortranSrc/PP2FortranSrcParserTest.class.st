@@ -9,6 +9,14 @@ PP2FortranSrcParserTest >> parserClass [
 	^ PP2FortranSrcParser 
 ]
 
+{ #category : #running }
+PP2FortranSrcParserTest >> setUp [
+
+	super setUp.
+	parser := self parserInstance.
+	parser model: FamixFortranModel new.
+]
+
 { #category : #tests }
 PP2FortranSrcParserTest >> testBlComment [
 	| ast |
@@ -152,7 +160,8 @@ PP2FortranSrcParserTest >> testPuSubroutine [
 PP2FortranSrcParserTest >> testPuSubroutineWithComment [
 
 	| ast |
-	ast := self parse: 'PUSubroutine ()
+	ast := self
+		       parse: 'PUSubroutine ()
 	(49:7)-(144:9)
 	(Nothing, Nothing)
 	"test01"
@@ -161,11 +170,11 @@ PP2FortranSrcParserTest >> testPuSubroutineWithComment [
 		(4:1)-(4:19)
 		(Comment "     some comment  ")]
 	Nothing'
-		rule: #puSubroutine.
+		       rule: #puSubroutine.
 
 	self
 		assert:
-			(parser model allWithType: FamixFortranSubroutine) first name value
+		(parser model allWithType: FamixFortranSubroutine) first name value
 		equals: '"test01"'.
 
 	self assertEmpty:
@@ -239,8 +248,11 @@ PP2FortranSrcParserTest >> testPuSubroutineWithSeveralParameters [
 				size
 		equals: 4.
 
-	self assertCollection: ((parser model allWithType: FamixFortranSubroutine) first
-			parameters collect: [ :param | param name ]) hasSameElements: #(alist splist rlist status).
+	self
+		assertCollection:
+			((parser model allWithType: FamixFortranSubroutine) first
+				 parameters collect: [ :param | param name ])
+		hasSameElements: #( alist splist rlist status ).
 
 	self assertEmpty:
 		(parser model allWithType: FamixFortranSubroutine) first
