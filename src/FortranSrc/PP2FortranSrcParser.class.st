@@ -64,9 +64,9 @@ PP2FortranSrcParser >> blComment [
 	" (self prelude: 'BlComment')
 	, comment"
 
-	^ super blComment ==> [ :nodes |
+	^ super blComment ==> [ :nodes | 
 	  (self newEntity: FamixFortranComment)
-		  content: nodes fourth second second second value;
+		  content: nodes fourth second second;
 		  yourself ]
 ]
 
@@ -79,7 +79,7 @@ PP2FortranSrcParser >> expValue [
 	  { 
 		  nodes fourth second first.
 		  nodes third.
-		  nodes fourth second second second } ]
+		  nodes fourth second second } ]
 ]
 
 { #category : #'grammar-helper' }
@@ -88,11 +88,9 @@ PP2FortranSrcParser >> haskellList: aRule [
 	"(self token: '[') , (aRule separatedBy: tkComma) optional
 	  , (self token: ']')"
 
-	^ (super haskellList: aRule) ==> [ :nodes | 
-	  nodes second
-		  ifNil: [ #(  ) ]
-		  ifNotNil: [ 
-		  nodes second select: #isArray ] ]
+	^ (super haskellList: aRule)
+	  ==> [ :nodes | 
+	  nodes second ifNil: [ #(  ) ] ifNotNil: [ (1 to: nodes second size by: 2) collect: [ :i | nodes second at: i  ] ] ]
 ]
 
 { #category : #initialization }
@@ -174,12 +172,16 @@ PP2FortranSrcParser >> programFile [
 	"(self token: 'ProgramFile') , metaInfo , (self haskellList: programUnit)"
 
 	^ super programFile ==> [ :nodes | 
-	  | prog |
-	  prog :=  (self newEntity: FamixFortranProgramFile)
-		          version: (nodes second at: 'miVersion' ifAbsent: [ '' ]);
-		          filename: (nodes second at: 'miFilename' ifAbsent: [ '' ]);
-		          yourself.
-	  nodes third do: [ :progUnit | prog addProgramUnit: progUnit ] ]
+	  | progFile |
+	  progFile := (self newEntity: FamixFortranProgramFile)
+		              version:
+			              (nodes second at: 'miVersion' ifAbsent: [ '' ]);
+		              filename: (nodes second
+				               at: 'miFilename'
+				               ifPresent: [ :node | node ]
+				               ifAbsent: [ '' ]);
+		              yourself.
+	  nodes third do: [ :progUnit | progFile addProgramUnit: progUnit ] ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -207,7 +209,7 @@ PP2FortranSrcParser >> puSubroutine [
 	^ super puSubroutine ==> [ :nodes | 
 	  | subroutine |
 	  subroutine := (self newEntity: FamixFortranSubroutine)
-		                name: nodes fifth value trim;
+		                name: nodes fifth;
 		                yourself.
 	  nodes sixth = 'Nothing' ifFalse: [ 
 		  nodes sixth second do: [ :node | 
@@ -215,8 +217,8 @@ PP2FortranSrcParser >> puSubroutine [
 				  ((self newEntity: FamixFortranParameter)
 					   name: node third value;
 					   yourself) ] ].
-	  model allComments do: [ :cmt | 
-		  cmt container: subroutine ] ]
+	  nodes seventh do: [ :cmt | cmt container: subroutine ].
+	  subroutine ]
 ]
 
 { #category : #accessing }
@@ -302,4 +304,14 @@ PP2FortranSrcParser >> statement [
 	==> [ :nodes |
 			nodes
 		 ]
+]
+
+{ #category : #token }
+PP2FortranSrcParser >> tkString [
+
+	"$"" asPParser , ('\""' asPParser / $"" asPParser negate) star flatten
+	  , $"" asPParser"
+
+	^ super tkString ==> [ :nodes |
+	  nodes second ]
 ]
