@@ -571,7 +571,7 @@ PP2FortranSrcGrammar >> puModule [
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puSubroutine [
 
-	^ (self prelude: 'PUSubroutine') , prefixSuffix , tkString token
+	^ (self prelude: 'PUSubroutine') , prefixSuffix , tkString
 	  , ((self token: 'Nothing') / (self justAList: expression))
 	  , (self haskellList: block) , (self maybe: programUnit)
 ]
