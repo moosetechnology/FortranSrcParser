@@ -17,17 +17,24 @@ PP2FortranSrcParserTest >> setUp [
 	parser model: FamixFortranModel new
 ]
 
-{ #category : #tests }
+{ #category : #'tests-block' }
 PP2FortranSrcParserTest >> testBlComment [
-	| ast |
+
+	| ast comment |
 	ast := self
-		parse: 'BlComment ()
+		       parse: 'BlComment ()
 	(4:1)-(4:19)
 	(Comment "     some comment  ")'
-		rule: #blComment.
+		       rule: #blComment.
 
-	self 
-		assert: ast second second value equals: '     some comment  '
+	comment := '     some comment  '.
+
+	self assert: ast content equals: comment.
+
+	self
+		assert:
+		(parser model allWithType: FamixFortranComment) first content
+		equals: comment.
 ]
 
 { #category : #tests }
