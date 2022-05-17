@@ -64,29 +64,10 @@ PP2FortranSrcParser >> blComment [
 	" (self prelude: 'BlComment')
 	, comment"
 
-	^ super blComment ==> [ :nodes | 
-	  1 halt.
-	  comment := FamixFortranComment
-		             new content: nodes;
-		             "{ 
-		  nodes third.
-		  nodes fourth }"yourself ]
-]
-
-{ #category : #'grammar-block' }
-PP2FortranSrcParser >> comment [
-
-	"self parens: (self token: 'Comment') , tkString"
-
-	^ super comment ==> [ :nodes | 
-	  | com |
-	  com := FamixFortranComment new
-		         content: nodes second second second value;
-		         yourself.
-	  1 halt
-	  "{ 
-		  nodes second first value.
-		  nodes second second second value }" ]
+	^ super blComment ==> [ :nodes |
+	  (self newEntity: FamixFortranComment)
+		  content: nodes fourth second second second value;
+		  yourself ]
 ]
 
 { #category : #'grammar-expression' }
@@ -182,6 +163,11 @@ PP2FortranSrcParser >> model: anObject [
 	model := anObject
 ]
 
+{ #category : #'private - creation' }
+PP2FortranSrcParser >> newEntity: aClass [
+	^ aClass new mooseModel: model; yourself
+]
+
 { #category : #'grammar-programUnit' }
 PP2FortranSrcParser >> programFile [
 
@@ -189,13 +175,21 @@ PP2FortranSrcParser >> programFile [
 
 	^ super programFile ==> [ :nodes | 
 	  | prog |
-	  prog := FamixFortranProgramFile new
-		          mooseModel: model;
+	  prog :=  (self newEntity: FamixFortranProgramFile)
 		          version: (nodes second at: 'miVersion' ifAbsent: [ '' ]);
 		          filename: (nodes second at: 'miFilename' ifAbsent: [ '' ]);
 		          yourself.
-	  nodes third do: [ :progUnit | 
-		  prog addProgramUnit: progUnit ] ]
+	  nodes third do: [ :progUnit | prog addProgramUnit: progUnit ] ]
+]
+
+{ #category : #'grammar-programUnit' }
+PP2FortranSrcParser >> puComment [
+
+	"(self prelude: 'PUComment') , comment"
+
+	^ super puComment ==> [ :nodes | (self newEntity: FamixFortranComment)
+		  content: nodes fourth second second second value;
+		  yourself  ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -212,20 +206,17 @@ PP2FortranSrcParser >> puSubroutine [
 
 	^ super puSubroutine ==> [ :nodes | 
 	  | subroutine |
-	  subroutine := FamixFortranSubroutine new
-		                mooseModel: model;
+	  subroutine := (self newEntity: FamixFortranSubroutine)
 		                name: nodes fifth value trim;
 		                yourself.
 	  nodes sixth = 'Nothing' ifFalse: [ 
 		  nodes sixth second do: [ :node | 
-			  | parameter |
-			  parameter := FamixFortranParameter new
-				               name: node third value;
-				               yourself.
-			  subroutine addParameter: parameter ] ].
-	  nodes seventh do: [ :body | 
-		  1 halt.
-		  body ] ]
+			  subroutine addParameter:
+				  ((self newEntity: FamixFortranParameter)
+					   name: node third value;
+					   yourself) ] ].
+	  model allComments do: [ :cmt | 
+		  cmt container: subroutine ] ]
 ]
 
 { #category : #accessing }

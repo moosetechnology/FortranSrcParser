@@ -31,18 +31,6 @@ PP2FortranSrcParserTest >> testBlComment [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testComment [
-
-	| ast |
-	ast := self parse: '(Comment "some comment")' rule: #comment.
-	1halt.
-
-	self
-		assert: (parser model allWithType: FamixFortranComment) first value
-		equals: 'some comment'
-]
-
-{ #category : #tests }
 PP2FortranSrcParserTest >> testExpValueString [
 
 	| ast |
@@ -222,7 +210,14 @@ PP2FortranSrcParserTest >> testPuSubroutineWithComment [
 
 	self assertEmpty:
 		(parser model allWithType: FamixFortranSubroutine) first
-			programUnits
+			programUnits.
+
+	self
+		assertCollection:
+		((parser model allWithType: FamixFortranSubroutine) first comments collect: [ :cmt | cmt content ])
+		hasSameElements:
+			#( ' xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+			   '' )
 ]
 
 { #category : #'tests-programUnit' }
@@ -273,7 +268,12 @@ PP2FortranSrcParserTest >> testPuSubroutineWithSeveralParameters [
 		ExpValue ()
 			(3:14)-(3:19)
 			(ValVariable "status")])
-	[]
+	[BlComment ()
+		(14:1)-(14:72)
+		(Comment " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
+	BlComment ()
+		(15:1)-(15:1)
+		(Comment "")]
 	Nothing'
 		rule: #puSubroutine.
 
@@ -296,7 +296,16 @@ PP2FortranSrcParserTest >> testPuSubroutineWithSeveralParameters [
 
 	self assertEmpty:
 		(parser model allWithType: FamixFortranSubroutine) first
-			programUnits
+			programUnits.
+
+	self
+		assertCollection:
+			((parser model allWithType: FamixFortranSubroutine) first comments 
+				 collect: [ :cmt | cmt content ])
+		hasSameElements:
+			#( ' xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+			   '' ).
+
 ]
 
 { #category : #'tests-programUnit' }
