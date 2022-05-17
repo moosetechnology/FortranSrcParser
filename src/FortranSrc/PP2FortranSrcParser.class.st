@@ -77,8 +77,8 @@ PP2FortranSrcParser >> expValue [
 
 	^ super expValue ==> [ :nodes | 
 	  { 
-		  nodes fourth second first.
 		  nodes third.
+		  nodes fourth second first.
 		  nodes fourth second second } ]
 ]
 
@@ -314,4 +314,15 @@ PP2FortranSrcParser >> tkString [
 
 	^ super tkString ==> [ :nodes |
 	  nodes second ]
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcParser >> valInteger [
+
+	"(self token: 'ValInteger') , tkString , tkNothing"
+
+	^ super valInteger ==> [ :nodes | 
+	  { 
+		  nodes first.
+		  nodes second asNumber. } ]
 ]

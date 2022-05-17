@@ -4,6 +4,11 @@ Class {
 	#category : #'FortranSrc-Tests'
 }
 
+{ #category : #'tests - todo' }
+PP2FortranSrcParserTest class >> haskellAst [
+	^ ''
+]
+
 { #category : #accessing }
 PP2FortranSrcParserTest >> parserClass [
 	^ PP2FortranSrcParser 
@@ -43,6 +48,20 @@ PP2FortranSrcParserTest >> testBlComment [
 ]
 
 { #category : #tests }
+PP2FortranSrcParserTest >> testExpValueInteger [
+
+	| ast |
+	ast := self
+		       parse: 'ExpValue ()
+	(3:14)-(3:19)
+	(ValInteger "42" Nothing)'
+		       rule: #expValue.
+
+	self assert: ast second equals: 'ValInteger'.
+	self assert: ast third equals: 42
+]
+
+{ #category : #tests }
 PP2FortranSrcParserTest >> testExpValueString [
 
 	| ast |
@@ -52,7 +71,21 @@ PP2FortranSrcParserTest >> testExpValueString [
 	(ValString "a string")'
 		       rule: #expValue.
 
-	self assert: ast first equals: 'ValString'.
+	self assert: ast second equals: 'ValString'.
+	self assert: ast third equals: 'a string'
+]
+
+{ #category : #tests }
+PP2FortranSrcParserTest >> testExpValueType [
+
+	| ast |
+	ast := self
+		       parse: 'ExpValue ()
+	(3:14)-(3:19)
+	(ValType "a string")'
+		       rule: #expValue.
+
+	self assert: ast second equals: 'ValType'.
 	self assert: ast third equals: 'a string'
 ]
 
@@ -66,8 +99,15 @@ PP2FortranSrcParserTest >> testExpValueVariable [
 	(ValVariable "status")'
 		       rule: #expValue.
 
-	self assert: ast first equals: 'ValVariable'.
+	self assert: ast second equals: 'ValVariable'.
 	self assert: ast third equals: 'status'
+]
+
+{ #category : #tests }
+PP2FortranSrcParserTest >> testFullHaskellAST [
+
+	| ast |
+	ast := self parse: self class haskellAst rule: #programFile.
 ]
 
 { #category : #tests }
