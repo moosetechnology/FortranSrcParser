@@ -396,6 +396,18 @@ PP2FortranSrcParserTest >> testTkString [
 ]
 
 { #category : #tests }
+PP2FortranSrcParserTest >> testValInteger [
+
+	| ast |
+	ast := self
+		       parse: 'ValInteger "42" Nothing'
+		       rule: #value.
+
+	self assert: ast first equals: 'ValInteger'.
+	self assert: ast second equals: 42
+]
+
+{ #category : #tests }
 PP2FortranSrcParserTest >> testValString [
 
 	| ast |
@@ -403,8 +415,8 @@ PP2FortranSrcParserTest >> testValString [
 		       parse: 'ValString "a string"'
 		       rule: #value.
 
-	self assert: ast second equals: 'ValString'.
-	self assert: ast third equals: 'a string'
+	self assert: ast first equals: 'ValString'.
+	self assert: ast second equals: 'a string'
 ]
 
 { #category : #tests }
