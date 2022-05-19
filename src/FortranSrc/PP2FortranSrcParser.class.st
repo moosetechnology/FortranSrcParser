@@ -111,6 +111,15 @@ PP2FortranSrcParser >> justAList: aRule [
 	  nodes second second ]
 ]
 
+{ #category : #'grammar-helper' }
+PP2FortranSrcParser >> maybe: aRule [
+
+	"Maybe  -> Nothing / (Just aRule)"
+
+	"tkNothing / (self parens: (self token: 'Just') , aRule)"
+	^ (super maybe: aRule) ==> [ :nodes | nodes = 'Nothing' ifTrue: [ nodes ] ifFalse:  [ nodes second second ] ]
+]
+
 { #category : #'grammar-metaInfo' }
 PP2FortranSrcParser >> metaInfo [
 
@@ -167,6 +176,13 @@ PP2FortranSrcParser >> newEntity: aClass [
 ]
 
 { #category : #'grammar-programUnit' }
+PP2FortranSrcParser >> position [
+
+	"self parens: tkNumber , (self token: ':') , tkNumber"
+	^ super position ==> [ :nodes | nodes second first @ nodes second last]
+]
+
+{ #category : #'grammar-programUnit' }
 PP2FortranSrcParser >> programFile [
 
 	"(self token: 'ProgramFile') , metaInfo , (self haskellList: programUnit)"
@@ -189,9 +205,27 @@ PP2FortranSrcParser >> puComment [
 
 	"(self prelude: 'PUComment') , comment"
 
-	^ super puComment ==> [ :nodes | (self newEntity: FamixFortranComment)
-		  content: nodes fourth second second second value;
-		  yourself  ]
+	^ super puComment ==> [ :nodes | 
+	  (self newEntity: FamixFortranComment)
+		  content: nodes fourth second second;
+		  yourself ]
+]
+
+{ #category : #'grammar-programUnit' }
+PP2FortranSrcParser >> puMain [
+
+	"(self prelude: 'PUMain') , (self maybe: tkString)
+	  , (self haskellList: block) , (self maybe: programUnit)"
+
+	^ super puMain ==> [ :nodes | 
+	  | program |
+	  program := (self newEntity: FamixFortranProgram)
+		             name: (nodes fourth = 'Nothing' ifTrue: [ '' ] ifFalse: [ nodes fourth ]);
+		             yourself. 
+	  self flag: #TODO. "gerer les élements du block"
+	  nodes sixth = 'Nothing' ifFalse: [ 
+		  nodes sixth do: [ :progUnit | progUnit container: program ] ].
+	  program ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -225,19 +259,20 @@ PP2FortranSrcParser >> puSubroutine [
 PP2FortranSrcParser >> srcSpan [
 
 	"position , (self token: '-') , position"
-	^ super srcSpan ==> [ :nodes |
-			{(nodes first second first asNumber)@(nodes first second last asNumber) . (nodes last second first asNumber) @ (nodes last second last asNumber) }
-		]
+	"NB: super srcSpan à une regle de production. Pour éviter le bug, mettre directement la définition plutôt que d'appeler srcSpan de la superclass"
+	^ position , (self token: '-') , position ==> [ :nodes | 
+	  { 
+		  nodes first.
+		  nodes last } ]
 ]
 
 { #category : #'grammar-statement' }
 PP2FortranSrcParser >> stCall [
-	"((self prelude: 'StCall') , (self parens: expression) , (self maybe: (self aList:  argument)))"
 
-	^ super stCall
-	==> [ :nodes |
-			nodes
-		 ]
+	"(self prelude: 'StCall') , (self parens: expression)
+	  , (self maybe: (self aList: argument))"
+
+	^ super stCall ==> [ :nodes | nodes  ]
 ]
 
 { #category : #'grammar-statement' }
@@ -306,6 +341,13 @@ PP2FortranSrcParser >> statement [
 		 ]
 ]
 
+{ #category : #'grammar-programUnit' }
+PP2FortranSrcParser >> tkNumber [
+
+	"#digit asPParser plus flatten trim"
+	^ super tkNumber ==> [ :nodes | nodes asNumber ]
+]
+
 { #category : #token }
 PP2FortranSrcParser >> tkString [
 
@@ -325,4 +367,15 @@ PP2FortranSrcParser >> valInteger [
 	  { 
 		  nodes first.
 		  nodes second asNumber. } ]
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcParser >> valString [
+
+	"(self token: 'ValString') , tkString"
+
+	^ ((self token: 'ValString') , tkString) ==> [ :nodes | 
+	  { 
+		  nodes first.
+		  nodes second } ]
 ]

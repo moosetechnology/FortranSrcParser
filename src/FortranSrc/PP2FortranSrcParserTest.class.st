@@ -104,13 +104,6 @@ PP2FortranSrcParserTest >> testExpValueVariable [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testFullHaskellAST [
-
-	| ast |
-	ast := self parse: self class haskellAst rule: #programFile.
-]
-
-{ #category : #tests }
 PP2FortranSrcParserTest >> testHaskellList [
 
 	| list |
@@ -127,6 +120,24 @@ PP2FortranSrcParserTest >> testHaskellListNotEmpty [
 	self assert: list first equals: 'aa'.
 	self assert: list second  equals: 'bb'.
 	self assert: list third equals: 'cc'
+]
+
+{ #category : #'tests-programUnit' }
+PP2FortranSrcParserTest >> testMaybe [
+
+	self assert: (self parse: '(Just "circle")' rule: #maybeOfString) equals: 'circle'.
+]
+
+{ #category : #'tests-programUnit' }
+PP2FortranSrcParserTest >> testMaybeNothing [
+
+	self assert: (self parse: 'Nothing' rule: #maybeOfString) equals: 'Nothing'
+]
+
+{ #category : #'tests-block' }
+PP2FortranSrcParserTest >> testPosition [
+
+	self assert: (self parse: '(1:7)' rule: #position) equals: 1 @ 7.
 ]
 
 { #category : #'tests-programUnit' }
@@ -178,6 +189,31 @@ PP2FortranSrcParserTest >> testProgramFileNoEmpty [
 
 	self assert: progFile programUnits size equals: 1.
 	self assert: progFile programUnits first name equals: 'subrtn'
+]
+
+{ #category : #'tests-programUnit' }
+PP2FortranSrcParserTest >> testPuMain [
+
+	| ast program |
+	ast := self
+		       parse: 'PUMain ()
+	(1:7)-(13:9)
+	(Just "circle")
+	[]
+	Nothing'
+		       rule: #puMain.
+	self
+		assert: (parser model allWithType: FamixFortranProgram) size
+		equals: 1.
+
+	program := (parser model allWithType: FamixFortranProgram)
+		              first.
+
+	self assert: program name equals: 'circle'.
+
+	self assertEmpty: program comments.
+
+	self assertEmpty: program programUnits
 ]
 
 { #category : #'tests-programUnit' }
@@ -343,6 +379,12 @@ PP2FortranSrcParserTest >> testSrcSpan [
 ]
 
 { #category : #'tests-programUnit' }
+PP2FortranSrcParserTest >> testTkNumber [
+
+	self assert: (self parse: '42' rule: #tkNumber) equals: 42
+]
+
+{ #category : #'tests-programUnit' }
 PP2FortranSrcParserTest >> testTkString [
 
 	| ast |
@@ -351,4 +393,28 @@ PP2FortranSrcParserTest >> testTkString [
 		       rule: #tkString.
 	self assert: ast equals: 'aString'.
 		
+]
+
+{ #category : #tests }
+PP2FortranSrcParserTest >> testValString [
+
+	| ast |
+	ast := self
+		       parse: 'ValString "a string"'
+		       rule: #value.
+
+	self assert: ast second equals: 'ValString'.
+	self assert: ast third equals: 'a string'
+]
+
+{ #category : #tests }
+PP2FortranSrcParserTest >> testValueInteger [
+
+	| ast |
+	ast := self
+		       parse: 'ValInteger "42" Nothing'
+		       rule: #valInteger.
+
+	self assert: ast first equals: 'ValInteger'.
+	self assert: ast second equals: 42
 ]

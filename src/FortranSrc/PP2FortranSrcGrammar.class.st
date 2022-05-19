@@ -70,7 +70,8 @@ Class {
 		'blCase',
 		'blDoWhile',
 		'blAssociate',
-		'haskellListOfString'
+		'haskellListOfString',
+		'maybeOfString'
 	],
 	#category : #'FortranSrc-Parser'
 }
@@ -451,6 +452,14 @@ PP2FortranSrcGrammar >> maybeNoParens: aRule [
 	"a special #maybe: that does not put parentheses around 'Just aRule'
 	notably when it is in a haskell list"
 	^ tkNothing / ((self token: 'Just') , aRule)
+]
+
+{ #category : #'grammar-tests' }
+PP2FortranSrcGrammar >> maybeOfString [
+
+	"rule to test method #maybe:"
+
+	^ self maybe: tkString
 ]
 
 { #category : #'grammar-metaInfo' }

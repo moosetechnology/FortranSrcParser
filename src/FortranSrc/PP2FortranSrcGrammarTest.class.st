@@ -515,6 +515,18 @@ PP2FortranSrcGrammarTest >> testPuComment [
 		rule: #puComment
 ]
 
+{ #category : #tests }
+PP2FortranSrcGrammarTest >> testPuMain [
+
+	self
+		       parse: 'PUMain ()
+	(1:7)-(13:9)
+	(Just "circle")
+	[]
+	Nothing'
+		       rule: #puMain.
+]
+
 { #category : #'tests-programUnit' }
 PP2FortranSrcGrammarTest >> testPuSubroutine [
 	self
