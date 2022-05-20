@@ -47,6 +47,28 @@ PP2FortranSrcParserTest >> testBlComment [
 		equals: comment
 ]
 
+{ #category : #'tests-expression' }
+PP2FortranSrcParserTest >> testExpUnary [
+
+	| ast |
+	ast := self
+		       parse: 'ExpUnary ()
+	(118:21)-(118:25)
+	Minus
+	(ExpValue ()
+		(118:22)-(118:25)
+		(ValInteger "0008" Nothing))'
+		       rule: #expUnary.
+
+	self assert: ast first equals: 'ExpUnary'.
+	self assertCollection: ast second hasSameElements: { 
+			(118 @ 21).
+			(118 @ 25) }.
+	self assert: ast third equals: 'Minus'.
+	self assert: ast fourth equals: 'ValInteger'.
+	self assert: ast fifth equals: 8
+]
+
 { #category : #tests }
 PP2FortranSrcParserTest >> testExpValueInteger [
 
@@ -417,6 +439,29 @@ PP2FortranSrcParserTest >> testValString [
 
 	self assert: ast first equals: 'ValString'.
 	self assert: ast second equals: 'a string'
+]
+
+{ #category : #tests }
+PP2FortranSrcParserTest >> testValue [
+
+	| ast |
+	ast := self parse: 'ValInteger "42" Nothing' rule: #value.
+
+	self assert: ast first equals: 'ValInteger'.
+	self assert: ast second equals: 42.
+
+	ast := self parse: 'ValString "a string"' rule: #value.
+	self assert: ast first equals: 'ValString'.
+	self assert: ast second equals: 'a string'.
+
+	ast := self parse: 'ValVariable "var"' rule: #value.
+	self assert: ast first equals: 'ValVariable'.
+	self assert: ast second equals: 'var'.
+
+	ast := self parse: 'ValIntrinsic "abs"' rule: #value.
+
+	self assert: ast first equals: 'ValIntrinsic'.
+	self assert: ast second equals: 'abs'
 ]
 
 { #category : #tests }

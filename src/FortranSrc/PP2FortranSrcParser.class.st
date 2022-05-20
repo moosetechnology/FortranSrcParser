@@ -44,8 +44,8 @@ PP2FortranSrcParser >> aList: aRule [
 
 	^ (super aList: aRule) ==> [ :nodes |
 	  { 
-		  nodes third.
-		  nodes fourth } ]
+		  nodes first second.
+		  nodes second } ]
 ]
 
 { #category : #'grammar-statement' }
@@ -66,8 +66,16 @@ PP2FortranSrcParser >> blComment [
 
 	^ super blComment ==> [ :nodes | 
 	  (self newEntity: FamixFortranComment)
-		  content: nodes fourth second second;
+		  content: nodes second second second;
 		  yourself ]
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcParser >> expUnary [
+
+	"(self prelude: 'ExpUnary') , unaryOp , (self parens: expression)"
+
+	^ super expUnary ==> [ :nodes | { nodes first first. nodes first second. nodes second. nodes third second second. nodes third second third } ]
 ]
 
 { #category : #'grammar-expression' }
@@ -77,9 +85,9 @@ PP2FortranSrcParser >> expValue [
 
 	^ super expValue ==> [ :nodes | 
 	  { 
-		  nodes third.
-		  nodes fourth second first.
-		  nodes fourth second second } ]
+		  nodes first second.
+		  nodes second second first.
+		  nodes second second second } ]
 ]
 
 { #category : #'grammar-helper' }
@@ -182,6 +190,13 @@ PP2FortranSrcParser >> position [
 	^ super position ==> [ :nodes | nodes second first @ nodes second last]
 ]
 
+{ #category : #'grammar-helper' }
+PP2FortranSrcParser >> prelude: aString [
+
+	"aString asPParser trim , emptyTuple , srcSpan"
+	^ (super prelude: aString) ==> [ :nodes | { nodes first. nodes third } ]
+]
+
 { #category : #'grammar-programUnit' }
 PP2FortranSrcParser >> programFile [
 
@@ -220,11 +235,11 @@ PP2FortranSrcParser >> puMain [
 	^ super puMain ==> [ :nodes | 
 	  | program |
 	  program := (self newEntity: FamixFortranProgram)
-		             name: (nodes fourth = 'Nothing' ifTrue: [ '' ] ifFalse: [ nodes fourth ]);
+		             name: (nodes second = 'Nothing' ifTrue: [ '' ] ifFalse: [ nodes second ]);
 		             yourself. 
 	  self flag: #TODO. "gerer les élements du block"
-	  nodes sixth = 'Nothing' ifFalse: [ 
-		  nodes sixth do: [ :progUnit | progUnit container: program ] ].
+	  nodes fourth = 'Nothing' ifFalse: [ 
+		  nodes fourth do: [ :progUnit | progUnit container: program ] ].
 	  program ]
 ]
 
@@ -243,15 +258,15 @@ PP2FortranSrcParser >> puSubroutine [
 	^ super puSubroutine ==> [ :nodes | 
 	  | subroutine |
 	  subroutine := (self newEntity: FamixFortranSubroutine)
-		                name: nodes fifth;
+		                name: nodes third;
 		                yourself.
-	  nodes sixth = 'Nothing' ifFalse: [ 
-		  nodes sixth second do: [ :node | 
+	  nodes fourth = 'Nothing' ifFalse: [ 
+		  nodes fourth second do: [ :node | 
 			  subroutine addParameter:
 				  ((self newEntity: FamixFortranParameter)
 					   name: node third value;
 					   yourself) ] ].
-	  nodes seventh do: [ :cmt | cmt container: subroutine ].
+	  nodes fifth do: [ :cmt | cmt container: subroutine ].
 	  subroutine ]
 ]
 
@@ -378,4 +393,22 @@ PP2FortranSrcParser >> valString [
 	  { 
 		  nodes first.
 		  nodes second } ]
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcParser >> value [
+
+	"valInteger / ((self token: 'ValString') , tkString)
+	  / ((self token: 'ValHollerith') , tkString)
+	  / ((self token: 'ValVariable') , tkString)
+	  / ((self token: 'ValIntrinsic') , tkString)
+	  / ((self token: 'ValOperator') , tkString)
+	  / ((self token: 'ValType') , tkString)
+	/ valReal / valComplex
+	/ valBoz
+	/ valLogical
+	/ valAssignment
+	/ valStar / valColon"
+
+	^ super value ==> [ :nodes | {nodes first. nodes second} ]
 ]
