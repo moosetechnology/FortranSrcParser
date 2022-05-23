@@ -68,7 +68,8 @@ PP2FortranSrcParserTest >> testBlStatement [
 			(ArgExpr (ExpValue ()                                                                        					(108:19)-(108:44)
 					(ValString "valrma: routine en echec")))]))'
 		       rule: #blStatement.
-	ast halt
+	self assert: ast candidates  size equals: 1.
+	self assert: ast candidates first name equals: 'edmess'.
 ]
 
 { #category : #'tests-expression' }
@@ -409,97 +410,15 @@ PP2FortranSrcParserTest >> testPuSubroutineWithSeveralParameters [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testPuSubroutineWithSeveralParametersAndSubroutineCall [
-
-	| subroutine |
-	self
-		parse: 'PUSubroutine ()
-	(1:7)-(302:9)
-	(Nothing, Nothing)
-	"stgbrk"
-	(Just AList ()
-		(2:8)-(3:19)
-		[ExpValue ()
-			(2:8)-(2:12)
-			(ValVariable "alist"),
-		ExpValue ()
-			(2:14)-(2:19)
-			(ValVariable "splist"),
-		ExpValue ()
-			(3:8)-(3:12)
-			(ValVariable "rlist"),
-		ExpValue ()
-			(3:14)-(3:19)
-			(ValVariable "status")])
-	[BlComment ()
-		(14:1)-(14:72)
-		(Comment " xxxxxxxxxxxat.t(/1)xxxxxxxx"),
-	BlComment ()
-		(15:1)-(15:1)
-		(Comment ""),
-	BlStatement ()
-	(62:7)-(62:18)
-	Nothing
-	(StCall ()
-	(108:7)-(108:45)
-	(ExpValue ()
-		(108:12)-(108:17)
-		(ValVariable "edmess"))
-	(Just AList ()
-		(108:18)-(108:45)
-		[Argument ()
-			(108:19)-(108:44)
-			Nothing
-			(ArgExpr (ExpValue ()                                                                        					(108:19)-(108:44)
-					(ValString "valrma: routine en echec")))]))]
-	Nothing'
-		rule: #puSubroutine.
-	1halt.
-	subroutine := (parser model allWithType: FamixFortranSubroutine)
-		              first.
-
-	self assert: subroutine name equals: 'stgbrk'.
-
-	self assert: subroutine parameters size equals: 4.
-
-	self
-		assertCollection:
-		(subroutine parameters collect: [ :param | param name ])
-		hasSameElements: #( alist splist rlist status ).
-
-	self assertEmpty: subroutine programUnits.
-
-	self assert: subroutine comments size equals: 2.
-
-	self
-		assert: subroutine comments first content
-		equals: ' xxxxxxxxxxxat.t(/1)xxxxxxxx'.
-	self assert: subroutine comments last content equals: ''
-]
-
-{ #category : #tests }
 PP2FortranSrcParserTest >> testPuSubroutineWithSubroutineCall [
 
-	| subroutine invocations |
-	self
-		parse: 'PUSubroutine ()
+	| ast invocations |
+	ast := self
+		       parse: 'PUSubroutine ()
 	(1:7)-(302:9)
 	(Nothing, Nothing)
 	"stgbrk"
-	(Just AList ()
-		(2:8)-(3:19)
-		[ExpValue ()
-			(2:8)-(2:12)
-			(ValVariable "alist"),
-		ExpValue ()
-			(2:14)-(2:19)
-			(ValVariable "splist"),
-		ExpValue ()
-			(3:8)-(3:12)
-			(ValVariable "rlist"),
-		ExpValue ()
-			(3:14)-(3:19)
-			(ValVariable "status")])
+	Nothing
 	[BlStatement ()
 	(62:7)-(62:18)
 	Nothing
@@ -510,30 +429,11 @@ PP2FortranSrcParserTest >> testPuSubroutineWithSubroutineCall [
 		(ValVariable "edmess"))
 	(Just AList ()
 		(108:18)-(108:45)
-		[Argument ()
-			(108:19)-(108:44)
-			Nothing
-			(ArgExpr (ExpValue ()                                                                        					(108:19)-(108:44)
-					(ValString "valrma: routine en echec")))]))]
+		[]))]
 	Nothing'
-		rule: #puSubroutine.
-	subroutine := (parser model allWithType: FamixFortranSubroutine)
-		              first.
+		       rule: #puSubroutine.
 
-	self assert: subroutine name equals: 'stgbrk'.
-
-	self assert: subroutine parameters size equals: 4.
-
-	self
-		assertCollection:
-		(subroutine parameters collect: [ :param | param name ])
-		hasSameElements: #( alist splist rlist status ).
-
-	self assertEmpty: subroutine programUnits.
-
-	self assert: subroutine comments size equals: 0.
-
-	invocations := subroutine outgoingInvocations.
+	invocations := ast outgoingInvocations.
 
 	self assert: invocations size equals: 1.
 	self assert: invocations first sender name equals: 'stgbrk'.
@@ -575,14 +475,8 @@ PP2FortranSrcParserTest >> testStCall [
 			(ArgExpr (ExpValue ()                                                                        					(108:19)-(108:44)
 					(ValString "valrma: routine en echec")))])'
 		       rule: #stCall.
-	self assertCollection: ast first includesAll: #( #StCall ).
-	self assert: ast second equals: 'edmess'.
-	self
-		assertCollection: ast third second first first
-		includesAll: #( #Argument ).
-	self
-		assertCollection: ast third second first third
-		includesAll: #( #ArgExpr )
+	
+	self assert: ast candidates first name equals: 'edmess'.
 ]
 
 { #category : #'tests-programUnit' }

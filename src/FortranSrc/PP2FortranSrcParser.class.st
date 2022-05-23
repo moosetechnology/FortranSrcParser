@@ -76,7 +76,7 @@ PP2FortranSrcParser >> blStatement [
 	"(self prelude: 'BlStatement') , (self maybe: expression)
 	  , (self parens: statement)"
 
-	^ super blStatement ==> [ :nodes | nodes ]
+	^ super blStatement ==> [ :nodes | nodes third. ]
 ]
 
 { #category : #'grammar-expression' }
@@ -294,15 +294,7 @@ PP2FortranSrcParser >> puSubroutine [
 				  ((self newEntity: FamixFortranParameter)
 					   name: node third value;
 					   yourself) ] ].
-	  self flag: #FIXME. "verifier ce qu'on a dans le block."
-	  "nodes fifth do: [ :cmt | cmt container: subroutine ]."
-	  nodes fifth do: [ :inv |
-		  (self newEntity: FamixFortranInvocation)
-			  sender: subroutine;
-			  addCandidate: ((self newEntity: FamixFortranExternalProcedure)
-					   name: inv third second;
-					   yourself);
-			  yourself ].
+	  nodes fifth do: [ :aBlock | aBlock setOwner: subroutine ].
 	  subroutine ]
 ]
 
@@ -323,11 +315,12 @@ PP2FortranSrcParser >> stCall [
 	"(self prelude: 'StCall') , (self parens: expression)
 	  , (self maybe: (self aList: argument))"
 
-	^ super stCall ==> [ :nodes | 
-	  { 
-		  nodes first.
-		  nodes second third.
-		  nodes third }]
+	^ super stCall ==> [ :nodes |
+	  (self newEntity: FamixFortranInvocation)
+		  addCandidate: ((self newEntity: FamixFortranExternalProcedure)
+				   name: nodes second third;
+				   yourself);
+		  yourself ]
 ]
 
 { #category : #'grammar-statement' }
