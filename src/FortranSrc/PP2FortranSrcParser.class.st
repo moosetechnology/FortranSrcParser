@@ -66,8 +66,17 @@ PP2FortranSrcParser >> blComment [
 
 	^ super blComment ==> [ :nodes | 
 	  (self newEntity: FamixFortranComment)
-		  content: nodes second second second;
+		  content: nodes second second;
 		  yourself ]
+]
+
+{ #category : #'grammar-block' }
+PP2FortranSrcParser >> blStatement [
+
+	"(self prelude: 'BlStatement') , (self maybe: expression)
+	  , (self parens: statement)"
+
+	^ super blStatement ==> [ :nodes | nodes ]
 ]
 
 { #category : #'grammar-expression' }
@@ -75,7 +84,13 @@ PP2FortranSrcParser >> expUnary [
 
 	"(self prelude: 'ExpUnary') , unaryOp , (self parens: expression)"
 
-	^ super expUnary ==> [ :nodes | { nodes first first. nodes first second. nodes second. nodes third second second. nodes third second third } ]
+	^ super expUnary ==> [ :nodes | 
+	  { 
+		  nodes first first.
+		  nodes first second.
+		  nodes second.
+		  nodes third second.
+		  nodes third third } ]
 ]
 
 { #category : #'grammar-expression' }
@@ -86,8 +101,8 @@ PP2FortranSrcParser >> expValue [
 	^ super expValue ==> [ :nodes | 
 	  { 
 		  nodes first second.
-		  nodes second second first.
-		  nodes second second second } ]
+		  nodes second first.
+		  nodes second second } ]
 ]
 
 { #category : #'grammar-helper' }
@@ -115,8 +130,7 @@ PP2FortranSrcParser >> justAList: aRule [
 
 	"self parens: (self token: 'Just') , (self aList: aRule)"
 
-	^ (super justAList: aRule) ==> [ :nodes |
-	  nodes second second ]
+	^ (super justAList: aRule) ==> [ :nodes | nodes second ]
 ]
 
 { #category : #'grammar-helper' }
@@ -125,7 +139,11 @@ PP2FortranSrcParser >> maybe: aRule [
 	"Maybe  -> Nothing / (Just aRule)"
 
 	"tkNothing / (self parens: (self token: 'Just') , aRule)"
-	^ (super maybe: aRule) ==> [ :nodes | nodes = 'Nothing' ifTrue: [ nodes ] ifFalse:  [ nodes second second ] ]
+
+	^ (super maybe: aRule) ==> [ :nodes | 
+	  nodes = 'Nothing'
+		  ifTrue: [ nodes ]
+		  ifFalse: [ nodes second ] ]
 ]
 
 { #category : #'grammar-metaInfo' }
@@ -136,7 +154,7 @@ PP2FortranSrcParser >> metaInfo [
 
 	^ super metaInfo
 	  ==> [ :nodes | 
-	  (nodes second third select: [ :each | each isAssociation ]) asDictionary ]
+	  (nodes third select: [ :each | each isAssociation ]) asDictionary ]
 ]
 
 { #category : #'grammar-metaInfo' }
@@ -183,11 +201,21 @@ PP2FortranSrcParser >> newEntity: aClass [
 	^ aClass new mooseModel: model; yourself
 ]
 
-{ #category : #'grammar-programUnit' }
+{ #category : #'grammar-helper' }
+PP2FortranSrcParser >> parens: aRule [
+
+	"(self token: '(') , aRule , (self token: ')')"
+
+	^ (super parens: aRule) ==> [ :nodes | nodes second ]
+]
+
+{ #category : #grammar }
 PP2FortranSrcParser >> position [
 
 	"self parens: tkNumber , (self token: ':') , tkNumber"
-	^ super position ==> [ :nodes | nodes second first @ nodes second last]
+
+	^ super position
+	  ==> [ :nodes | nodes first @ nodes third ]
 ]
 
 { #category : #'grammar-helper' }
@@ -235,8 +263,10 @@ PP2FortranSrcParser >> puMain [
 	^ super puMain ==> [ :nodes | 
 	  | program |
 	  program := (self newEntity: FamixFortranProgram)
-		             name: (nodes second = 'Nothing' ifTrue: [ '' ] ifFalse: [ nodes second ]);
-		             yourself. 
+		             name: (nodes second = 'Nothing'
+				              ifTrue: [ '' ]
+				              ifFalse: [ nodes second ]);
+		             yourself.
 	  self flag: #TODO. "gerer les élements du block"
 	  nodes fourth = 'Nothing' ifFalse: [ 
 		  nodes fourth do: [ :progUnit | progUnit container: program ] ].
@@ -245,8 +275,6 @@ PP2FortranSrcParser >> puMain [
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcParser >> puSubroutine [
-
-	"#prelude: return 3 nodes."
 
 	" (self prelude: 'PUSubroutine')
 	, prefixSuffix
@@ -266,7 +294,15 @@ PP2FortranSrcParser >> puSubroutine [
 				  ((self newEntity: FamixFortranParameter)
 					   name: node third value;
 					   yourself) ] ].
-	  nodes fifth do: [ :cmt | cmt container: subroutine ].
+	  self flag: #FIXME. "verifier ce qu'on a dans le block."
+	  "nodes fifth do: [ :cmt | cmt container: subroutine ]."
+	  nodes fifth do: [ :inv |
+		  (self newEntity: FamixFortranInvocation)
+			  sender: subroutine;
+			  addCandidate: ((self newEntity: FamixFortranExternalProcedure)
+					   name: inv third second;
+					   yourself);
+			  yourself ].
 	  subroutine ]
 ]
 
@@ -287,7 +323,11 @@ PP2FortranSrcParser >> stCall [
 	"(self prelude: 'StCall') , (self parens: expression)
 	  , (self maybe: (self aList: argument))"
 
-	^ super stCall ==> [ :nodes | nodes  ]
+	^ super stCall ==> [ :nodes | 
+	  { 
+		  nodes first.
+		  nodes second third.
+		  nodes third }]
 ]
 
 { #category : #'grammar-statement' }
@@ -369,8 +409,7 @@ PP2FortranSrcParser >> tkString [
 	"$"" asPParser , ('\""' asPParser / $"" asPParser negate) star flatten
 	  , $"" asPParser"
 
-	^ super tkString ==> [ :nodes |
-	  nodes second ]
+	^ super tkString ==> [ :nodes | nodes second]
 ]
 
 { #category : #'grammar-expression' }
