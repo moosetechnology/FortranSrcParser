@@ -3,7 +3,8 @@ Class {
 	#superclass : #PP2FortranSrcGrammar,
 	#instVars : [
 		'stack',
-		'model'
+		'model',
+		'srcFortran'
 	],
 	#category : #'FortranSrc-Parser'
 }
@@ -11,10 +12,10 @@ Class {
 { #category : #accessing }
 PP2FortranSrcParser class >> ignoredNames [
 
-	^ super ignoredNames , #( stack model )
+	^ super ignoredNames , #( stack model srcFortran )
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #debugging }
 PP2FortranSrcParser class >> pp2FortranSrcDebug [
 	| methodsLink |
 	<script>
@@ -79,6 +80,23 @@ PP2FortranSrcParser >> blStatement [
 	^ super blStatement ==> [ :nodes | nodes third. ]
 ]
 
+{ #category : #tests }
+PP2FortranSrcParser >> expFunctionCall [
+
+	"return a function expression applied to a list of arguments."
+
+	"(self prelude: 'ExpFunctionCall') , (self parens: expression)
+	  , (self maybe: (self aList: argument))"
+
+	^ super expFunctionCall ==> [ :nodes | 
+	  (self newEntity: FamixFortranInvocation)
+		  addCandidate: ((self newEntity: FamixFortranFunction)
+				   name: nodes second third;
+					isIntrinsic: true;
+				   yourself);
+		  yourself ]
+]
+
 { #category : #'grammar-expression' }
 PP2FortranSrcParser >> expUnary [
 
@@ -122,7 +140,8 @@ PP2FortranSrcParser >> initialize [
 	super initialize.
 
 	stack := Stack new.
-	model := FamixFortranModel new
+	model := FamixFortranModel new.
+	srcFortran := '/Users/Younoussa/Documents/demoparser'
 ]
 
 { #category : #'grammar-helper' }
@@ -162,7 +181,9 @@ PP2FortranSrcParser >> miFilename [
 
 	"(self token: 'miFilename') , (self token: '=') , tkString"
 
-	^ super miFilename ==> [ :nodes | nodes first -> nodes third ]
+	^ super miFilename
+	  ==> [ :nodes | "self srcFile: nodes third." 
+	  nodes first -> nodes third ]
 ]
 
 { #category : #'grammar-metaInfo' }
@@ -298,15 +319,56 @@ PP2FortranSrcParser >> puSubroutine [
 	  subroutine ]
 ]
 
+{ #category : #'grammar-programUnit' }
+PP2FortranSrcParser >> retrieveInModel: entityName [
+
+	| subroutines functions candidates |
+	self flag: #TODO. "Need to be implemented"
+	subroutines := self model allWithType: FamixFortranSubroutine.
+
+	candidates := subroutines select: [ :subroutine | 
+		              subroutine name = entityName ].
+	^ candidates
+		  ifEmpty: [ 
+			  functions := self model allWithType: FamixFortranFunction.
+			  candidates := functions select: [ :function | 
+				                function name = entityName ].
+			  functions
+				  ifEmpty: [ 
+					  (self newEntity: FamixFortranExternalProcedure)
+						  name: entityName;
+						  yourself ]
+				  ifNotEmpty: [ candidates first ] ]
+		  ifNotEmpty: [ candidates first ]
+]
+
 { #category : #accessing }
+PP2FortranSrcParser >> srcFortran [
+
+	^ srcFortran
+]
+
+{ #category : #accessing }
+PP2FortranSrcParser >> srcFortran: anObject [
+
+	srcFortran := anObject
+]
+
+{ #category : #grammar }
 PP2FortranSrcParser >> srcSpan [
 
 	"position , (self token: '-') , position"
+
 	"NB: super srcSpan à une regle de production. Pour éviter le bug, mettre directement la définition plutôt que d'appeler srcSpan de la superclass"
+
 	^ position , (self token: '-') , position ==> [ :nodes | 
-	  { 
-		  nodes first.
-		  nodes last } ]
+	  (self newEntity: FamixFortranIndexedFileAnchor)
+		  startLine: nodes first x;
+		  endLine: nodes third x;
+		  startColumn: nodes first y;
+		  endColumn: nodes third y;
+		  fileName: self srcFortran; 
+		  yourself ]
 ]
 
 { #category : #'grammar-statement' }
@@ -315,11 +377,11 @@ PP2FortranSrcParser >> stCall [
 	"(self prelude: 'StCall') , (self parens: expression)
 	  , (self maybe: (self aList: argument))"
 
-	^ super stCall ==> [ :nodes |
+	^ super stCall ==> [ :nodes | 
 	  (self newEntity: FamixFortranInvocation)
 		  addCandidate: ((self newEntity: FamixFortranExternalProcedure)
-				   name: nodes second third;
-				   yourself);
+		               name: nodes second third;
+		               yourself);
 		  yourself ]
 ]
 

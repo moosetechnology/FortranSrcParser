@@ -4,11 +4,6 @@ Class {
 	#category : #'FortranSrc-Tests'
 }
 
-{ #category : #'tests - todo' }
-PP2FortranSrcParserTest class >> haskellAst [
-	^ ''
-]
-
 { #category : #accessing }
 PP2FortranSrcParserTest >> parserClass [
 	^ PP2FortranSrcParser 
@@ -68,7 +63,11 @@ PP2FortranSrcParserTest >> testBlStatement [
 			(ArgExpr (ExpValue ()                                                                        					(108:19)-(108:44)
 					(ValString "valrma: routine en echec")))]))'
 		       rule: #blStatement.
-	self assert: ast candidates  size equals: 1.
+
+	self
+		assert: (parser model allWithType: FamixFortranInvocation) size
+		equals: 1.
+	self assert: ast candidates size equals: 1.
 	self assert: ast candidates first name equals: 'edmess'.
 ]
 
@@ -86,9 +85,6 @@ PP2FortranSrcParserTest >> testExpUnary [
 		       rule: #expUnary.
 
 	self assert: ast first equals: 'ExpUnary'.
-	self assertCollection: ast second hasSameElements: { 
-			(118 @ 21).
-			(118 @ 25) }.
 	self assert: ast third equals: 'Minus'.
 	self assert: ast fourth equals: 'ValInteger'.
 	self assert: ast fifth equals: 8
@@ -448,13 +444,10 @@ PP2FortranSrcParserTest >> testSrcSpan [
 		parse: '(1:7)-(302:9)'
 		rule: #srcSpan.
 	
-	self assertCollection: ast hasSameElements: {1@7 . 302@9}.
-
-	ast := self
-		parse: '(2:8)-(3:19)'
-		rule: #srcSpan.
-	
-	self assertCollection: ast hasSameElements: {2@8 . 3@19}
+	self assert: ast startLine equals: 1.
+	self assert: ast endLine equals: 302.
+	self assert: ast startColumn equals: 7.
+	self assert: ast endColumn equals: 9.
 ]
 
 { #category : #'tests-statement' }
@@ -475,7 +468,7 @@ PP2FortranSrcParserTest >> testStCall [
 			(ArgExpr (ExpValue ()                                                                        					(108:19)-(108:44)
 					(ValString "valrma: routine en echec")))])'
 		       rule: #stCall.
-	
+
 	self assert: ast candidates first name equals: 'edmess'.
 ]
 
