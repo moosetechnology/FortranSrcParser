@@ -462,15 +462,15 @@ PP2FortranSrcParserTest >> testPuSubroutineWithSubroutineCall [
 	"stgbrk"
 	Nothing
 	[BlStatement ()
-	(62:7)-(62:18)
+	(108:7)-(108:19)
 	Nothing
 	(StCall ()
-	(108:7)-(108:45)
-	(ExpValue ()
-		(108:12)-(108:17)
-		(ValVariable "edmess"))
-	(Just AList ()
-		(108:18)-(108:45)
+		(108:7)-(108:19)
+		(ExpValue ()
+			(108:12)-(108:17)
+			(ValVariable "edmess"))
+		(Just AList ()
+			(108:18)-(108:19)
 		[]))]
 	Nothing'
 		       rule: #puSubroutine.
@@ -480,7 +480,8 @@ PP2FortranSrcParserTest >> testPuSubroutineWithSubroutineCall [
 	self assert: invocations size equals: 1.
 	self assert: invocations first sender name equals: 'stgbrk'.
 	self assert: invocations first candidates size equals: 1.
-	self assert: invocations first candidates first name equals: 'edmess'
+	self assert: invocations first candidates first name equals: 'edmess'.
+	"self assert: invocations first signature equals: 'call edmess()'"
 ]
 
 { #category : #'tests-programUnit' }
