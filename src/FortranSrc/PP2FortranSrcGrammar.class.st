@@ -71,7 +71,8 @@ Class {
 		'blDoWhile',
 		'blAssociate',
 		'haskellListOfString',
-		'maybeOfString'
+		'maybeOfString',
+		'valLogical'
 	],
 	#category : #'FortranSrc-Parser'
 }
@@ -726,10 +727,17 @@ PP2FortranSrcGrammar >> valInteger [
 ]
 
 { #category : #'grammar-expression' }
+PP2FortranSrcGrammar >> valLogical [
+
+	
+	^ (self token: 'ValLogical')
+	  , ((self token: 'False') / (self token: 'True')) , tkNothing
+]
+
+{ #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> value [
 
-	^ valInteger
-	  / ((self token: 'ValString') , tkString)
+	^ valInteger / ((self token: 'ValString') , tkString)
 	  / ((self token: 'ValHollerith') , tkString)
 	  / ((self token: 'ValVariable') , tkString)
 	  / ((self token: 'ValIntrinsic') , tkString)
@@ -737,7 +745,7 @@ PP2FortranSrcGrammar >> value [
 	  / ((self token: 'ValType') , tkString)
 	"/ valReal / valComplex"
 	"/ valBoz"
-	"/ valLogical"
+	/ valLogical
 	"/ valAssignment"
 	"/ valStar / valColon"
 ]

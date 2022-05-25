@@ -107,8 +107,7 @@ PP2FortranSrcParser >> expUnary [
 		  nodes first first.
 		  nodes first second.
 		  nodes second.
-		  nodes third second.
-		  nodes third third } ]
+		  nodes third } ]
 ]
 
 { #category : #'grammar-expression' }

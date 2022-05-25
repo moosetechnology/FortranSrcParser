@@ -86,8 +86,8 @@ PP2FortranSrcParserTest >> testExpUnary [
 
 	self assert: ast first equals: 'ExpUnary'.
 	self assert: ast third equals: 'Minus'.
-	self assert: ast fourth equals: 'ValInteger'.
-	self assert: ast fifth equals: 8
+	self assert: ast fourth second equals: 'ValInteger'.
+	self assert: ast fourth third  equals: 8
 ]
 
 { #category : #tests }
@@ -167,6 +167,167 @@ PP2FortranSrcParserTest >> testFullFileStgbrk [
 	self
 		assert: ast first outgoingInvocations first candidates first name
 		equals: 'ooowin'
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileStgget [
+
+	| ast |
+	ast := self parse: self class stggetAst rule: #start.
+	self assert: ast first name equals: 'stgget'.
+	self assert: ast first comments size equals: 75.
+	self assert: ast first outgoingInvocations size equals: 5.
+	self
+		assert: ast first outgoingInvocations first signature
+		equals: 'CALLOOOWAC(OO4,0,''STGGET 15 XS '',OO1,0)'.
+	self
+		assert: ast first outgoingInvocations first sender name
+		equals: 'stgget'.
+	self
+		assert: ast first outgoingInvocations first candidates size
+		equals: 1.
+
+	self
+		assert: ast first outgoingInvocations first candidates first name
+		equals: 'ooowac'
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileStgglu [
+
+	| ast |
+	ast := self parse: self class stggluAst rule: #start.
+	self assert: ast first name equals: 'stgglu'.
+	self assert: ast first comments size equals: 81.
+	self assert: ast first outgoingInvocations size equals: 7.
+	self
+		assert: ast first outgoingInvocations first signature
+		equals: 'CALLOOOWAC(OO4,0,''STGGLU 19 ZS '',OO1,0)'.
+	self
+		assert: ast first outgoingInvocations first sender name
+		equals: 'stgglu'.
+	self
+		assert: ast first outgoingInvocations first candidates size
+		equals: 1.
+
+	self
+		assert: ast first outgoingInvocations first candidates first name
+		equals: 'ooowac'
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileStglen [
+
+	| ast |
+	ast := self parse: self class stglenAst rule: #start.
+	self assert: ast first name equals: 'stglen'.
+	self assert: ast first comments size equals: 63.
+	self assert: ast first outgoingInvocations size equals: 2.
+	self
+		assert: ast first outgoingInvocations first signature
+		equals: 'CALLOOOWAC(OO4,0,''STGLEN 13 XS '',OO1,0)'.
+	self
+		assert: ast first outgoingInvocations first sender name
+		equals: 'stglen'.
+	self
+		assert: ast first outgoingInvocations first candidates size
+		equals: 1.
+
+	self
+		assert: ast first outgoingInvocations first candidates first name
+		equals: 'ooowac'
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileStglow [
+
+	| ast |
+	ast := self parse: self class stglowAst rule: #start.
+	self assert: ast first name equals: 'stglow'.
+	self assert: ast first comments size equals: 65.
+	self assert: ast first outgoingInvocations size equals: 4.
+	self
+		assert: ast first outgoingInvocations first signature
+		equals: 'CALLOOOWI1(OO4,0,''STGLOW 13 RS '',OO6,OO5)'.
+	self
+		assert: ast first outgoingInvocations first sender name
+		equals: 'stglow'.
+	self
+		assert: ast first outgoingInvocations first candidates size
+		equals: 1.
+
+	self
+		assert: ast first outgoingInvocations first candidates first name
+		equals: 'ooowi1'
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileStgset [
+
+	| ast |
+	ast := self parse: self class stgsetAst rule: #start.
+	self assert: ast first name equals: 'stgset'.
+	self assert: ast first comments size equals: 77.
+	self assert: ast first outgoingInvocations size equals: 4.
+	self
+		assert: ast first outgoingInvocations first signature
+		equals: 'CALLOOOWAC(OO4,0,''STGSET 21 XS '',OO1,0)'.
+	self
+		assert: ast first outgoingInvocations first sender name
+		equals: 'stgset'.
+	self
+		assert: ast first outgoingInvocations first candidates size
+		equals: 1.
+
+	self
+		assert: ast first outgoingInvocations first candidates first name
+		equals: 'ooowac'
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileStgup [
+
+	| ast |
+	ast := self parse: self class stgupAst rule: #start.
+	self assert: ast first name equals: 'stgup'.
+	self assert: ast first comments size equals: 65.
+	self assert: ast first outgoingInvocations size equals: 4.
+	self
+		assert: ast first outgoingInvocations first signature
+		equals: 'CALLOOOWI1(OO4,0,''STGUP 13 RS '',OO6,OO5)'.
+	self
+		assert: ast first outgoingInvocations first sender name
+		equals: 'stgup'.
+	self
+		assert: ast first outgoingInvocations first candidates size
+		equals: 1.
+
+	self
+		assert: ast first outgoingInvocations first candidates first name
+		equals: 'ooowi1'
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileString [
+
+	| ast |
+	ast := self parse: self class stringAst rule: #start.
+	self assert: ast first name equals: 'string'.
+	self assert: ast first comments size equals: 64.
+	self assert: ast first outgoingInvocations size equals: 4.
+	self
+		assert: ast first outgoingInvocations first signature
+		equals: 'CALL GLSGET(GLSMOD)'.
+	self
+		assert: ast first outgoingInvocations first sender name
+		equals: 'string'.
+	self
+		assert: ast first outgoingInvocations first candidates size
+		equals: 1.
+
+	self
+		assert: ast first outgoingInvocations first candidates first name
+		equals: 'glsget'
 ]
 
 { #category : #'tests - allnodes' }
