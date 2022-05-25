@@ -146,6 +146,52 @@ PP2FortranSrcParserTest >> testExpValueVariable [
 	self assert: ast third equals: 'status'
 ]
 
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileStgbrk [
+
+	| ast |
+	ast := self parse: self class stgbrkAst rule: #start.
+	self assert: ast first name equals: 'stgbrk'.
+	self assert: ast first comments size equals: 81.
+	self assert: ast first outgoingInvocations size equals: 7.
+	self
+		assert: ast first outgoingInvocations first signature
+		equals: 'CALLOOOWIN(OO4,0,''STGBRK 20 RLIST '',OO1,2+NLIST)'.
+	self
+		assert: ast first outgoingInvocations first sender name
+		equals: 'stgbrk'.
+	self
+		assert: ast first outgoingInvocations first candidates size
+		equals: 1.
+
+	self
+		assert: ast first outgoingInvocations first candidates first name
+		equals: 'ooowin'
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileValrma [
+
+	| ast |
+	ast := self parse: self class valrmaAst rule: #start.
+	self assert: ast first name equals: 'valrma'.
+	self assert: ast first comments size equals: 81.
+	self assert: ast first outgoingInvocations size equals: 1.
+	self
+		assert: ast first outgoingInvocations first signature
+		equals: 'call edmess()'.
+	self
+		assert: ast first outgoingInvocations first sender name
+		equals: 'valrma'.
+	self
+		assert: ast first outgoingInvocations first candidates size
+		equals: 1.
+
+	self
+		assert: ast first outgoingInvocations first candidates first name
+		equals: 'edmess'
+]
+
 { #category : #tests }
 PP2FortranSrcParserTest >> testHaskellList [
 
