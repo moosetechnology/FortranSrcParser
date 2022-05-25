@@ -123,6 +123,15 @@ PP2FortranSrcParser >> expValue [
 		  nodes second second } ]
 ]
 
+{ #category : #'private - creation' }
+PP2FortranSrcParser >> getSignature: aNode [
+
+	^ self srcFortran asFileReference
+		readStreamDo: [ :stream | 
+		stream contents copyFrom: aNode startPos to: aNode endPos ]
+		ifAbsent: [ '' ]
+]
+
 { #category : #'grammar-helper' }
 PP2FortranSrcParser >> haskellList: aRule [
 
@@ -141,7 +150,7 @@ PP2FortranSrcParser >> initialize [
 
 	stack := Stack new.
 	model := FamixFortranModel new.
-	srcFortran := '/Users/Younoussa/Documents/demoparser'
+	srcFortran := ''
 ]
 
 { #category : #'grammar-helper' }
@@ -181,8 +190,8 @@ PP2FortranSrcParser >> miFilename [
 
 	"(self token: 'miFilename') , (self token: '=') , tkString"
 
-	^ super miFilename
-	  ==> [ :nodes | "self srcFile: nodes third." 
+	^ super miFilename ==> [ :nodes |
+	  self srcFortran: nodes third.
 	  nodes first -> nodes third ]
 ]
 
@@ -315,7 +324,8 @@ PP2FortranSrcParser >> puSubroutine [
 				  ((self newEntity: FamixFortranParameter)
 					   name: node third value;
 					   yourself) ] ].
-	  nodes fifth do: [ :aBlock | aBlock setOwner: subroutine ].
+	  nodes fifth do: [ :aBlock | 
+		  aBlock isArray ifFalse: [ aBlock setOwner: subroutine] ].
 	  subroutine ]
 ]
 
@@ -367,7 +377,7 @@ PP2FortranSrcParser >> srcSpan [
 		  endLine: nodes third x;
 		  startColumn: nodes first y;
 		  endColumn: nodes third y;
-		  fileName: self srcFortran; 
+		  fileName: self srcFortran;
 		  yourself ]
 ]
 
@@ -378,11 +388,13 @@ PP2FortranSrcParser >> stCall [
 	  , (self maybe: (self aList: argument))"
 
 	^ super stCall ==> [ :nodes | 
-	  (self newEntity: FamixFortranInvocation)
-		  addCandidate: ((self newEntity: FamixFortranExternalProcedure)
-		               name: nodes second third;
-		               yourself);
-		  yourself ]
+(self newEntity: FamixFortranInvocation)
+		           addCandidate:
+			           ((self newEntity: FamixFortranExternalProcedure)
+				            name: nodes second third;
+				            yourself);
+		           signature: (self getSignature: nodes first second);
+		           yourself. ]
 ]
 
 { #category : #'grammar-statement' }
