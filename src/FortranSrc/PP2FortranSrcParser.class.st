@@ -186,9 +186,9 @@ PP2FortranSrcParser >> expValue [
 PP2FortranSrcParser >> getSignature: aNode [
 
 	^ self srcFortran asFileReference
-		readStreamDo: [ :stream | 
-		stream contents copyFrom: aNode startPos to: aNode endPos ]
-		ifAbsent: [ '' ]
+		  readStreamDo: [ :stream | 
+			  stream contents copyFrom: aNode startPos to: aNode endPos ]
+		  ifAbsent: [ '' ]
 ]
 
 { #category : #'grammar-helper' }
@@ -457,6 +457,23 @@ PP2FortranSrcParser >> stExpressionAssign [
 	"((self prelude: 'StExpressionAssign') , (self parens: expression) , (self parens: expression))"
 	self flag: #FIXME. "StExpressionAssign peut cacher des invocation qui empêche de les traiter plus haut. voir message à moi-même discord."
 	^ super stExpressionAssign ==> [ :nodes | nodes ]
+]
+
+{ #category : #'grammar-statement' }
+PP2FortranSrcParser >> stFunction [
+
+	"(self prelude: 'StFunction') , (self parens: expression)
+	  , (self parens: (self aList: expression))
+	  , (self parens: expression)"
+
+	^ super stFunction ==> [ :nodes | 
+	  | candidate | 
+	  candidate := self ensureSubroutine: nodes second third.
+	  (self newEntity: FamixFortranInvocation)
+		  addCandidate: candidate;
+		  signature: (self getSignature: nodes first second);
+		  sourceAnchor: nodes first second;
+		  yourself ]
 ]
 
 { #category : #'grammar-statement' }

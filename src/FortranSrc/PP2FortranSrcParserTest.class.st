@@ -216,6 +216,29 @@ PP2FortranSrcParserTest >> testFullFileStgbrk [
 ]
 
 { #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileStgbrkEso [
+
+	| ast |
+	ast := self parse: self class stgbrkAstEso rule: #start.
+	self assert: ast first name equals: 'stgbrk'.
+	self assert: ast first comments size equals: 131.
+	self assert: ast first outgoingInvocations size equals: 16.
+	self
+		assert: ast first outgoingInvocations last signature
+		equals: 'ESOar(ESOat(rlist,elist),ESOat(rlist,ilist))=ms'.
+	self
+		assert: ast first outgoingInvocations first sender name
+		equals: 'stgbrk'.
+	self
+		assert: ast first outgoingInvocations first candidates size
+		equals: 1.
+
+	self
+		assert: ast first outgoingInvocations last candidates first name
+		equals: 'esoar'
+]
+
+{ #category : #'tests - allnodes' }
 PP2FortranSrcParserTest >> testFullFileStgget [
 
 	| ast |
@@ -724,6 +747,31 @@ PP2FortranSrcParserTest >> testStCall [
 		       rule: #stCall.
 
 	self assert: ast candidates first name equals: 'edmess'.
+]
+
+{ #category : #'tests-statement' }
+PP2FortranSrcParserTest >> testStFunction [
+
+	| ast |
+	ast := self
+		       parse: 'StFunction ()
+	(100:7)-(100:26)
+	(ExpValue ()
+		(100:7)-(100:11)
+ 		(ValVariable "esoat"))
+	(AList ()
+		(100:13)-(100:23)
+		[ExpValue ()
+			(100:13)-(100:17)
+			(ValVariable "rlist"),
+		ExpValue ()
+			(100:19)-(100:23)
+			(ValVariable "ilist")])
+	(ExpValue ()
+		(100:26)-(100:26)
+		(ValInteger "0" Nothing))'
+		       rule: #statement.
+	self assert: ast candidates first name equals: 'esoat'
 ]
 
 { #category : #'tests-programUnit' }
