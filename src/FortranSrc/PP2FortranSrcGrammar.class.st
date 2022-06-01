@@ -72,7 +72,8 @@ Class {
 		'blAssociate',
 		'haskellListOfString',
 		'maybeOfString',
-		'valLogical'
+		'valLogical',
+		'stFunction'
 	],
 	#category : #'FortranSrc-Parser'
 }
@@ -632,6 +633,13 @@ PP2FortranSrcGrammar >> stExpressionAssign [
 ]
 
 { #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stFunction [
+
+	^ (self prelude: 'StFunction') , (self parens: expression)
+	  , (self parens: (self aList: expression)) , (self parens: expression)
+]
+
+{ #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> stIfLogical [
 	^ (self prelude: 'StIfLogical')
 	, (self parens: expression)
@@ -646,26 +654,24 @@ PP2FortranSrcGrammar >> start [
 { #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> statement [
 
-	^ stDeclaration
+	^ stDeclaration / (self prelude: 'StDimension' aList: declarator)
+	  / (self prelude: 'StAllocatable' aList: declarator)
+	  / (self prelude: 'StCommon' aList: commonGroup)
+	  / (self prelude: 'StEquivalence' aList: (self aList: expression))
+	  / (self prelude: 'StImplicit' maybe: (self aList: impList))
+	  / stIfLogical / stExpressionAssign
+	  /
+	  ((self prelude: 'StGotoUnconditional') , (self parens: expression))
+	  / stCall / (self prelude: 'StReturn' maybe: expression)
+	  / (self prelude: 'StContinue') / stFunction 
 	"/ stStructure / stIntent / stOptional / stPublic / stPrivate / stProtected / stSave"
-	/ (self prelude: 'StDimension' aList: declarator)
-	/ (self prelude: 'StAllocatable' aList: declarator)
 	"/ stAsynchronous / stPointer / stTarget / stValue / stVolatile / stData / stAutomatic / ststatic / stNamelist / stParameter / stExternal / stIntrinsic"
-	/ (self prelude: 'StCommon' aList: commonGroup)
-	/ (self prelude: 'StEquivalence' aList: (self aList: expression))
 	"/ stFormat"
-	/ (self prelude: 'StImplicit' maybe: (self aList: impList))
-	
+
 	"/ stEntry / stInclude / stDo / stDoWhile / stEnddo / stCycle / stExit "
-	/ stIfLogical
-	" / stIfArithmetic / stSelectCase / stCase / stEndcase / stFunction"
-	/ stExpressionAssign
+	" / stIfArithmetic / stSelectCase / stCase / stEndcase"
 	" / stPointerAssign / stLabelAssign"
-	/ ((self prelude: 'StGotoUnconditional'), (self parens: expression ))
 	" / stGotoAssigned / stGotoComputed"
-	/ stCall
-	/ (self prelude: 'StReturn' maybe: expression)
-	/ (self prelude: 'StContinue')
 	"/ ststop / stPause / stRead / stRead2 / stWrite / stPrint / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum / stFormatBogus"
 ]
 

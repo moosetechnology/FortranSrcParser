@@ -68,7 +68,10 @@ PP2FortranSrcParser >> blComment [
 	^ super blComment ==> [ :nodes | 
 	  (self newEntity: FamixFortranComment)
 		  content: nodes second second;
-		  yourself ]
+		  isEsope:
+			  (nodes second second beginsWith: 'ESO' caseSensitive: false);
+			  sourceAnchor: nodes first second;
+			  yourself ]
 ]
 
 { #category : #'grammar-block' }
@@ -77,10 +80,63 @@ PP2FortranSrcParser >> blStatement [
 	"(self prelude: 'BlStatement') , (self maybe: expression)
 	  , (self parens: statement)"
 
-	^ super blStatement ==> [ :nodes | nodes third. ]
+	^ super blStatement ==> [ :nodes | nodes third ]
 ]
 
-{ #category : #tests }
+{ #category : #'grammar-programUnit' }
+PP2FortranSrcParser >> ensureFunction: aNode [
+
+	| externalProcedures candidates |
+	externalProcedures := self model allWithType: FamixFortranFunction.
+
+	candidates := externalProcedures select: [ :each | 
+		              each name = aNode third ].
+	^ candidates
+		  ifEmpty: [ 
+			  (self newEntity: FamixFortranFunction)
+				  name: aNode third;
+				  isIntrinsic: aNode second = 'ValIntrinsic';
+				  isStub: true;
+				  yourself ]
+		  ifNotEmpty: [ candidates first]
+]
+
+{ #category : #'grammar-programUnit' }
+PP2FortranSrcParser >> ensureFunction: aName intrinsic: aBoolean [
+
+	| externalProcedures candidates |
+	externalProcedures := self model allWithType: FamixFortranFunction.
+
+	candidates := externalProcedures select: [ :each | 
+		              each name = aName ].
+	^ candidates
+		  ifEmpty: [ 
+			  (self newEntity: FamixFortranFunction)
+				  name: aName;
+				  isIntrinsic: aBoolean;
+				  isStub: true;
+				  yourself ]
+		  ifNotEmpty: [ candidates first ]
+]
+
+{ #category : #'grammar-programUnit' }
+PP2FortranSrcParser >> ensureSubroutine: aName [
+
+	| externalProcedures candidates |
+	externalProcedures := self model allWithType: FamixFortranSubroutine.
+
+	candidates := externalProcedures select: [ :each | 
+		              each name = aName ].
+	^ candidates
+		  ifEmpty: [ 
+			  (self newEntity: FamixFortranSubroutine)
+				  name: aName;
+				  isStub: true;
+				  yourself ]
+		  ifNotEmpty: [ candidates first ]
+]
+
+{ #category : #'grammar-expression' }
 PP2FortranSrcParser >> expFunctionCall [
 
 	"return a function expression applied to a list of arguments."
@@ -89,11 +145,15 @@ PP2FortranSrcParser >> expFunctionCall [
 	  , (self maybe: (self aList: argument))"
 
 	^ super expFunctionCall ==> [ :nodes | 
+	  | candidate |
+	  candidate := self
+		               ensureFunction: nodes second third
+		               intrinsic: nodes second second = 'ValIntrinsic'.
+	  "candidate halt."
 	  (self newEntity: FamixFortranInvocation)
-		  addCandidate: ((self newEntity: FamixFortranFunction)
-				   name: nodes second third;
-					isIntrinsic: true;
-				   yourself);
+		  addCandidate: candidate;
+		  sourceAnchor: nodes first second;
+		  signature: (self getSignature: nodes first second);
 		  yourself ]
 ]
 
@@ -314,41 +374,26 @@ PP2FortranSrcParser >> puSubroutine [
 
 	^ super puSubroutine ==> [ :nodes | 
 	  | subroutine |
-	  subroutine := (self newEntity: FamixFortranSubroutine)
-		                name: nodes third;
-		                yourself.
+	  subroutine := self ensureSubroutine: nodes third.
+	  subroutine sourceAnchor: nodes first second.
 	  nodes fourth = 'Nothing' ifFalse: [ 
-		  nodes fourth second do: [ :node | 
+		  nodes fourth second do: [ :node |
 			  subroutine addParameter:
 				  ((self newEntity: FamixFortranParameter)
+					   sourceAnchor: node first;
 					   name: node third value;
 					   yourself) ] ].
-	  nodes fifth do: [ :aBlock | 
-		  aBlock isArray ifFalse: [ aBlock setOwner: subroutine] ].
+	  nodes fifth do: [ :aBlockNode | 
+		  aBlockNode isArray
+			  ifFalse: [ 
+				  aBlockNode setOwner: subroutine
+				  "aBlockNode isInvocation ifTrue: [ 1 halt ]" ]
+			  ifTrue: [ 
+				  (aBlockNode flattened select: [ :entity | 
+					   entity class = FamixFortranInvocation or: [ 
+						   entity class = FamixFortranComment ] ]) do: [ :anEntity | 
+					  anEntity setOwner: subroutine ] ] ].
 	  subroutine ]
-]
-
-{ #category : #'grammar-programUnit' }
-PP2FortranSrcParser >> retrieveInModel: entityName [
-
-	| subroutines functions candidates |
-	self flag: #TODO. "Need to be implemented"
-	subroutines := self model allWithType: FamixFortranSubroutine.
-
-	candidates := subroutines select: [ :subroutine | 
-		              subroutine name = entityName ].
-	^ candidates
-		  ifEmpty: [ 
-			  functions := self model allWithType: FamixFortranFunction.
-			  candidates := functions select: [ :function | 
-				                function name = entityName ].
-			  functions
-				  ifEmpty: [ 
-					  (self newEntity: FamixFortranExternalProcedure)
-						  name: entityName;
-						  yourself ]
-				  ifNotEmpty: [ candidates first ] ]
-		  ifNotEmpty: [ candidates first ]
 ]
 
 { #category : #accessing }
@@ -387,13 +432,13 @@ PP2FortranSrcParser >> stCall [
 	  , (self maybe: (self aList: argument))"
 
 	^ super stCall ==> [ :nodes | 
-(self newEntity: FamixFortranInvocation)
-		           addCandidate:
-			           ((self newEntity: FamixFortranExternalProcedure)
-				            name: nodes second third;
-				            yourself);
-		           signature: (self getSignature: nodes first second);
-		           yourself. ]
+	  | candidate |
+	  candidate := self ensureSubroutine: nodes second third.
+	  (self newEntity: FamixFortranInvocation)
+		  addCandidate: candidate;
+		  signature: (self getSignature: nodes first second);
+		sourceAnchor: nodes first second;
+		  yourself ]
 ]
 
 { #category : #'grammar-statement' }
@@ -408,12 +453,10 @@ PP2FortranSrcParser >> stDeclaration [
 
 { #category : #'grammar-statement' }
 PP2FortranSrcParser >> stExpressionAssign [
-	"((self prelude: 'StExpressionAssign') , (self parens: expression) , (self parens: expression))"
 
-	^ super stExpressionAssign
-	==> [ :nodes |
-			nodes
-		 ]
+	"((self prelude: 'StExpressionAssign') , (self parens: expression) , (self parens: expression))"
+	self flag: #FIXME. "StExpressionAssign peut cacher des invocation qui empêche de les traiter plus haut. voir message à moi-même discord."
+	^ super stExpressionAssign ==> [ :nodes | nodes ]
 ]
 
 { #category : #'grammar-statement' }

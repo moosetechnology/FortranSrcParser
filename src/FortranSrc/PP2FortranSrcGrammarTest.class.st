@@ -9,7 +9,7 @@ PP2FortranSrcGrammarTest class >> stgbrkAst [
 
 	^ 'ProgramFile (MetaInfo
                      {miVersion = Fortran77,
-                      miFilename = "/Users/Younoussa/Documents/demoparser/stgbrk.f"})
+                      miFilename = "/Users/Younoussa/Documents/demoparser/tmp/stgbrk.f"})
             [PUSubroutine ()
                           (1:7)-(302:9)
                           (Nothing, Nothing)
@@ -5011,6 +5011,2117 @@ PP2FortranSrcGrammarTest class >> stgbrkAst [
                                        (301:7)-(301:12)
                                        Nothing
                                        (StReturn () (301:7)-(301:12) Nothing)]
+                          Nothing]
+'
+]
+
+{ #category : #'tests - file in/out' }
+PP2FortranSrcGrammarTest class >> stgbrkAstEso [
+	^ 'ProgramFile (MetaInfo
+                     {miVersion = Fortran77,
+                      miFilename = "/Users/Younoussa/Documents/acropol-pour-inria/modules/String/build/pbuild/stgbrk.e.f"})
+            [PUSubroutine ()
+                          (1:7)-(238:9)
+                          (Nothing, Nothing)
+                          "stgbrk"
+                          (Just AList ()
+                                      (2:8)-(3:19)
+                                      [ExpValue ()
+                                                (2:8)-(2:12)
+                                                (ValVariable "alist"),
+                                       ExpValue ()
+                                                (2:14)-(2:19)
+                                                (ValVariable "splist"),
+                                       ExpValue ()
+                                                (3:8)-(3:12)
+                                                (ValVariable "rlist"),
+                                       ExpValue ()
+                                                (3:14)-(3:19)
+                                                (ValVariable "status")])
+                          [BlComment ()
+                                     (4:1)-(4:19)
+                                     (Comment "     == entrees =="),
+                           BlComment ()
+                                     (5:1)-(5:19)
+                                     (Comment "     == sorties =="),
+                           BlComment ()
+                                     (6:1)-(6:72)
+                                     (Comment " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
+                           BlComment ()
+                                     (7:1)-(7:39)
+                                     (Comment "b  subroutine : stgbrk (langage esope)"),
+                           BlComment ()
+                                     (8:1)-(8:23)
+                                     (Comment "b  module     : string"),
+                           BlComment ()
+                                     (9:1)-(9:25)
+                                     (Comment "b  auteur     : l.brault"),
+                           BlComment ()
+                                     (10:1)-(10:32)
+                                     (Comment "b  date       : 28-octobre-1997"),
+                           BlComment ()
+                                     (11:1)-(11:22)
+                                     (Comment "b  service    : epnc "),
+                           BlComment ()
+                                     (12:1)-(12:58)
+                                     (Comment "b  but        : briser/decouper des chaines de caracteres"),
+                           BlComment ()
+                                     (13:1)-(13:49)
+                                     (Comment "b               d''apres une liste de separateurs"),
+                           BlComment ()
+                                     (14:1)-(14:72)
+                                     (Comment " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
+                           BlComment () (15:1)-(15:1) (Comment ""),
+                           BlComment ()
+                                     (16:1)-(16:35)
+                                     (Comment "ae  alist  : \"la\" liste de chaines"),
+                           BlComment ()
+                                     (17:1)-(17:39)
+                                     (Comment "ae  splist : \"la\" liste de separateurs"),
+                           BlComment () (18:1)-(18:1) (Comment ""),
+                           BlComment ()
+                                     (19:1)-(19:59)
+                                     (Comment "as  rlist  : la liste des morceaux/decoupes de \"la\" chaine"),
+                           BlComment ()
+                                     (20:1)-(20:54)
+                                     (Comment "as  status : status d''execution (status=0 <=> succes)"),
+                           BlComment () (21:1)-(21:1) (Comment ""),
+                           BlComment () (22:1)-(22:1) (Comment ""),
+                           BlComment ()
+                                     (23:1)-(23:62)
+                                     (Comment " fichier a inclure dans tout source pacome, esope ou fortran."),
+                           BlComment () (24:1)-(24:1) (Comment ""),
+                           BlComment ()
+                                     (25:1)-(25:38)
+                                     (Comment " utilisation lors de la compilation :"),
+                           BlComment () (26:1)-(26:1) (Comment ""),
+                           BlComment ()
+                                     (27:1)-(27:18)
+                                     (Comment " source fortran :"),
+                           BlComment ()
+                                     (28:1)-(28:57)
+                                     (Comment "  f77 -dfortran -c -i{repertoires d''inclusion} fichier.f"),
+                           BlComment () (29:1)-(29:1) (Comment ""),
+                           BlComment ()
+                                     (30:1)-(30:16)
+                                     (Comment " source esope :"),
+                           BlComment ()
+                                     (31:1)-(31:59)
+                                     (Comment "  cpp -p -i{repertoires d''inclusion} fichier.e > fichier.e"),
+                           BlComment () (32:1)-(32:1) (Comment ""),
+                           BlComment ()
+                                     (33:1)-(33:40)
+                                     (Comment " source fortran et esope pour le cray :"),
+                           BlComment ()
+                                     (34:1)-(34:77)
+                                     (Comment "  cpp -dcray -i{repertoires d''inclusion} fichier.[f,e] > fichier_source_cray"),
+                           BlComment () (35:1)-(35:1) (Comment ""),
+                           BlComment ()
+                                     (36:1)-(36:24)
+                                     (Comment "  auteur  : l.caramelle"),
+                           BlComment ()
+                                     (37:1)-(37:29)
+                                     (Comment "  service : serlog systemes."),
+                           BlComment ()
+                                     (38:1)-(38:22)
+                                     (Comment "  date    : 28/03/93."),
+                           BlComment () (39:1)-(39:1) (Comment ""),
+                           BlComment () (40:1)-(40:1) (Comment ""),
+                           BlComment ()
+                                     (41:1)-(41:23)
+                                     (Comment "  modif   : g.martinez"),
+                           BlComment ()
+                                     (42:1)-(42:18)
+                                     (Comment "  service : epnc."),
+                           BlComment ()
+                                     (43:1)-(43:22)
+                                     (Comment "  date    : 24/08/95."),
+                           BlComment ()
+                                     (44:1)-(44:30)
+                                     (Comment "  sujet   : portage sur cray."),
+                           BlComment () (45:1)-(45:1) (Comment ""),
+                           BlComment ()
+                                     (46:1)-(46:20)
+                                     (Comment "  modif   : m.ponce"),
+                           BlComment ()
+                                     (47:1)-(47:31)
+                                     (Comment "            (origine l.brault)"),
+                           BlComment ()
+                                     (48:1)-(48:17)
+                                     (Comment "  service : epdn"),
+                           BlComment ()
+                                     (49:1)-(49:23)
+                                     (Comment "  date    : 19/07/2000"),
+                           BlComment ()
+                                     (50:1)-(50:32)
+                                     (Comment "  sujet   : implicit_h_included"),
+                           BlComment () (51:1)-(51:1) (Comment ""),
+                           BlStatement ()
+                                       (54:7)-(54:28)
+                                       Nothing
+                                       (StImplicit ()
+                                                   (54:7)-(54:28)
+                                                   (Just AList ()
+                                                               (54:16)-(54:28)
+                                                               [ImpList ()
+                                                                        (54:16)-(54:28)
+                                                                        (TypeSpec ()
+                                                                                  (54:16)-(54:22)
+                                                                                  TypeLogical
+                                                                                  Nothing)
+                                                                        (AList ()
+                                                                               (54:25)-(54:27)
+                                                                               [ImpRange ()
+                                                                                         (54:25)-(54:27)
+                                                                                         "a"
+                                                                                         "z"])])),
+                           BlComment () (56:1)-(56:1) (Comment ""),
+                           BlComment ()
+                                     (57:1)-(57:54)
+                                     (Comment " >> verifier que cette implementation est compatible "),
+                           BlComment ()
+                                     (58:1)-(58:49)
+                                     (Comment " >> avec celle du type chaine de gibiane/acropol"),
+                           BlComment () (59:1)-(59:2) (Comment " "),
+                           BlComment ()
+                                     (60:1)-(60:43)
+                                     (Comment " lstg : longueur de la chaine de caractere"),
+                           BlComment ()
+                                     (61:1)-(61:36)
+                                     (Comment " cstg : les caracteres de la chaine"),
+                           BlComment () (62:1)-(62:1) (Comment ""),
+                           BlComment ()
+                                     (63:1)-(63:22)
+                                     (Comment " propriete: lstg >= 0"),
+                           BlComment () (64:1)-(64:1) (Comment ""),
+                           BlStatement ()
+                                       (65:7)-(65:18)
+                                       Nothing
+                                       (StDeclaration ()
+                                                      (65:7)-(65:18)
+                                                      (TypeSpec ()
+                                                                (65:7)-(65:13)
+                                                                TypeInteger
+                                                                Nothing)
+                                                      Nothing
+                                                      (AList ()
+                                                             (65:15)-(65:18)
+                                                             [Declarator ()
+                                                                         (65:15)-(65:18)
+                                                                         (ExpValue ()
+                                                                                   (65:15)-(65:18)
+                                                                                   (ValVariable "lstg"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing])),
+                           BlComment ()
+                                     (66:1)-(66:20)
+                                     (Comment "eso  segment string"),
+                           BlComment ()
+                                     (67:1)-(67:29)
+                                     (Comment "eso    character cstg*(lstg)"),
+                           BlComment ()
+                                     (68:1)-(68:16)
+                                     (Comment "eso  endsegment"),
+                           BlComment () (69:1)-(69:1) (Comment ""),
+                           BlComment ()
+                                     (70:1)-(70:30)
+                                     (Comment " nlist : capacite de la liste"),
+                           BlComment ()
+                                     (71:1)-(71:30)
+                                     (Comment " ilist : taille   de la liste"),
+                           BlComment () (72:1)-(72:1) (Comment ""),
+                           BlComment ()
+                                     (73:1)-(73:31)
+                                     (Comment " propriete: 0<= ilist <= nlist"),
+                           BlComment () (74:1)-(74:1) (Comment ""),
+                           BlStatement ()
+                                       (75:7)-(75:19)
+                                       Nothing
+                                       (StDeclaration ()
+                                                      (75:7)-(75:19)
+                                                      (TypeSpec ()
+                                                                (75:7)-(75:13)
+                                                                TypeInteger
+                                                                Nothing)
+                                                      Nothing
+                                                      (AList ()
+                                                             (75:15)-(75:19)
+                                                             [Declarator ()
+                                                                         (75:15)-(75:19)
+                                                                         (ExpValue ()
+                                                                                   (75:15)-(75:19)
+                                                                                   (ValVariable "nlist"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing])),
+                           BlComment ()
+                                     (76:1)-(76:18)
+                                     (Comment "eso  segment,list"),
+                           BlComment ()
+                                     (77:1)-(77:21)
+                                     (Comment "eso    integer ilist"),
+                           BlComment ()
+                                     (78:1)-(78:28)
+                                     (Comment "eso    integer elist(nlist)"),
+                           BlComment ()
+                                     (79:1)-(79:16)
+                                     (Comment "eso  endsegment"),
+                           BlComment () (80:1)-(80:1) (Comment ""),
+                           BlComment ()
+                                     (81:1)-(81:25)
+                                     (Comment "eso  pointeur alist.list"),
+                           BlComment ()
+                                     (82:1)-(82:26)
+                                     (Comment "eso  pointeur splist.list"),
+                           BlComment ()
+                                     (83:1)-(83:25)
+                                     (Comment "eso  pointeur rlist.list"),
+                           BlStatement ()
+                                       (84:7)-(84:21)
+                                       Nothing
+                                       (StDeclaration ()
+                                                      (84:7)-(84:21)
+                                                      (TypeSpec ()
+                                                                (84:7)-(84:13)
+                                                                TypeInteger
+                                                                Nothing)
+                                                      Nothing
+                                                      (AList ()
+                                                             (84:16)-(84:21)
+                                                             [Declarator ()
+                                                                         (84:16)-(84:21)
+                                                                         (ExpValue ()
+                                                                                   (84:16)-(84:21)
+                                                                                   (ValVariable "status"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing])),
+                           BlComment () (85:1)-(85:1) (Comment ""),
+                           BlComment ()
+                                     (86:1)-(86:24)
+                                     (Comment "eso  pointeur xs.string"),
+                           BlComment ()
+                                     (87:1)-(87:24)
+                                     (Comment "eso  pointeur sp.string"),
+                           BlComment ()
+                                     (88:1)-(88:24)
+                                     (Comment "eso  pointeur ms.string"),
+                           BlStatement ()
+                                       (89:7)-(89:18)
+                                       Nothing
+                                       (StDeclaration ()
+                                                      (89:7)-(89:18)
+                                                      (TypeSpec ()
+                                                                (89:7)-(89:13)
+                                                                TypeInteger
+                                                                Nothing)
+                                                      Nothing
+                                                      (AList ()
+                                                             (89:16)-(89:18)
+                                                             [Declarator ()
+                                                                         (89:16)-(89:18)
+                                                                         (ExpValue ()
+                                                                                   (89:16)-(89:18)
+                                                                                   (ValVariable "lxs"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing])),
+                           BlStatement ()
+                                       (90:7)-(90:18)
+                                       Nothing
+                                       (StDeclaration ()
+                                                      (90:7)-(90:18)
+                                                      (TypeSpec ()
+                                                                (90:7)-(90:13)
+                                                                TypeInteger
+                                                                Nothing)
+                                                      Nothing
+                                                      (AList ()
+                                                             (90:16)-(90:18)
+                                                             [Declarator ()
+                                                                         (90:16)-(90:18)
+                                                                         (ExpValue ()
+                                                                                   (90:16)-(90:18)
+                                                                                   (ValVariable "lsp"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing])),
+                           BlStatement ()
+                                       (91:7)-(91:19)
+                                       Nothing
+                                       (StDeclaration ()
+                                                      (91:7)-(91:19)
+                                                      (TypeSpec ()
+                                                                (91:7)-(91:13)
+                                                                TypeInteger
+                                                                Nothing)
+                                                      Nothing
+                                                      (AList ()
+                                                             (91:16)-(91:19)
+                                                             [Declarator ()
+                                                                         (91:16)-(91:19)
+                                                                         (ExpValue ()
+                                                                                   (91:16)-(91:19)
+                                                                                   (ValVariable "lmin"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing])),
+                           BlStatement ()
+                                       (92:7)-(92:19)
+                                       Nothing
+                                       (StDeclaration ()
+                                                      (92:7)-(92:19)
+                                                      (TypeSpec ()
+                                                                (92:7)-(92:13)
+                                                                TypeInteger
+                                                                Nothing)
+                                                      Nothing
+                                                      (AList ()
+                                                             (92:16)-(92:19)
+                                                             [Declarator ()
+                                                                         (92:16)-(92:16)
+                                                                         (ExpValue ()
+                                                                                   (92:16)-(92:16)
+                                                                                   (ValVariable "i"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing,
+                                                              Declarator ()
+                                                                         (92:18)-(92:19)
+                                                                         (ExpValue ()
+                                                                                   (92:18)-(92:19)
+                                                                                   (ValVariable "ia"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing])),
+                           BlStatement ()
+                                       (93:7)-(93:22)
+                                       Nothing
+                                       (StDeclaration ()
+                                                      (93:7)-(93:22)
+                                                      (TypeSpec ()
+                                                                (93:7)-(93:13)
+                                                                TypeInteger
+                                                                Nothing)
+                                                      Nothing
+                                                      (AList ()
+                                                             (93:16)-(93:22)
+                                                             [Declarator ()
+                                                                         (93:16)-(93:18)
+                                                                         (ExpValue ()
+                                                                                   (93:16)-(93:18)
+                                                                                   (ValVariable "idx"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing,
+                                                              Declarator ()
+                                                                         (93:20)-(93:22)
+                                                                         (ExpValue ()
+                                                                                   (93:20)-(93:22)
+                                                                                   (ValVariable "kdx"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing])),
+                           BlStatement ()
+                                       (94:7)-(94:25)
+                                       Nothing
+                                       (StDeclaration ()
+                                                      (94:7)-(94:25)
+                                                      (TypeSpec ()
+                                                                (94:7)-(94:13)
+                                                                TypeInteger
+                                                                Nothing)
+                                                      Nothing
+                                                      (AList ()
+                                                             (94:16)-(94:25)
+                                                             [Declarator ()
+                                                                         (94:16)-(94:20)
+                                                                         (ExpValue ()
+                                                                                   (94:16)-(94:20)
+                                                                                   (ValVariable "first"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing,
+                                                              Declarator ()
+                                                                         (94:22)-(94:25)
+                                                                         (ExpValue ()
+                                                                                   (94:22)-(94:25)
+                                                                                   (ValVariable "last"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing])),
+                           BlStatement ()
+                                       (95:7)-(95:27)
+                                       Nothing
+                                       (StDeclaration ()
+                                                      (95:7)-(95:27)
+                                                      (TypeSpec ()
+                                                                (95:7)-(95:13)
+                                                                TypeInteger
+                                                                Nothing)
+                                                      Nothing
+                                                      (AList ()
+                                                             (95:16)-(95:27)
+                                                             [Declarator ()
+                                                                         (95:16)-(95:21)
+                                                                         (ExpValue ()
+                                                                                   (95:16)-(95:21)
+                                                                                   (ValVariable "mfirst"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing,
+                                                              Declarator ()
+                                                                         (95:23)-(95:27)
+                                                                         (ExpValue ()
+                                                                                   (95:23)-(95:27)
+                                                                                   (ValVariable "mlast"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing])),
+                           BlComment () (96:1)-(96:1) (Comment ""),
+                           BlStatement ()
+                                       (97:7)-(97:14)
+                                       Nothing
+                                       (StExpressionAssign ()
+                                                           (97:7)-(97:14)
+                                                           (ExpValue ()
+                                                                     (97:7)-(97:12)
+                                                                     (ValVariable "status"))
+                                                           (ExpValue ()
+                                                                     (97:14)-(97:14)
+                                                                     (ValInteger "0"
+                                                                                 Nothing))),
+                           BlStatement ()
+                                       (98:7)-(98:14)
+                                       Nothing
+                                       (StExpressionAssign ()
+                                                           (98:7)-(98:14)
+                                                           (ExpValue ()
+                                                                     (98:7)-(98:11)
+                                                                     (ValVariable "nlist"))
+                                                           (ExpValue ()
+                                                                     (98:13)-(98:14)
+                                                                     (ValInteger "10"
+                                                                                 Nothing))),
+                           BlComment ()
+                                     (99:1)-(99:18)
+                                     (Comment "eso  segini,rlist"),
+                           BlStatement ()
+                                       (100:7)-(100:26)
+                                       Nothing
+                                       (StFunction ()
+                                                   (100:7)-(100:26)
+                                                   (ExpValue ()
+                                                             (100:7)-(100:11)
+                                                             (ValVariable "esoat"))
+                                                   (AList ()
+                                                          (100:13)-(100:23)
+                                                          [ExpValue ()
+                                                                    (100:13)-(100:17)
+                                                                    (ValVariable "rlist"),
+                                                           ExpValue ()
+                                                                    (100:19)-(100:23)
+                                                                    (ValVariable "ilist")])
+                                                   (ExpValue ()
+                                                             (100:26)-(100:26)
+                                                             (ValInteger "0"
+                                                                         Nothing))),
+                           BlComment () (101:1)-(101:1) (Comment ""),
+                           BlComment ()
+                                     (102:1)-(102:19)
+                                     (Comment "eso  segact,splist"),
+                           BlComment ()
+                                     (103:1)-(103:18)
+                                     (Comment "eso  segact,alist"),
+                           BlComment () (104:1)-(104:1) (Comment ""),
+                           BlComment ()
+                                     (105:1)-(105:40)
+                                     (Comment "     //repeter \"decouper chaque chaine\""),
+                           BlDo ()
+                                (106:7)-(231:11)
+                                Nothing
+                                Nothing
+                                Nothing
+                                (Just DoSpecification ()
+                                                      (106:10)-(106:32)
+                                                      (StExpressionAssign ()
+                                                                          (106:10)-(106:13)
+                                                                          (ExpValue ()
+                                                                                    (106:10)-(106:11)
+                                                                                    (ValVariable "ia"))
+                                                                          (ExpValue ()
+                                                                                    (106:13)-(106:13)
+                                                                                    (ValInteger "1"
+                                                                                                Nothing)))
+                                                      (ExpFunctionCall ()
+                                                                       (106:15)-(106:32)
+                                                                       (ExpValue ()
+                                                                                 (106:15)-(106:19)
+                                                                                 (ValVariable "esoat"))
+                                                                       (Just AList ()
+                                                                                   (106:21)-(106:31)
+                                                                                   [Argument ()
+                                                                                             (106:21)-(106:25)
+                                                                                             Nothing
+                                                                                             (ArgExpr (ExpValue ()
+                                                                                                                (106:21)-(106:25)
+                                                                                                                (ValVariable "alist"))),
+                                                                                    Argument ()
+                                                                                             (106:27)-(106:31)
+                                                                                             Nothing
+                                                                                             (ArgExpr (ExpValue ()
+                                                                                                                (106:27)-(106:31)
+                                                                                                                (ValVariable "ilist")))]))
+                                                      Nothing)
+                                [BlStatement ()
+                                             (107:9)-(107:44)
+                                             Nothing
+                                             (StExpressionAssign ()
+                                                                 (107:9)-(107:44)
+                                                                 (ExpValue ()
+                                                                           (107:9)-(107:10)
+                                                                           (ValVariable "xs"))
+                                                                 (ExpFunctionCall ()
+                                                                                  (107:12)-(107:44)
+                                                                                  (ExpValue ()
+                                                                                            (107:12)-(107:14)
+                                                                                            (ValIntrinsic "abs"))
+                                                                                  (Just AList ()
+                                                                                              (107:16)-(107:43)
+                                                                                              [Argument ()
+                                                                                                        (107:16)-(107:43)
+                                                                                                        Nothing
+                                                                                                        (ArgExpr (ExpFunctionCall ()
+                                                                                                                                  (107:16)-(107:43)
+                                                                                                                                  (ExpValue ()
+                                                                                                                                            (107:16)-(107:20)
+                                                                                                                                            (ValVariable "esoar"))
+                                                                                                                                  (Just AList ()
+                                                                                                                                              (107:22)-(107:42)
+                                                                                                                                              [Argument ()
+                                                                                                                                                        (107:22)-(107:39)
+                                                                                                                                                        Nothing
+                                                                                                                                                        (ArgExpr (ExpFunctionCall ()
+                                                                                                                                                                                  (107:22)-(107:39)
+                                                                                                                                                                                  (ExpValue ()
+                                                                                                                                                                                            (107:22)-(107:26)
+                                                                                                                                                                                            (ValVariable "esoat"))
+                                                                                                                                                                                  (Just AList ()
+                                                                                                                                                                                              (107:28)-(107:38)
+                                                                                                                                                                                              [Argument ()
+                                                                                                                                                                                                        (107:28)-(107:32)
+                                                                                                                                                                                                        Nothing
+                                                                                                                                                                                                        (ArgExpr (ExpValue ()
+                                                                                                                                                                                                                           (107:28)-(107:32)
+                                                                                                                                                                                                                           (ValVariable "alist"))),
+                                                                                                                                                                                               Argument ()
+                                                                                                                                                                                                        (107:34)-(107:38)
+                                                                                                                                                                                                        Nothing
+                                                                                                                                                                                                        (ArgExpr (ExpValue ()
+                                                                                                                                                                                                                           (107:34)-(107:38)
+                                                                                                                                                                                                                           (ValVariable "elist")))]))),
+                                                                                                                                               Argument ()
+                                                                                                                                                        (107:41)-(107:42)
+                                                                                                                                                        Nothing
+                                                                                                                                                        (ArgExpr (ExpValue ()
+                                                                                                                                                                           (107:41)-(107:42)
+                                                                                                                                                                           (ValVariable "ia")))])))]))),
+                                 BlComment () (108:1)-(108:1) (Comment ""),
+                                 BlComment ()
+                                           (109:1)-(109:17)
+                                           (Comment "eso    segact,xs"),
+                                 BlStatement ()
+                                             (110:9)-(110:35)
+                                             Nothing
+                                             (StExpressionAssign ()
+                                                                 (110:9)-(110:35)
+                                                                 (ExpValue ()
+                                                                           (110:9)-(110:11)
+                                                                           (ValVariable "lxs"))
+                                                                 (ExpFunctionCall ()
+                                                                                  (110:13)-(110:35)
+                                                                                  (ExpValue ()
+                                                                                            (110:13)-(110:17)
+                                                                                            (ValVariable "esosl"))
+                                                                                  (Just AList ()
+                                                                                              (110:19)-(110:34)
+                                                                                              [Argument ()
+                                                                                                        (110:19)-(110:32)
+                                                                                                        Nothing
+                                                                                                        (ArgExpr (ExpFunctionCall ()
+                                                                                                                                  (110:19)-(110:32)
+                                                                                                                                  (ExpValue ()
+                                                                                                                                            (110:19)-(110:23)
+                                                                                                                                            (ValVariable "esoat"))
+                                                                                                                                  (Just AList ()
+                                                                                                                                              (110:25)-(110:31)
+                                                                                                                                              [Argument ()
+                                                                                                                                                        (110:25)-(110:26)
+                                                                                                                                                        Nothing
+                                                                                                                                                        (ArgExpr (ExpValue ()
+                                                                                                                                                                           (110:25)-(110:26)
+                                                                                                                                                                           (ValVariable "xs"))),
+                                                                                                                                               Argument ()
+                                                                                                                                                        (110:28)-(110:31)
+                                                                                                                                                        Nothing
+                                                                                                                                                        (ArgExpr (ExpValue ()
+                                                                                                                                                                           (110:28)-(110:31)
+                                                                                                                                                                           (ValVariable "cstg")))]))),
+                                                                                               Argument ()
+                                                                                                        (110:34)-(110:34)
+                                                                                                        Nothing
+                                                                                                        (ArgExpr (ExpValue ()
+                                                                                                                           (110:34)-(110:34)
+                                                                                                                           (ValInteger "1"
+                                                                                                                                       Nothing)))]))),
+                                 BlComment () (111:1)-(111:1) (Comment ""),
+                                 BlIf ()
+                                      (112:9)-(228:13)
+                                      Nothing
+                                      Nothing
+                                      [Just ExpBinary ()
+                                                      (112:12)-(112:19)
+                                                      EQ
+                                                      (ExpValue ()
+                                                                (112:12)-(112:14)
+                                                                (ValVariable "lxs"))
+                                                      (ExpValue ()
+                                                                (112:19)-(112:19)
+                                                                (ValInteger "0"
+                                                                            Nothing)),
+                                       Nothing]
+                                      [[BlComment ()
+                                                  (113:1)-(113:44)
+                                                  (Comment "         == la chaine a \"decouper\" est vide"),
+                                        BlComment ()
+                                                  (114:1)-(114:32)
+                                                  (Comment "         >> ne rien renvoyer <<")],
+                                       [BlComment ()
+                                                  (116:1)-(116:51)
+                                                  (Comment "         == la chaine a \"decouper\" n''est pas vide "),
+                                        BlStatement ()
+                                                    (117:11)-(117:17)
+                                                    Nothing
+                                                    (StExpressionAssign ()
+                                                                        (117:11)-(117:17)
+                                                                        (ExpValue ()
+                                                                                  (117:11)-(117:15)
+                                                                                  (ValVariable "first"))
+                                                                        (ExpValue ()
+                                                                                  (117:17)-(117:17)
+                                                                                  (ValInteger "1"
+                                                                                              Nothing))),
+                                        BlStatement ()
+                                                    (118:11)-(118:18)
+                                                    Nothing
+                                                    (StExpressionAssign ()
+                                                                        (118:11)-(118:18)
+                                                                        (ExpValue ()
+                                                                                  (118:11)-(118:14)
+                                                                                  (ValVariable "last"))
+                                                                        (ExpValue ()
+                                                                                  (118:16)-(118:18)
+                                                                                  (ValVariable "lxs"))),
+                                        BlComment ()
+                                                  (119:1)-(119:1)
+                                                  (Comment ""),
+                                        BlComment ()
+                                                  (120:1)-(120:38)
+                                                  (Comment "         //repeter \"decouper morceau\""),
+                                        BlStatement ()
+                                                    (121:2)-(121:18)
+                                                    (Just ExpValue ()
+                                                                   (121:2)-(121:4)
+                                                                   (ValInteger "100"
+                                                                               Nothing))
+                                                    (StContinue ()
+                                                                (121:11)-(121:18)),
+                                        BlComment ()
+                                                  (122:1)-(122:1)
+                                                  (Comment ""),
+                                        BlComment ()
+                                                  (123:1)-(123:46)
+                                                  (Comment "           //repeter \"sauter separateur-tete\""),
+                                        BlComment ()
+                                                  (124:1)-(124:43)
+                                                  (Comment "             -- chercher separateur-entete"),
+                                        BlComment ()
+                                                  (125:1)-(125:53)
+                                                  (Comment "             -- ... donnant le plus petit separateur"),
+                                        BlStatement ()
+                                                    (126:2)-(126:17)
+                                                    (Just ExpValue ()
+                                                                   (126:2)-(126:4)
+                                                                   (ValInteger "110"
+                                                                               Nothing))
+                                                    (StExpressionAssign ()
+                                                                        (126:15)-(126:17)
+                                                                        (ExpValue ()
+                                                                                  (126:15)-(126:15)
+                                                                                  (ValVariable "i"))
+                                                                        (ExpValue ()
+                                                                                  (126:17)-(126:17)
+                                                                                  (ValInteger "0"
+                                                                                              Nothing))),
+                                        BlStatement ()
+                                                    (127:15)-(127:21)
+                                                    Nothing
+                                                    (StExpressionAssign ()
+                                                                        (127:15)-(127:21)
+                                                                        (ExpValue ()
+                                                                                  (127:15)-(127:18)
+                                                                                  (ValVariable "lmin"))
+                                                                        (ExpUnary ()
+                                                                                  (127:20)-(127:21)
+                                                                                  Minus
+                                                                                  (ExpValue ()
+                                                                                            (127:21)-(127:21)
+                                                                                            (ValInteger "1"
+                                                                                                        Nothing)))),
+                                        BlStatement ()
+                                                    (128:2)-(128:19)
+                                                    (Just ExpValue ()
+                                                                   (128:2)-(128:4)
+                                                                   (ValInteger "120"
+                                                                               Nothing))
+                                                    (StExpressionAssign ()
+                                                                        (128:15)-(128:19)
+                                                                        (ExpValue ()
+                                                                                  (128:15)-(128:15)
+                                                                                  (ValVariable "i"))
+                                                                        (ExpBinary ()
+                                                                                   (128:17)-(128:19)
+                                                                                   Addition
+                                                                                   (ExpValue ()
+                                                                                             (128:17)-(128:17)
+                                                                                             (ValVariable "i"))
+                                                                                   (ExpValue ()
+                                                                                             (128:19)-(128:19)
+                                                                                             (ValInteger "1"
+                                                                                                         Nothing)))),
+                                        BlIf ()
+                                             (129:15)-(149:19)
+                                             Nothing
+                                             Nothing
+                                             [Just ExpBinary ()
+                                                             (129:18)-(129:43)
+                                                             LTE
+                                                             (ExpValue ()
+                                                                       (129:18)-(129:18)
+                                                                       (ValVariable "i"))
+                                                             (ExpFunctionCall ()
+                                                                              (129:23)-(129:43)
+                                                                              (ExpValue ()
+                                                                                        (129:24)-(129:28)
+                                                                                        (ValVariable "esoat"))
+                                                                              (Just AList ()
+                                                                                          (129:30)-(129:41)
+                                                                                          [Argument ()
+                                                                                                    (129:30)-(129:35)
+                                                                                                    Nothing
+                                                                                                    (ArgExpr (ExpValue ()
+                                                                                                                       (129:30)-(129:35)
+                                                                                                                       (ValVariable "splist"))),
+                                                                                           Argument ()
+                                                                                                    (129:37)-(129:41)
+                                                                                                    Nothing
+                                                                                                    (ArgExpr (ExpValue ()
+                                                                                                                       (129:37)-(129:41)
+                                                                                                                       (ValVariable "ilist")))]))]
+                                             [[BlStatement ()
+                                                           (130:17)-(130:52)
+                                                           Nothing
+                                                           (StExpressionAssign ()
+                                                                               (130:17)-(130:52)
+                                                                               (ExpValue ()
+                                                                                         (130:17)-(130:18)
+                                                                                         (ValVariable "sp"))
+                                                                               (ExpFunctionCall ()
+                                                                                                (130:20)-(130:52)
+                                                                                                (ExpValue ()
+                                                                                                          (130:20)-(130:22)
+                                                                                                          (ValIntrinsic "abs"))
+                                                                                                (Just AList ()
+                                                                                                            (130:24)-(130:51)
+                                                                                                            [Argument ()
+                                                                                                                      (130:24)-(130:51)
+                                                                                                                      Nothing
+                                                                                                                      (ArgExpr (ExpFunctionCall ()
+                                                                                                                                                (130:24)-(130:51)
+                                                                                                                                                (ExpValue ()
+                                                                                                                                                          (130:24)-(130:28)
+                                                                                                                                                          (ValVariable "esoar"))
+                                                                                                                                                (Just AList ()
+                                                                                                                                                            (130:30)-(130:50)
+                                                                                                                                                            [Argument ()
+                                                                                                                                                                      (130:30)-(130:48)
+                                                                                                                                                                      Nothing
+                                                                                                                                                                      (ArgExpr (ExpFunctionCall ()
+                                                                                                                                                                                                (130:30)-(130:48)
+                                                                                                                                                                                                (ExpValue ()
+                                                                                                                                                                                                          (130:30)-(130:34)
+                                                                                                                                                                                                          (ValVariable "esoat"))
+                                                                                                                                                                                                (Just AList ()
+                                                                                                                                                                                                            (130:36)-(130:47)
+                                                                                                                                                                                                            [Argument ()
+                                                                                                                                                                                                                      (130:36)-(130:41)
+                                                                                                                                                                                                                      Nothing
+                                                                                                                                                                                                                      (ArgExpr (ExpValue ()
+                                                                                                                                                                                                                                         (130:36)-(130:41)
+                                                                                                                                                                                                                                         (ValVariable "splist"))),
+                                                                                                                                                                                                             Argument ()
+                                                                                                                                                                                                                      (130:43)-(130:47)
+                                                                                                                                                                                                                      Nothing
+                                                                                                                                                                                                                      (ArgExpr (ExpValue ()
+                                                                                                                                                                                                                                         (130:43)-(130:47)
+                                                                                                                                                                                                                                         (ValVariable "elist")))]))),
+                                                                                                                                                             Argument ()
+                                                                                                                                                                      (130:50)-(130:50)
+                                                                                                                                                                      Nothing
+                                                                                                                                                                      (ArgExpr (ExpValue ()
+                                                                                                                                                                                         (130:50)-(130:50)
+                                                                                                                                                                                         (ValVariable "i")))])))]))),
+                                               BlComment ()
+                                                         (131:1)-(131:25)
+                                                         (Comment "eso            segact,sp"),
+                                               BlStatement ()
+                                                           (132:17)-(132:43)
+                                                           Nothing
+                                                           (StExpressionAssign ()
+                                                                               (132:17)-(132:43)
+                                                                               (ExpValue ()
+                                                                                         (132:17)-(132:19)
+                                                                                         (ValVariable "lsp"))
+                                                                               (ExpFunctionCall ()
+                                                                                                (132:21)-(132:43)
+                                                                                                (ExpValue ()
+                                                                                                          (132:21)-(132:25)
+                                                                                                          (ValVariable "esosl"))
+                                                                                                (Just AList ()
+                                                                                                            (132:27)-(132:42)
+                                                                                                            [Argument ()
+                                                                                                                      (132:27)-(132:40)
+                                                                                                                      Nothing
+                                                                                                                      (ArgExpr (ExpFunctionCall ()
+                                                                                                                                                (132:27)-(132:40)
+                                                                                                                                                (ExpValue ()
+                                                                                                                                                          (132:27)-(132:31)
+                                                                                                                                                          (ValVariable "esoat"))
+                                                                                                                                                (Just AList ()
+                                                                                                                                                            (132:33)-(132:39)
+                                                                                                                                                            [Argument ()
+                                                                                                                                                                      (132:33)-(132:34)
+                                                                                                                                                                      Nothing
+                                                                                                                                                                      (ArgExpr (ExpValue ()
+                                                                                                                                                                                         (132:33)-(132:34)
+                                                                                                                                                                                         (ValVariable "sp"))),
+                                                                                                                                                             Argument ()
+                                                                                                                                                                      (132:36)-(132:39)
+                                                                                                                                                                      Nothing
+                                                                                                                                                                      (ArgExpr (ExpValue ()
+                                                                                                                                                                                         (132:36)-(132:39)
+                                                                                                                                                                                         (ValVariable "cstg")))]))),
+                                                                                                             Argument ()
+                                                                                                                      (132:42)-(132:42)
+                                                                                                                      Nothing
+                                                                                                                      (ArgExpr (ExpValue ()
+                                                                                                                                         (132:42)-(132:42)
+                                                                                                                                         (ValInteger "1"
+                                                                                                                                                     Nothing)))]))),
+                                               BlIf ()
+                                                    (133:17)-(138:21)
+                                                    Nothing
+                                                    Nothing
+                                                    [Just ExpBinary ()
+                                                                    (133:20)-(133:27)
+                                                                    EQ
+                                                                    (ExpValue ()
+                                                                              (133:20)-(133:22)
+                                                                              (ValVariable "lsp"))
+                                                                    (ExpValue ()
+                                                                              (133:27)-(133:27)
+                                                                              (ValInteger "0"
+                                                                                          Nothing)),
+                                                     Nothing]
+                                                    [[BlStatement ()
+                                                                  (134:19)-(134:23)
+                                                                  Nothing
+                                                                  (StExpressionAssign ()
+                                                                                      (134:19)-(134:23)
+                                                                                      (ExpValue ()
+                                                                                                (134:19)-(134:21)
+                                                                                                (ValVariable "idx"))
+                                                                                      (ExpValue ()
+                                                                                                (134:23)-(134:23)
+                                                                                                (ValInteger "1"
+                                                                                                            Nothing)))],
+                                                     [BlStatement ()
+                                                                  (136:19)-(137:43)
+                                                                  Nothing
+                                                                  (StExpressionAssign ()
+                                                                                      (136:19)-(137:43)
+                                                                                      (ExpValue ()
+                                                                                                (136:19)-(136:21)
+                                                                                                (ValVariable "idx"))
+                                                                                      (ExpFunctionCall ()
+                                                                                                       (136:23)-(137:43)
+                                                                                                       (ExpValue ()
+                                                                                                                 (136:23)-(136:27)
+                                                                                                                 (ValIntrinsic "index"))
+                                                                                                       (Just AList ()
+                                                                                                                   (136:29)-(137:42)
+                                                                                                                   [Argument ()
+                                                                                                                             (136:29)-(136:54)
+                                                                                                                             Nothing
+                                                                                                                             (ArgExpr (ExpSubscript ()
+                                                                                                                                                    (136:29)-(136:54)
+                                                                                                                                                    (ExpFunctionCall ()
+                                                                                                                                                                     (136:29)-(136:42)
+                                                                                                                                                                     (ExpValue ()
+                                                                                                                                                                               (136:29)-(136:33)
+                                                                                                                                                                               (ValVariable "esoat"))
+                                                                                                                                                                     (Just AList ()
+                                                                                                                                                                                 (136:35)-(136:41)
+                                                                                                                                                                                 [Argument ()
+                                                                                                                                                                                           (136:35)-(136:36)
+                                                                                                                                                                                           Nothing
+                                                                                                                                                                                           (ArgExpr (ExpValue ()
+                                                                                                                                                                                                              (136:35)-(136:36)
+                                                                                                                                                                                                              (ValVariable "xs"))),
+                                                                                                                                                                                  Argument ()
+                                                                                                                                                                                           (136:38)-(136:41)
+                                                                                                                                                                                           Nothing
+                                                                                                                                                                                           (ArgExpr (ExpValue ()
+                                                                                                                                                                                                              (136:38)-(136:41)
+                                                                                                                                                                                                              (ValVariable "cstg")))]))
+                                                                                                                                                    (AList ()
+                                                                                                                                                           (136:44)-(136:53)
+                                                                                                                                                           [IxRange ()
+                                                                                                                                                                    (136:44)-(136:53)
+                                                                                                                                                                    (Just ExpValue ()
+                                                                                                                                                                                   (136:44)-(136:48)
+                                                                                                                                                                                   (ValVariable "first"))
+                                                                                                                                                                    (Just ExpValue ()
+                                                                                                                                                                                   (136:50)-(136:53)
+                                                                                                                                                                                   (ValVariable "last"))
+                                                                                                                                                                    Nothing]))),
+                                                                                                                    Argument ()
+                                                                                                                             (137:29)-(137:42)
+                                                                                                                             Nothing
+                                                                                                                             (ArgExpr (ExpFunctionCall ()
+                                                                                                                                                       (137:29)-(137:42)
+                                                                                                                                                       (ExpValue ()
+                                                                                                                                                                 (137:29)-(137:33)
+                                                                                                                                                                 (ValVariable "esoat"))
+                                                                                                                                                       (Just AList ()
+                                                                                                                                                                   (137:35)-(137:41)
+                                                                                                                                                                   [Argument ()
+                                                                                                                                                                             (137:35)-(137:36)
+                                                                                                                                                                             Nothing
+                                                                                                                                                                             (ArgExpr (ExpValue ()
+                                                                                                                                                                                                (137:35)-(137:36)
+                                                                                                                                                                                                (ValVariable "sp"))),
+                                                                                                                                                                    Argument ()
+                                                                                                                                                                             (137:38)-(137:41)
+                                                                                                                                                                             Nothing
+                                                                                                                                                                             (ArgExpr (ExpValue ()
+                                                                                                                                                                                                (137:38)-(137:41)
+                                                                                                                                                                                                (ValVariable "cstg")))])))])))]]
+                                                    Nothing,
+                                               BlIf ()
+                                                    (139:17)-(146:21)
+                                                    Nothing
+                                                    Nothing
+                                                    [Just ExpBinary ()
+                                                                    (139:20)-(139:27)
+                                                                    EQ
+                                                                    (ExpValue ()
+                                                                              (139:20)-(139:22)
+                                                                              (ValVariable "idx"))
+                                                                    (ExpValue ()
+                                                                              (139:27)-(139:27)
+                                                                              (ValInteger "1"
+                                                                                          Nothing))]
+                                                    [[BlComment ()
+                                                                (140:1)-(140:32)
+                                                                (Comment "                 -- initialiser"),
+                                                      BlStatement ()
+                                                                  (141:19)-(141:40)
+                                                                  Nothing
+                                                                  (StIfLogical ()
+                                                                               (141:19)-(141:40)
+                                                                               (ExpBinary ()
+                                                                                          (141:22)-(141:31)
+                                                                                          EQ
+                                                                                          (ExpValue ()
+                                                                                                    (141:22)-(141:25)
+                                                                                                    (ValVariable "lmin"))
+                                                                                          (ExpUnary ()
+                                                                                                    (141:30)-(141:31)
+                                                                                                    Minus
+                                                                                                    (ExpValue ()
+                                                                                                              (141:31)-(141:31)
+                                                                                                              (ValInteger "1"
+                                                                                                                          Nothing))))
+                                                                               (StExpressionAssign ()
+                                                                                                   (141:33)-(141:40)
+                                                                                                   (ExpValue ()
+                                                                                                             (141:33)-(141:36)
+                                                                                                             (ValVariable "lmin"))
+                                                                                                   (ExpValue ()
+                                                                                                             (141:38)-(141:40)
+                                                                                                             (ValVariable "lsp")))),
+                                                      BlComment ()
+                                                                (142:1)-(142:55)
+                                                                (Comment "                 -- favoriser tout separateur-non-vide"),
+                                                      BlStatement ()
+                                                                  (143:19)-(143:39)
+                                                                  Nothing
+                                                                  (StIfLogical ()
+                                                                               (143:19)-(143:39)
+                                                                               (ExpBinary ()
+                                                                                          (143:22)-(143:30)
+                                                                                          EQ
+                                                                                          (ExpValue ()
+                                                                                                    (143:22)-(143:25)
+                                                                                                    (ValVariable "lmin"))
+                                                                                          (ExpValue ()
+                                                                                                    (143:30)-(143:30)
+                                                                                                    (ValInteger "0"
+                                                                                                                Nothing)))
+                                                                               (StExpressionAssign ()
+                                                                                                   (143:32)-(143:39)
+                                                                                                   (ExpValue ()
+                                                                                                             (143:32)-(143:35)
+                                                                                                             (ValVariable "lmin"))
+                                                                                                   (ExpValue ()
+                                                                                                             (143:37)-(143:39)
+                                                                                                             (ValVariable "lsp")))),
+                                                      BlComment ()
+                                                                (144:1)-(144:62)
+                                                                (Comment "                 -- prendre le plus petit separateur-non-vide"),
+                                                      BlStatement ()
+                                                                  (145:19)-(145:58)
+                                                                  Nothing
+                                                                  (StIfLogical ()
+                                                                               (145:19)-(145:58)
+                                                                               (ExpBinary ()
+                                                                                          (145:22)-(145:49)
+                                                                                          And
+                                                                                          (ExpBinary ()
+                                                                                                     (145:22)-(145:34)
+                                                                                                     LT
+                                                                                                     (ExpValue ()
+                                                                                                               (145:23)-(145:25)
+                                                                                                               (ValVariable "lsp"))
+                                                                                                     (ExpValue ()
+                                                                                                               (145:30)-(145:33)
+                                                                                                               (ValVariable "lmin")))
+                                                                                          (ExpBinary ()
+                                                                                                     (145:40)-(145:49)
+                                                                                                     GT
+                                                                                                     (ExpValue ()
+                                                                                                               (145:41)-(145:43)
+                                                                                                               (ValVariable "lsp"))
+                                                                                                     (ExpValue ()
+                                                                                                               (145:48)-(145:48)
+                                                                                                               (ValInteger "0"
+                                                                                                                           Nothing))))
+                                                                               (StExpressionAssign ()
+                                                                                                   (145:51)-(145:58)
+                                                                                                   (ExpValue ()
+                                                                                                             (145:51)-(145:54)
+                                                                                                             (ValVariable "lmin"))
+                                                                                                   (ExpValue ()
+                                                                                                             (145:56)-(145:58)
+                                                                                                             (ValVariable "lsp"))))]]
+                                                    Nothing,
+                                               BlComment ()
+                                                         (147:1)-(147:25)
+                                                         (Comment "eso            segdes,sp"),
+                                               BlStatement ()
+                                                           (148:17)-(148:24)
+                                                           Nothing
+                                                           (StGotoUnconditional ()
+                                                                                (148:17)-(148:24)
+                                                                                (ExpValue ()
+                                                                                          (148:22)-(148:24)
+                                                                                          (ValInteger "120"
+                                                                                                      Nothing)))]]
+                                             Nothing,
+                                        BlComment ()
+                                                  (150:1)-(150:1)
+                                                  (Comment ""),
+                                        BlComment ()
+                                                  (151:1)-(151:49)
+                                                  (Comment "             //si trouve, sauter separateur-tete"),
+                                        BlIf ()
+                                             (152:15)-(157:19)
+                                             Nothing
+                                             Nothing
+                                             [Just ExpBinary ()
+                                                             (152:18)-(152:27)
+                                                             NE
+                                                             (ExpValue ()
+                                                                       (152:18)-(152:21)
+                                                                       (ValVariable "lmin"))
+                                                             (ExpUnary ()
+                                                                       (152:26)-(152:27)
+                                                                       Minus
+                                                                       (ExpValue ()
+                                                                                 (152:27)-(152:27)
+                                                                                 (ValInteger "1"
+                                                                                             Nothing)))]
+                                             [[BlComment ()
+                                                         (153:1)-(153:43)
+                                                         (Comment "               -- sauter separateur-entete"),
+                                               BlStatement ()
+                                                           (154:17)-(154:32)
+                                                           Nothing
+                                                           (StExpressionAssign ()
+                                                                               (154:17)-(154:32)
+                                                                               (ExpValue ()
+                                                                                         (154:17)-(154:21)
+                                                                                         (ValVariable "first"))
+                                                                               (ExpBinary ()
+                                                                                          (154:23)-(154:32)
+                                                                                          Addition
+                                                                                          (ExpValue ()
+                                                                                                    (154:23)-(154:27)
+                                                                                                    (ValVariable "first"))
+                                                                                          (ExpValue ()
+                                                                                                    (154:29)-(154:32)
+                                                                                                    (ValVariable "lmin")))),
+                                               BlComment ()
+                                                         (155:1)-(155:62)
+                                                         (Comment "               //si possible, sauter prochain separateur-tete"),
+                                               BlStatement ()
+                                                           (156:17)-(156:59)
+                                                           Nothing
+                                                           (StIfLogical ()
+                                                                        (156:17)-(156:59)
+                                                                        (ExpBinary ()
+                                                                                   (156:20)-(156:50)
+                                                                                   And
+                                                                                   (ExpBinary ()
+                                                                                              (156:20)-(156:34)
+                                                                                              LTE
+                                                                                              (ExpValue ()
+                                                                                                        (156:21)-(156:25)
+                                                                                                        (ValVariable "first"))
+                                                                                              (ExpValue ()
+                                                                                                        (156:30)-(156:33)
+                                                                                                        (ValVariable "last")))
+                                                                                   (ExpBinary ()
+                                                                                              (156:40)-(156:50)
+                                                                                              GTE
+                                                                                              (ExpValue ()
+                                                                                                        (156:41)-(156:44)
+                                                                                                        (ValVariable "lmin"))
+                                                                                              (ExpValue ()
+                                                                                                        (156:49)-(156:49)
+                                                                                                        (ValInteger "1"
+                                                                                                                    Nothing))))
+                                                                        (StGotoUnconditional ()
+                                                                                             (156:52)-(156:59)
+                                                                                             (ExpValue ()
+                                                                                                       (156:57)-(156:59)
+                                                                                                       (ValInteger "110"
+                                                                                                                   Nothing))))]]
+                                             Nothing,
+                                        BlComment ()
+                                                  (158:1)-(158:50)
+                                                  (Comment "           //fin repeter \"sauter separateur-tete\""),
+                                        BlComment ()
+                                                  (159:1)-(159:1)
+                                                  (Comment ""),
+                                        BlComment ()
+                                                  (160:1)-(160:43)
+                                                  (Comment "           //si possible, chercher morceau"),
+                                        BlIf ()
+                                             (161:13)-(225:17)
+                                             Nothing
+                                             Nothing
+                                             [Just ExpBinary ()
+                                                             (161:16)-(161:28)
+                                                             LTE
+                                                             (ExpValue ()
+                                                                       (161:16)-(161:20)
+                                                                       (ValVariable "first"))
+                                                             (ExpValue ()
+                                                                       (161:25)-(161:28)
+                                                                       (ValVariable "last"))]
+                                             [[BlComment ()
+                                                         (162:1)-(162:44)
+                                                         (Comment "             -- chercher separateur-morceau"),
+                                               BlComment ()
+                                                         (163:1)-(163:50)
+                                                         (Comment "             -- ... donnant le plus petit morceau"),
+                                               BlStatement ()
+                                                           (164:15)-(164:17)
+                                                           Nothing
+                                                           (StExpressionAssign ()
+                                                                               (164:15)-(164:17)
+                                                                               (ExpValue ()
+                                                                                         (164:15)-(164:15)
+                                                                                         (ValVariable "i"))
+                                                                               (ExpValue ()
+                                                                                         (164:17)-(164:17)
+                                                                                         (ValInteger "0"
+                                                                                                     Nothing))),
+                                               BlStatement ()
+                                                           (165:15)-(165:19)
+                                                           Nothing
+                                                           (StExpressionAssign ()
+                                                                               (165:15)-(165:19)
+                                                                               (ExpValue ()
+                                                                                         (165:15)-(165:17)
+                                                                                         (ValVariable "kdx"))
+                                                                               (ExpValue ()
+                                                                                         (165:19)-(165:19)
+                                                                                         (ValInteger "0"
+                                                                                                     Nothing))),
+                                               BlStatement ()
+                                                           (166:15)-(166:21)
+                                                           Nothing
+                                                           (StExpressionAssign ()
+                                                                               (166:15)-(166:21)
+                                                                               (ExpValue ()
+                                                                                         (166:15)-(166:18)
+                                                                                         (ValVariable "lmin"))
+                                                                               (ExpUnary ()
+                                                                                         (166:20)-(166:21)
+                                                                                         Minus
+                                                                                         (ExpValue ()
+                                                                                                   (166:21)-(166:21)
+                                                                                                   (ValInteger "1"
+                                                                                                               Nothing)))),
+                                               BlStatement ()
+                                                           (167:2)-(167:19)
+                                                           (Just ExpValue ()
+                                                                          (167:2)-(167:4)
+                                                                          (ValInteger "130"
+                                                                                      Nothing))
+                                                           (StExpressionAssign ()
+                                                                               (167:15)-(167:19)
+                                                                               (ExpValue ()
+                                                                                         (167:15)-(167:15)
+                                                                                         (ValVariable "i"))
+                                                                               (ExpBinary ()
+                                                                                          (167:17)-(167:19)
+                                                                                          Addition
+                                                                                          (ExpValue ()
+                                                                                                    (167:17)-(167:17)
+                                                                                                    (ValVariable "i"))
+                                                                                          (ExpValue ()
+                                                                                                    (167:19)-(167:19)
+                                                                                                    (ValInteger "1"
+                                                                                                                Nothing)))),
+                                               BlIf ()
+                                                    (168:15)-(194:19)
+                                                    Nothing
+                                                    Nothing
+                                                    [Just ExpBinary ()
+                                                                    (168:18)-(168:43)
+                                                                    LTE
+                                                                    (ExpValue ()
+                                                                              (168:18)-(168:18)
+                                                                              (ValVariable "i"))
+                                                                    (ExpFunctionCall ()
+                                                                                     (168:23)-(168:43)
+                                                                                     (ExpValue ()
+                                                                                               (168:24)-(168:28)
+                                                                                               (ValVariable "esoat"))
+                                                                                     (Just AList ()
+                                                                                                 (168:30)-(168:41)
+                                                                                                 [Argument ()
+                                                                                                           (168:30)-(168:35)
+                                                                                                           Nothing
+                                                                                                           (ArgExpr (ExpValue ()
+                                                                                                                              (168:30)-(168:35)
+                                                                                                                              (ValVariable "splist"))),
+                                                                                                  Argument ()
+                                                                                                           (168:37)-(168:41)
+                                                                                                           Nothing
+                                                                                                           (ArgExpr (ExpValue ()
+                                                                                                                              (168:37)-(168:41)
+                                                                                                                              (ValVariable "ilist")))]))]
+                                                    [[BlStatement ()
+                                                                  (169:17)-(169:52)
+                                                                  Nothing
+                                                                  (StExpressionAssign ()
+                                                                                      (169:17)-(169:52)
+                                                                                      (ExpValue ()
+                                                                                                (169:17)-(169:18)
+                                                                                                (ValVariable "sp"))
+                                                                                      (ExpFunctionCall ()
+                                                                                                       (169:20)-(169:52)
+                                                                                                       (ExpValue ()
+                                                                                                                 (169:20)-(169:22)
+                                                                                                                 (ValIntrinsic "abs"))
+                                                                                                       (Just AList ()
+                                                                                                                   (169:24)-(169:51)
+                                                                                                                   [Argument ()
+                                                                                                                             (169:24)-(169:51)
+                                                                                                                             Nothing
+                                                                                                                             (ArgExpr (ExpFunctionCall ()
+                                                                                                                                                       (169:24)-(169:51)
+                                                                                                                                                       (ExpValue ()
+                                                                                                                                                                 (169:24)-(169:28)
+                                                                                                                                                                 (ValVariable "esoar"))
+                                                                                                                                                       (Just AList ()
+                                                                                                                                                                   (169:30)-(169:50)
+                                                                                                                                                                   [Argument ()
+                                                                                                                                                                             (169:30)-(169:48)
+                                                                                                                                                                             Nothing
+                                                                                                                                                                             (ArgExpr (ExpFunctionCall ()
+                                                                                                                                                                                                       (169:30)-(169:48)
+                                                                                                                                                                                                       (ExpValue ()
+                                                                                                                                                                                                                 (169:30)-(169:34)
+                                                                                                                                                                                                                 (ValVariable "esoat"))
+                                                                                                                                                                                                       (Just AList ()
+                                                                                                                                                                                                                   (169:36)-(169:47)
+                                                                                                                                                                                                                   [Argument ()
+                                                                                                                                                                                                                             (169:36)-(169:41)
+                                                                                                                                                                                                                             Nothing
+                                                                                                                                                                                                                             (ArgExpr (ExpValue ()
+                                                                                                                                                                                                                                                (169:36)-(169:41)
+                                                                                                                                                                                                                                                (ValVariable "splist"))),
+                                                                                                                                                                                                                    Argument ()
+                                                                                                                                                                                                                             (169:43)-(169:47)
+                                                                                                                                                                                                                             Nothing
+                                                                                                                                                                                                                             (ArgExpr (ExpValue ()
+                                                                                                                                                                                                                                                (169:43)-(169:47)
+                                                                                                                                                                                                                                                (ValVariable "elist")))]))),
+                                                                                                                                                                    Argument ()
+                                                                                                                                                                             (169:50)-(169:50)
+                                                                                                                                                                             Nothing
+                                                                                                                                                                             (ArgExpr (ExpValue ()
+                                                                                                                                                                                                (169:50)-(169:50)
+                                                                                                                                                                                                (ValVariable "i")))])))]))),
+                                                      BlComment ()
+                                                                (170:1)-(170:25)
+                                                                (Comment "eso            segact,sp"),
+                                                      BlStatement ()
+                                                                  (171:17)-(171:43)
+                                                                  Nothing
+                                                                  (StExpressionAssign ()
+                                                                                      (171:17)-(171:43)
+                                                                                      (ExpValue ()
+                                                                                                (171:17)-(171:19)
+                                                                                                (ValVariable "lsp"))
+                                                                                      (ExpFunctionCall ()
+                                                                                                       (171:21)-(171:43)
+                                                                                                       (ExpValue ()
+                                                                                                                 (171:21)-(171:25)
+                                                                                                                 (ValVariable "esosl"))
+                                                                                                       (Just AList ()
+                                                                                                                   (171:27)-(171:42)
+                                                                                                                   [Argument ()
+                                                                                                                             (171:27)-(171:40)
+                                                                                                                             Nothing
+                                                                                                                             (ArgExpr (ExpFunctionCall ()
+                                                                                                                                                       (171:27)-(171:40)
+                                                                                                                                                       (ExpValue ()
+                                                                                                                                                                 (171:27)-(171:31)
+                                                                                                                                                                 (ValVariable "esoat"))
+                                                                                                                                                       (Just AList ()
+                                                                                                                                                                   (171:33)-(171:39)
+                                                                                                                                                                   [Argument ()
+                                                                                                                                                                             (171:33)-(171:34)
+                                                                                                                                                                             Nothing
+                                                                                                                                                                             (ArgExpr (ExpValue ()
+                                                                                                                                                                                                (171:33)-(171:34)
+                                                                                                                                                                                                (ValVariable "sp"))),
+                                                                                                                                                                    Argument ()
+                                                                                                                                                                             (171:36)-(171:39)
+                                                                                                                                                                             Nothing
+                                                                                                                                                                             (ArgExpr (ExpValue ()
+                                                                                                                                                                                                (171:36)-(171:39)
+                                                                                                                                                                                                (ValVariable "cstg")))]))),
+                                                                                                                    Argument ()
+                                                                                                                             (171:42)-(171:42)
+                                                                                                                             Nothing
+                                                                                                                             (ArgExpr (ExpValue ()
+                                                                                                                                                (171:42)-(171:42)
+                                                                                                                                                (ValInteger "1"
+                                                                                                                                                            Nothing)))]))),
+                                                      BlIf ()
+                                                           (172:17)-(177:21)
+                                                           Nothing
+                                                           Nothing
+                                                           [Just ExpBinary ()
+                                                                           (172:20)-(172:27)
+                                                                           EQ
+                                                                           (ExpValue ()
+                                                                                     (172:20)-(172:22)
+                                                                                     (ValVariable "lsp"))
+                                                                           (ExpValue ()
+                                                                                     (172:27)-(172:27)
+                                                                                     (ValInteger "0"
+                                                                                                 Nothing)),
+                                                            Nothing]
+                                                           [[BlStatement ()
+                                                                         (173:19)-(173:23)
+                                                                         Nothing
+                                                                         (StExpressionAssign ()
+                                                                                             (173:19)-(173:23)
+                                                                                             (ExpValue ()
+                                                                                                       (173:19)-(173:21)
+                                                                                                       (ValVariable "idx"))
+                                                                                             (ExpValue ()
+                                                                                                       (173:23)-(173:23)
+                                                                                                       (ValInteger "1"
+                                                                                                                   Nothing)))],
+                                                            [BlStatement ()
+                                                                         (175:19)-(176:43)
+                                                                         Nothing
+                                                                         (StExpressionAssign ()
+                                                                                             (175:19)-(176:43)
+                                                                                             (ExpValue ()
+                                                                                                       (175:19)-(175:21)
+                                                                                                       (ValVariable "idx"))
+                                                                                             (ExpFunctionCall ()
+                                                                                                              (175:23)-(176:43)
+                                                                                                              (ExpValue ()
+                                                                                                                        (175:23)-(175:27)
+                                                                                                                        (ValIntrinsic "index"))
+                                                                                                              (Just AList ()
+                                                                                                                          (175:29)-(176:42)
+                                                                                                                          [Argument ()
+                                                                                                                                    (175:29)-(175:54)
+                                                                                                                                    Nothing
+                                                                                                                                    (ArgExpr (ExpSubscript ()
+                                                                                                                                                           (175:29)-(175:54)
+                                                                                                                                                           (ExpFunctionCall ()
+                                                                                                                                                                            (175:29)-(175:42)
+                                                                                                                                                                            (ExpValue ()
+                                                                                                                                                                                      (175:29)-(175:33)
+                                                                                                                                                                                      (ValVariable "esoat"))
+                                                                                                                                                                            (Just AList ()
+                                                                                                                                                                                        (175:35)-(175:41)
+                                                                                                                                                                                        [Argument ()
+                                                                                                                                                                                                  (175:35)-(175:36)
+                                                                                                                                                                                                  Nothing
+                                                                                                                                                                                                  (ArgExpr (ExpValue ()
+                                                                                                                                                                                                                     (175:35)-(175:36)
+                                                                                                                                                                                                                     (ValVariable "xs"))),
+                                                                                                                                                                                         Argument ()
+                                                                                                                                                                                                  (175:38)-(175:41)
+                                                                                                                                                                                                  Nothing
+                                                                                                                                                                                                  (ArgExpr (ExpValue ()
+                                                                                                                                                                                                                     (175:38)-(175:41)
+                                                                                                                                                                                                                     (ValVariable "cstg")))]))
+                                                                                                                                                           (AList ()
+                                                                                                                                                                  (175:44)-(175:53)
+                                                                                                                                                                  [IxRange ()
+                                                                                                                                                                           (175:44)-(175:53)
+                                                                                                                                                                           (Just ExpValue ()
+                                                                                                                                                                                          (175:44)-(175:48)
+                                                                                                                                                                                          (ValVariable "first"))
+                                                                                                                                                                           (Just ExpValue ()
+                                                                                                                                                                                          (175:50)-(175:53)
+                                                                                                                                                                                          (ValVariable "last"))
+                                                                                                                                                                           Nothing]))),
+                                                                                                                           Argument ()
+                                                                                                                                    (176:29)-(176:42)
+                                                                                                                                    Nothing
+                                                                                                                                    (ArgExpr (ExpFunctionCall ()
+                                                                                                                                                              (176:29)-(176:42)
+                                                                                                                                                              (ExpValue ()
+                                                                                                                                                                        (176:29)-(176:33)
+                                                                                                                                                                        (ValVariable "esoat"))
+                                                                                                                                                              (Just AList ()
+                                                                                                                                                                          (176:35)-(176:41)
+                                                                                                                                                                          [Argument ()
+                                                                                                                                                                                    (176:35)-(176:36)
+                                                                                                                                                                                    Nothing
+                                                                                                                                                                                    (ArgExpr (ExpValue ()
+                                                                                                                                                                                                       (176:35)-(176:36)
+                                                                                                                                                                                                       (ValVariable "sp"))),
+                                                                                                                                                                           Argument ()
+                                                                                                                                                                                    (176:38)-(176:41)
+                                                                                                                                                                                    Nothing
+                                                                                                                                                                                    (ArgExpr (ExpValue ()
+                                                                                                                                                                                                       (176:38)-(176:41)
+                                                                                                                                                                                                       (ValVariable "cstg")))])))])))]]
+                                                           Nothing,
+                                                      BlIf ()
+                                                           (178:17)-(191:21)
+                                                           Nothing
+                                                           Nothing
+                                                           [Just ExpBinary ()
+                                                                           (178:20)-(178:27)
+                                                                           NE
+                                                                           (ExpValue ()
+                                                                                     (178:20)-(178:22)
+                                                                                     (ValVariable "idx"))
+                                                                           (ExpValue ()
+                                                                                     (178:27)-(178:27)
+                                                                                     (ValInteger "0"
+                                                                                                 Nothing))]
+                                                           [[BlIf ()
+                                                                  (179:19)-(182:23)
+                                                                  Nothing
+                                                                  Nothing
+                                                                  [Just ExpBinary ()
+                                                                                  (179:22)-(179:29)
+                                                                                  EQ
+                                                                                  (ExpValue ()
+                                                                                            (179:22)-(179:24)
+                                                                                            (ValVariable "kdx"))
+                                                                                  (ExpValue ()
+                                                                                            (179:29)-(179:29)
+                                                                                            (ValInteger "0"
+                                                                                                        Nothing))]
+                                                                  [[BlStatement ()
+                                                                                (180:21)-(180:27)
+                                                                                Nothing
+                                                                                (StExpressionAssign ()
+                                                                                                    (180:21)-(180:27)
+                                                                                                    (ExpValue ()
+                                                                                                              (180:21)-(180:23)
+                                                                                                              (ValVariable "kdx"))
+                                                                                                    (ExpValue ()
+                                                                                                              (180:25)-(180:27)
+                                                                                                              (ValVariable "idx"))),
+                                                                    BlStatement ()
+                                                                                (181:21)-(181:28)
+                                                                                Nothing
+                                                                                (StExpressionAssign ()
+                                                                                                    (181:21)-(181:28)
+                                                                                                    (ExpValue ()
+                                                                                                              (181:21)-(181:24)
+                                                                                                              (ValVariable "lmin"))
+                                                                                                    (ExpValue ()
+                                                                                                              (181:26)-(181:28)
+                                                                                                              (ValVariable "lsp")))]]
+                                                                  Nothing,
+                                                             BlIf ()
+                                                                  (183:19)-(186:23)
+                                                                  Nothing
+                                                                  Nothing
+                                                                  [Just ExpBinary ()
+                                                                                  (183:22)-(183:31)
+                                                                                  LT
+                                                                                  (ExpValue ()
+                                                                                            (183:22)-(183:24)
+                                                                                            (ValVariable "idx"))
+                                                                                  (ExpValue ()
+                                                                                            (183:29)-(183:31)
+                                                                                            (ValVariable "kdx"))]
+                                                                  [[BlStatement ()
+                                                                                (184:21)-(184:27)
+                                                                                Nothing
+                                                                                (StExpressionAssign ()
+                                                                                                    (184:21)-(184:27)
+                                                                                                    (ExpValue ()
+                                                                                                              (184:21)-(184:23)
+                                                                                                              (ValVariable "kdx"))
+                                                                                                    (ExpValue ()
+                                                                                                              (184:25)-(184:27)
+                                                                                                              (ValVariable "idx"))),
+                                                                    BlStatement ()
+                                                                                (185:21)-(185:28)
+                                                                                Nothing
+                                                                                (StExpressionAssign ()
+                                                                                                    (185:21)-(185:28)
+                                                                                                    (ExpValue ()
+                                                                                                              (185:21)-(185:24)
+                                                                                                              (ValVariable "lmin"))
+                                                                                                    (ExpValue ()
+                                                                                                              (185:26)-(185:28)
+                                                                                                              (ValVariable "lsp")))]]
+                                                                  Nothing,
+                                                             BlIf ()
+                                                                  (187:19)-(190:23)
+                                                                  Nothing
+                                                                  Nothing
+                                                                  [Just ExpBinary ()
+                                                                                  (187:22)-(187:51)
+                                                                                  And
+                                                                                  (ExpBinary ()
+                                                                                             (187:22)-(187:33)
+                                                                                             EQ
+                                                                                             (ExpValue ()
+                                                                                                       (187:23)-(187:25)
+                                                                                                       (ValVariable "idx"))
+                                                                                             (ExpValue ()
+                                                                                                       (187:30)-(187:32)
+                                                                                                       (ValVariable "kdx")))
+                                                                                  (ExpBinary ()
+                                                                                             (187:39)-(187:51)
+                                                                                             LT
+                                                                                             (ExpValue ()
+                                                                                                       (187:40)-(187:42)
+                                                                                                       (ValVariable "lsp"))
+                                                                                             (ExpValue ()
+                                                                                                       (187:47)-(187:50)
+                                                                                                       (ValVariable "lmin")))]
+                                                                  [[BlStatement ()
+                                                                                (188:21)-(188:27)
+                                                                                Nothing
+                                                                                (StExpressionAssign ()
+                                                                                                    (188:21)-(188:27)
+                                                                                                    (ExpValue ()
+                                                                                                              (188:21)-(188:23)
+                                                                                                              (ValVariable "kdx"))
+                                                                                                    (ExpValue ()
+                                                                                                              (188:25)-(188:27)
+                                                                                                              (ValVariable "idx"))),
+                                                                    BlStatement ()
+                                                                                (189:21)-(189:28)
+                                                                                Nothing
+                                                                                (StExpressionAssign ()
+                                                                                                    (189:21)-(189:28)
+                                                                                                    (ExpValue ()
+                                                                                                              (189:21)-(189:24)
+                                                                                                              (ValVariable "lmin"))
+                                                                                                    (ExpValue ()
+                                                                                                              (189:26)-(189:28)
+                                                                                                              (ValVariable "lsp")))]]
+                                                                  Nothing]]
+                                                           Nothing,
+                                                      BlComment ()
+                                                                (192:1)-(192:25)
+                                                                (Comment "eso            segdes,sp"),
+                                                      BlStatement ()
+                                                                  (193:17)-(193:24)
+                                                                  Nothing
+                                                                  (StGotoUnconditional ()
+                                                                                       (193:17)-(193:24)
+                                                                                       (ExpValue ()
+                                                                                                 (193:22)-(193:24)
+                                                                                                 (ValInteger "130"
+                                                                                                             Nothing)))]]
+                                                    Nothing,
+                                               BlComment ()
+                                                         (195:1)-(195:1)
+                                                         (Comment ""),
+                                               BlComment ()
+                                                         (196:1)-(196:43)
+                                                         (Comment "             -- determiner limites morceau"),
+                                               BlIf ()
+                                                    (197:15)-(208:19)
+                                                    Nothing
+                                                    Nothing
+                                                    [Just ExpBinary ()
+                                                                    (197:18)-(197:25)
+                                                                    NE
+                                                                    (ExpValue ()
+                                                                              (197:18)-(197:20)
+                                                                              (ValVariable "kdx"))
+                                                                    (ExpValue ()
+                                                                              (197:25)-(197:25)
+                                                                              (ValInteger "0"
+                                                                                          Nothing)),
+                                                     Nothing]
+                                                    [[BlStatement ()
+                                                                  (198:17)-(198:28)
+                                                                  Nothing
+                                                                  (StExpressionAssign ()
+                                                                                      (198:17)-(198:28)
+                                                                                      (ExpValue ()
+                                                                                                (198:17)-(198:22)
+                                                                                                (ValVariable "mfirst"))
+                                                                                      (ExpValue ()
+                                                                                                (198:24)-(198:28)
+                                                                                                (ValVariable "first"))),
+                                                      BlIf ()
+                                                           (199:17)-(203:21)
+                                                           Nothing
+                                                           Nothing
+                                                           [Just ExpBinary ()
+                                                                           (199:20)-(199:27)
+                                                                           EQ
+                                                                           (ExpValue ()
+                                                                                     (199:20)-(199:22)
+                                                                                     (ValVariable "kdx"))
+                                                                           (ExpValue ()
+                                                                                     (199:27)-(199:27)
+                                                                                     (ValInteger "1"
+                                                                                                 Nothing)),
+                                                            Nothing]
+                                                           [[BlStatement ()
+                                                                         (200:19)-(200:29)
+                                                                         Nothing
+                                                                         (StExpressionAssign ()
+                                                                                             (200:19)-(200:29)
+                                                                                             (ExpValue ()
+                                                                                                       (200:19)-(200:23)
+                                                                                                       (ValVariable "mlast"))
+                                                                                             (ExpValue ()
+                                                                                                       (200:25)-(200:29)
+                                                                                                       (ValVariable "first")))],
+                                                            [BlStatement ()
+                                                                         (202:19)-(202:35)
+                                                                         Nothing
+                                                                         (StExpressionAssign ()
+                                                                                             (202:19)-(202:35)
+                                                                                             (ExpValue ()
+                                                                                                       (202:19)-(202:23)
+                                                                                                       (ValVariable "mlast"))
+                                                                                             (ExpBinary ()
+                                                                                                        (202:25)-(202:35)
+                                                                                                        Subtraction
+                                                                                                        (ExpBinary ()
+                                                                                                                   (202:25)-(202:33)
+                                                                                                                   Addition
+                                                                                                                   (ExpValue ()
+                                                                                                                             (202:25)-(202:29)
+                                                                                                                             (ValVariable "first"))
+                                                                                                                   (ExpValue ()
+                                                                                                                             (202:31)-(202:33)
+                                                                                                                             (ValVariable "kdx")))
+                                                                                                        (ExpValue ()
+                                                                                                                  (202:35)-(202:35)
+                                                                                                                  (ValInteger "2"
+                                                                                                                              Nothing))))]]
+                                                           Nothing],
+                                                     [BlStatement ()
+                                                                  (205:17)-(205:22)
+                                                                  Nothing
+                                                                  (StExpressionAssign ()
+                                                                                      (205:17)-(205:22)
+                                                                                      (ExpValue ()
+                                                                                                (205:17)-(205:20)
+                                                                                                (ValVariable "lmin"))
+                                                                                      (ExpValue ()
+                                                                                                (205:22)-(205:22)
+                                                                                                (ValInteger "0"
+                                                                                                            Nothing))),
+                                                      BlStatement ()
+                                                                  (206:17)-(206:28)
+                                                                  Nothing
+                                                                  (StExpressionAssign ()
+                                                                                      (206:17)-(206:28)
+                                                                                      (ExpValue ()
+                                                                                                (206:17)-(206:22)
+                                                                                                (ValVariable "mfirst"))
+                                                                                      (ExpValue ()
+                                                                                                (206:24)-(206:28)
+                                                                                                (ValVariable "first"))),
+                                                      BlStatement ()
+                                                                  (207:17)-(207:26)
+                                                                  Nothing
+                                                                  (StExpressionAssign ()
+                                                                                      (207:17)-(207:26)
+                                                                                      (ExpValue ()
+                                                                                                (207:17)-(207:21)
+                                                                                                (ValVariable "mlast"))
+                                                                                      (ExpValue ()
+                                                                                                (207:23)-(207:26)
+                                                                                                (ValVariable "last")))]]
+                                                    Nothing,
+                                               BlComment ()
+                                                         (209:1)-(209:1)
+                                                         (Comment ""),
+                                               BlComment ()
+                                                         (210:1)-(210:32)
+                                                         (Comment "             -- ranger morceau "),
+                                               BlStatement ()
+                                                           (211:15)-(211:33)
+                                                           Nothing
+                                                           (StExpressionAssign ()
+                                                                               (211:15)-(211:33)
+                                                                               (ExpValue ()
+                                                                                         (211:15)-(211:18)
+                                                                                         (ValVariable "lstg"))
+                                                                               (ExpBinary ()
+                                                                                          (211:20)-(211:33)
+                                                                                          Addition
+                                                                                          (ExpBinary ()
+                                                                                                     (211:20)-(211:31)
+                                                                                                     Subtraction
+                                                                                                     (ExpValue ()
+                                                                                                               (211:20)-(211:24)
+                                                                                                               (ValVariable "mlast"))
+                                                                                                     (ExpValue ()
+                                                                                                               (211:26)-(211:31)
+                                                                                                               (ValVariable "mfirst")))
+                                                                                          (ExpValue ()
+                                                                                                    (211:33)-(211:33)
+                                                                                                    (ValInteger "1"
+                                                                                                                Nothing)))),
+                                               BlComment ()
+                                                         (212:1)-(212:23)
+                                                         (Comment "eso          segini,ms"),
+                                               BlStatement ()
+                                                           (213:17)-(213:59)
+                                                           Nothing
+                                                           (StFunction ()
+                                                                       (213:17)-(213:59)
+                                                                       (ExpValue ()
+                                                                                 (213:17)-(213:21)
+                                                                                 (ValVariable "esoat"))
+                                                                       (AList ()
+                                                                              (213:23)-(213:29)
+                                                                              [ExpValue ()
+                                                                                        (213:23)-(213:24)
+                                                                                        (ValVariable "ms"),
+                                                                               ExpValue ()
+                                                                                        (213:26)-(213:29)
+                                                                                        (ValVariable "cstg")])
+                                                                       (ExpSubscript ()
+                                                                                     (213:32)-(213:59)
+                                                                                     (ExpFunctionCall ()
+                                                                                                      (213:32)-(213:45)
+                                                                                                      (ExpValue ()
+                                                                                                                (213:32)-(213:36)
+                                                                                                                (ValVariable "esoat"))
+                                                                                                      (Just AList ()
+                                                                                                                  (213:38)-(213:44)
+                                                                                                                  [Argument ()
+                                                                                                                            (213:38)-(213:39)
+                                                                                                                            Nothing
+                                                                                                                            (ArgExpr (ExpValue ()
+                                                                                                                                               (213:38)-(213:39)
+                                                                                                                                               (ValVariable "xs"))),
+                                                                                                                   Argument ()
+                                                                                                                            (213:41)-(213:44)
+                                                                                                                            Nothing
+                                                                                                                            (ArgExpr (ExpValue ()
+                                                                                                                                               (213:41)-(213:44)
+                                                                                                                                               (ValVariable "cstg")))]))
+                                                                                     (AList ()
+                                                                                            (213:47)-(213:58)
+                                                                                            [IxRange ()
+                                                                                                     (213:47)-(213:58)
+                                                                                                     (Just ExpValue ()
+                                                                                                                    (213:47)-(213:52)
+                                                                                                                    (ValVariable "mfirst"))
+                                                                                                     (Just ExpValue ()
+                                                                                                                    (213:54)-(213:58)
+                                                                                                                    (ValVariable "mlast"))
+                                                                                                     Nothing]))),
+                                               BlComment ()
+                                                         (214:1)-(214:23)
+                                                         (Comment "eso          segdes,ms"),
+                                               BlStatement ()
+                                                           (215:15)-(215:53)
+                                                           Nothing
+                                                           (StFunction ()
+                                                                       (215:15)-(215:53)
+                                                                       (ExpValue ()
+                                                                                 (215:15)-(215:19)
+                                                                                 (ValVariable "esoat"))
+                                                                       (AList ()
+                                                                              (215:21)-(215:31)
+                                                                              [ExpValue ()
+                                                                                        (215:21)-(215:25)
+                                                                                        (ValVariable "rlist"),
+                                                                               ExpValue ()
+                                                                                        (215:27)-(215:31)
+                                                                                        (ValVariable "ilist")])
+                                                                       (ExpBinary ()
+                                                                                  (215:34)-(215:53)
+                                                                                  Addition
+                                                                                  (ExpFunctionCall ()
+                                                                                                   (215:34)-(215:51)
+                                                                                                   (ExpValue ()
+                                                                                                             (215:34)-(215:38)
+                                                                                                             (ValVariable "esoat"))
+                                                                                                   (Just AList ()
+                                                                                                               (215:40)-(215:50)
+                                                                                                               [Argument ()
+                                                                                                                         (215:40)-(215:44)
+                                                                                                                         Nothing
+                                                                                                                         (ArgExpr (ExpValue ()
+                                                                                                                                            (215:40)-(215:44)
+                                                                                                                                            (ValVariable "rlist"))),
+                                                                                                                Argument ()
+                                                                                                                         (215:46)-(215:50)
+                                                                                                                         Nothing
+                                                                                                                         (ArgExpr (ExpValue ()
+                                                                                                                                            (215:46)-(215:50)
+                                                                                                                                            (ValVariable "ilist")))]))
+                                                                                  (ExpValue ()
+                                                                                            (215:53)-(215:53)
+                                                                                            (ValInteger "1"
+                                                                                                        Nothing)))),
+                                               BlIf ()
+                                                    (216:15)-(219:19)
+                                                    Nothing
+                                                    Nothing
+                                                    [Just ExpBinary ()
+                                                                    (216:18)-(216:46)
+                                                                    GT
+                                                                    (ExpFunctionCall ()
+                                                                                     (216:18)-(216:37)
+                                                                                     (ExpValue ()
+                                                                                               (216:19)-(216:23)
+                                                                                               (ValVariable "esoat"))
+                                                                                     (Just AList ()
+                                                                                                 (216:25)-(216:35)
+                                                                                                 [Argument ()
+                                                                                                           (216:25)-(216:29)
+                                                                                                           Nothing
+                                                                                                           (ArgExpr (ExpValue ()
+                                                                                                                              (216:25)-(216:29)
+                                                                                                                              (ValVariable "rlist"))),
+                                                                                                  Argument ()
+                                                                                                           (216:31)-(216:35)
+                                                                                                           Nothing
+                                                                                                           (ArgExpr (ExpValue ()
+                                                                                                                              (216:31)-(216:35)
+                                                                                                                              (ValVariable "ilist")))]))
+                                                                    (ExpValue ()
+                                                                              (216:42)-(216:46)
+                                                                              (ValVariable "nlist"))]
+                                                    [[BlStatement ()
+                                                                  (217:17)-(217:30)
+                                                                  Nothing
+                                                                  (StExpressionAssign ()
+                                                                                      (217:17)-(217:30)
+                                                                                      (ExpValue ()
+                                                                                                (217:17)-(217:21)
+                                                                                                (ValVariable "nlist"))
+                                                                                      (ExpBinary ()
+                                                                                                 (217:23)-(217:30)
+                                                                                                 Addition
+                                                                                                 (ExpValue ()
+                                                                                                           (217:23)-(217:27)
+                                                                                                           (ValVariable "nlist"))
+                                                                                                 (ExpValue ()
+                                                                                                           (217:29)-(217:30)
+                                                                                                           (ValInteger "10"
+                                                                                                                       Nothing)))),
+                                                      BlComment ()
+                                                                (218:1)-(218:28)
+                                                                (Comment "eso            segadj,rlist")]]
+                                                    Nothing,
+                                               BlStatement ()
+                                                           (220:15)-(220:61)
+                                                           Nothing
+                                                           (StFunction ()
+                                                                       (220:15)-(220:61)
+                                                                       (ExpValue ()
+                                                                                 (220:15)-(220:19)
+                                                                                 (ValVariable "esoar"))
+                                                                       (AList ()
+                                                                              (220:21)-(220:57)
+                                                                              [ExpFunctionCall ()
+                                                                                               (220:21)-(220:38)
+                                                                                               (ExpValue ()
+                                                                                                         (220:21)-(220:25)
+                                                                                                         (ValVariable "esoat"))
+                                                                                               (Just AList ()
+                                                                                                           (220:27)-(220:37)
+                                                                                                           [Argument ()
+                                                                                                                     (220:27)-(220:31)
+                                                                                                                     Nothing
+                                                                                                                     (ArgExpr (ExpValue ()
+                                                                                                                                        (220:27)-(220:31)
+                                                                                                                                        (ValVariable "rlist"))),
+                                                                                                            Argument ()
+                                                                                                                     (220:33)-(220:37)
+                                                                                                                     Nothing
+                                                                                                                     (ArgExpr (ExpValue ()
+                                                                                                                                        (220:33)-(220:37)
+                                                                                                                                        (ValVariable "elist")))]),
+                                                                               ExpFunctionCall ()
+                                                                                               (220:40)-(220:57)
+                                                                                               (ExpValue ()
+                                                                                                         (220:40)-(220:44)
+                                                                                                         (ValVariable "esoat"))
+                                                                                               (Just AList ()
+                                                                                                           (220:46)-(220:56)
+                                                                                                           [Argument ()
+                                                                                                                     (220:46)-(220:50)
+                                                                                                                     Nothing
+                                                                                                                     (ArgExpr (ExpValue ()
+                                                                                                                                        (220:46)-(220:50)
+                                                                                                                                        (ValVariable "rlist"))),
+                                                                                                            Argument ()
+                                                                                                                     (220:52)-(220:56)
+                                                                                                                     Nothing
+                                                                                                                     (ArgExpr (ExpValue ()
+                                                                                                                                        (220:52)-(220:56)
+                                                                                                                                        (ValVariable "ilist")))])])
+                                                                       (ExpValue ()
+                                                                                 (220:60)-(220:61)
+                                                                                 (ValVariable "ms"))),
+                                               BlComment ()
+                                                         (221:1)-(221:1)
+                                                         (Comment ""),
+                                               BlComment ()
+                                                         (222:1)-(222:54)
+                                                         (Comment "             //si possible, decouper prochain morceau"),
+                                               BlStatement ()
+                                                           (223:15)-(223:32)
+                                                           Nothing
+                                                           (StExpressionAssign ()
+                                                                               (223:15)-(223:32)
+                                                                               (ExpValue ()
+                                                                                         (223:15)-(223:19)
+                                                                                         (ValVariable "first"))
+                                                                               (ExpBinary ()
+                                                                                          (223:21)-(223:32)
+                                                                                          Addition
+                                                                                          (ExpBinary ()
+                                                                                                     (223:21)-(223:30)
+                                                                                                     Addition
+                                                                                                     (ExpValue ()
+                                                                                                               (223:21)-(223:25)
+                                                                                                               (ValVariable "mlast"))
+                                                                                                     (ExpValue ()
+                                                                                                               (223:27)-(223:30)
+                                                                                                               (ValVariable "lmin")))
+                                                                                          (ExpValue ()
+                                                                                                    (223:32)-(223:32)
+                                                                                                    (ValInteger "1"
+                                                                                                                Nothing)))),
+                                               BlStatement ()
+                                                           (224:15)-(224:39)
+                                                           Nothing
+                                                           (StIfLogical ()
+                                                                        (224:15)-(224:39)
+                                                                        (ExpBinary ()
+                                                                                   (224:18)-(224:30)
+                                                                                   LTE
+                                                                                   (ExpValue ()
+                                                                                             (224:18)-(224:22)
+                                                                                             (ValVariable "first"))
+                                                                                   (ExpValue ()
+                                                                                             (224:27)-(224:30)
+                                                                                             (ValVariable "last")))
+                                                                        (StGotoUnconditional ()
+                                                                                             (224:32)-(224:39)
+                                                                                             (ExpValue ()
+                                                                                                       (224:37)-(224:39)
+                                                                                                       (ValInteger "100"
+                                                                                                                   Nothing))))]]
+                                             Nothing,
+                                        BlComment ()
+                                                  (226:1)-(226:1)
+                                                  (Comment ""),
+                                        BlComment ()
+                                                  (227:1)-(227:42)
+                                                  (Comment "         //fin repeter \"decouper morceau\"")]]
+                                      Nothing,
+                                 BlComment () (229:1)-(229:1) (Comment ""),
+                                 BlComment ()
+                                           (230:1)-(230:17)
+                                           (Comment "eso    segdes,xs")]
+                                Nothing,
+                           BlComment ()
+                                     (232:1)-(232:44)
+                                     (Comment "     //fin repeter \"decouper chaque chaine\""),
+                           BlComment () (233:1)-(233:1) (Comment ""),
+                           BlComment ()
+                                     (234:1)-(234:18)
+                                     (Comment "eso  segdes,alist"),
+                           BlComment ()
+                                     (235:1)-(235:19)
+                                     (Comment "eso  segdes,splist"),
+                           BlComment ()
+                                     (236:1)-(236:18)
+                                     (Comment "eso  segdes,rlist"),
+                           BlStatement ()
+                                       (237:7)-(237:12)
+                                       Nothing
+                                       (StReturn () (237:7)-(237:12) Nothing)]
                           Nothing]
 '
 ]
@@ -24278,7 +26389,7 @@ PP2FortranSrcGrammarTest class >> valrmaAst [
 
 	^ 'ProgramFile (MetaInfo
                      {miVersion = Fortran77,
-                      miFilename = "/Users/Younoussa/Documents/demoparser/valrma.f"})
+                      miFilename = "/Users/Younoussa/Documents/demoparser/tmp/valrma.f"})
             [PUSubroutine ()
                           (1:7)-(111:9)
                           (Nothing, Nothing)
@@ -25306,6 +27417,12 @@ PP2FortranSrcGrammarTest >> testFullFileStgbrk [
 ]
 
 { #category : #'tests - allnodes' }
+PP2FortranSrcGrammarTest >> testFullFileStgbrkEso [
+
+	self parse: self class stgbrkAstEso rule: #start
+]
+
+{ #category : #'tests - allnodes' }
 PP2FortranSrcGrammarTest >> testFullFileStgget [
 
 	self parse: self class stggetAst  rule: #start
@@ -25681,6 +27798,29 @@ PP2FortranSrcGrammarTest >> testStExpressionAssign [
 		(ValInteger "0" Nothing))'
 		rule: #statement.
 
+]
+
+{ #category : #'tests-statement' }
+PP2FortranSrcGrammarTest >> testStFunction [
+
+	self
+		parse: 'StFunction ()
+	(100:7)-(100:26)
+	(ExpValue ()
+		(100:7)-(100:11)
+ 		(ValVariable "esoat"))
+	(AList ()
+		(100:13)-(100:23)
+		[ExpValue ()
+			(100:13)-(100:17)
+			(ValVariable "rlist"),
+		ExpValue ()
+			(100:19)-(100:23)
+			(ValVariable "ilist")])
+	(ExpValue ()
+		(100:26)-(100:26)
+		(ValInteger "0" Nothing))'
+		rule: #statement
 ]
 
 { #category : #'tests-statement' }
