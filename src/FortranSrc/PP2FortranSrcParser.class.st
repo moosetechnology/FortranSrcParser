@@ -339,7 +339,7 @@ PP2FortranSrcParser >> puComment [
 
 	^ super puComment ==> [ :nodes | 
 	  (self newEntity: FamixFortranComment)
-		  content: nodes fourth second second;
+		  content: nodes second second;
 		  yourself ]
 ]
 
