@@ -499,7 +499,6 @@ PP2FortranSrcParserTest >> testProgramFileNoEmpty [
 		[]
 	Nothing]'
 		       rule: #programFile.
-
 	self
 		assert: (parser model allWithType: FamixFortranProgramFile) size
 		equals: 1.

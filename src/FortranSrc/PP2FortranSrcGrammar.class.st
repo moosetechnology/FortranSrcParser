@@ -675,6 +675,12 @@ PP2FortranSrcGrammar >> statement [
 	"/ ststop / stPause / stRead / stRead2 / stWrite / stPrint / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum / stFormatBogus"
 ]
 
+{ #category : #'grammar-helper' }
+PP2FortranSrcGrammar >> surrounded: aRule by: aToken [
+
+	^ (self token: aToken) , aRule , (self token: aToken)
+]
+
 { #category : #token }
 PP2FortranSrcGrammar >> tkComma [
 

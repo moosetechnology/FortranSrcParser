@@ -9,7 +9,7 @@ PP2FortranSrcGrammarTest class >> stgbrkAst [
 
 	^ 'ProgramFile (MetaInfo
                      {miVersion = Fortran77,
-                      miFilename = "/Users/Younoussa/Documents/demoparser/tmp/stgbrk.f"})
+                      miFilename = "/Users/sow/Documents/framadcode/demo/src/stgbrk.f"})
             [PUSubroutine ()
                           (1:7)-(302:9)
                           (Nothing, Nothing)

@@ -61,17 +61,19 @@ PP2FortranSrcParser >> argument [
 
 { #category : #'grammar-block' }
 PP2FortranSrcParser >> blComment [
-
+	self flag: #TODO. "Find a better way to comment name"
+	
 	" (self prelude: 'BlComment')
 	, comment"
 
 	^ super blComment ==> [ :nodes | 
 	  (self newEntity: FamixFortranComment)
 		  content: nodes second second;
-		  isEsope:
+		isEsope:
 			  (nodes second second beginsWith: 'ESO' caseSensitive: false);
-			  sourceAnchor: nodes first second;
-			  yourself ]
+		sourceAnchor: nodes first second;
+		name: 'comment-', UUIDGenerator next asString; 
+		yourself ]
 ]
 
 { #category : #'grammar-block' }
@@ -84,18 +86,18 @@ PP2FortranSrcParser >> blStatement [
 ]
 
 { #category : #'grammar-programUnit' }
-PP2FortranSrcParser >> ensureFunction: aNode [
+PP2FortranSrcParser >> ensureFunction: aName [
 
 	| externalProcedures candidates |
 	externalProcedures := self model allWithType: FamixFortranFunction.
 
 	candidates := externalProcedures select: [ :each | 
-		              each name = aNode third ].
+		              each name = aName ].
 	^ candidates
 		  ifEmpty: [ 
 			  (self newEntity: FamixFortranFunction)
-				  name: aNode third;
-				  isIntrinsic: aNode second = 'ValIntrinsic';
+				  name: aName;
+				  isEsope: ({ #esoat. #esoar. #esosl } includes: aName);
 				  isStub: true;
 				  yourself ]
 		  ifNotEmpty: [ candidates first]
@@ -115,6 +117,7 @@ PP2FortranSrcParser >> ensureFunction: aName intrinsic: aBoolean [
 				  name: aName;
 				  isIntrinsic: aBoolean;
 				  isStub: true;
+				  isEsope: ({ #esoat. #esoar. #esosl } includes: aName);
 				  yourself ]
 		  ifNotEmpty: [ candidates first ]
 ]
@@ -125,8 +128,7 @@ PP2FortranSrcParser >> ensureSubroutine: aName [
 	| externalProcedures candidates |
 	externalProcedures := self model allWithType: FamixFortranSubroutine.
 
-	candidates := externalProcedures select: [ :each | 
-		              each name = aName ].
+	candidates := externalProcedures select: [ :each | each name = aName ].
 	^ candidates
 		  ifEmpty: [ 
 			  (self newEntity: FamixFortranSubroutine)
@@ -149,7 +151,6 @@ PP2FortranSrcParser >> expFunctionCall [
 	  candidate := self
 		               ensureFunction: nodes second third
 		               intrinsic: nodes second second = 'ValIntrinsic'.
-	  "candidate halt."
 	  (self newEntity: FamixFortranInvocation)
 		  addCandidate: candidate;
 		  sourceAnchor: nodes first second;
@@ -319,15 +320,22 @@ PP2FortranSrcParser >> programFile [
 
 	"(self token: 'ProgramFile') , metaInfo , (self haskellList: programUnit)"
 
-	^ super programFile ==> [ :nodes | 
-	  | progFile |
+	^ super programFile ==> [ :nodes | | progFile filename |
+	  filename := (nodes second
+				               at: 'miFilename'
+				               ifPresent: [ :node | node ]
+				               ifAbsent: [ '' ]).
 	  progFile := (self newEntity: FamixFortranProgramFile)
 		              version:
 			              (nodes second at: 'miVersion' ifAbsent: [ '' ]);
-		              filename: (nodes second
-				               at: 'miFilename'
-				               ifPresent: [ :node | node ]
-				               ifAbsent: [ '' ]);
+		              filename: filename asFileReference basename;
+						  sourceAnchor: ((self newEntity: FamixFortranIndexedFileAnchor)
+		  							startLine: 1;
+		  							endLine: (filename asFileReference ifExists: [ filename asFileReference contents lines size ] ifAbsent: [ 1 ] );
+		  							startColumn: 1;
+		  							endColumn: (filename asFileReference ifExists: [ filename asFileReference contents lines last size ] ifAbsent: [ 1 ] );
+		  							fileName: filename asFileReference basename;
+		  							yourself);
 		              yourself.
 	  nodes third do: [ :progUnit | progFile addProgramUnit: progUnit ] ]
 ]
@@ -394,6 +402,16 @@ PP2FortranSrcParser >> puSubroutine [
 						   entity class = FamixFortranComment ] ]) do: [ :anEntity | 
 					  anEntity setOwner: subroutine ] ] ].
 	  subroutine ]
+]
+
+{ #category : #'grammar-programUnit' }
+PP2FortranSrcParser >> setStubEntity [
+
+	| subroutines programFiles |
+	subroutines  := self model allWithType: FamixFortranSubroutine.
+	programFiles  := (self model allWithType: FamixFortranProgramFile) collect: [ :pf | pf filename asLowercase withoutSuffix: '.e.f' ].
+
+	subroutines collect: [ :subroutine | programFiles includes: subroutine name ] thenDo: [ :subroutine | subroutine isStub: false ] 
 ]
 
 { #category : #accessing }
@@ -467,8 +485,8 @@ PP2FortranSrcParser >> stFunction [
 	  , (self parens: expression)"
 
 	^ super stFunction ==> [ :nodes | 
-	  | candidate | 
-	  candidate := self ensureSubroutine: nodes second third.
+	  | candidate |
+	  candidate := self ensureFunction: nodes second third.
 	  (self newEntity: FamixFortranInvocation)
 		  addCandidate: candidate;
 		  signature: (self getSignature: nodes first second);
