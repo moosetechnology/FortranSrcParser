@@ -61,7 +61,6 @@ PP2FortranSrcParser >> argument [
 
 { #category : #'grammar-block' }
 PP2FortranSrcParser >> blComment [
-	self flag: #TODO. "Find a better way to comment name"
 	
 	" (self prelude: 'BlComment')
 	, comment"
@@ -72,7 +71,6 @@ PP2FortranSrcParser >> blComment [
 		isEsope:
 			  (nodes second second beginsWith: 'ESO' caseSensitive: false);
 		sourceAnchor: nodes first second;
-		name: 'comment-', UUIDGenerator next asString; 
 		yourself ]
 ]
 
