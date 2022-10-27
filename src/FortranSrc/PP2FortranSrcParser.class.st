@@ -9,6 +9,18 @@ Class {
 	#category : #'FortranSrc-Parser'
 }
 
+{ #category : #'private-helper' }
+PP2FortranSrcParser class >> getBasename: filename [
+
+	^ filename asFileReference basename
+]
+
+{ #category : #'private-helper' }
+PP2FortranSrcParser class >> getLines: filename [
+
+	^ filename asFileReference contents lines
+]
+
 { #category : #accessing }
 PP2FortranSrcParser class >> ignoredNames [
 
@@ -181,7 +193,7 @@ PP2FortranSrcParser >> expValue [
 		  nodes second second } ]
 ]
 
-{ #category : #'private - creation' }
+{ #category : #'private-helper' }
 PP2FortranSrcParser >> getSignature: aNode [
 
 	^ self srcFortran asFileReference
@@ -284,9 +296,25 @@ PP2FortranSrcParser >> model: anObject [
 	model := anObject
 ]
 
-{ #category : #'private - creation' }
+{ #category : #'private-creation' }
 PP2FortranSrcParser >> newEntity: aClass [
 	^ aClass new mooseModel: model; yourself
+]
+
+{ #category : #'private-creation' }
+PP2FortranSrcParser >> newIndexedFileAnchor: filename [
+
+	^ (self newEntity: FamixFortranIndexedFileAnchor)
+		  startLine: 1;
+		  endLine: (filename asFileReference
+				   ifExists: [ (self class getLines: filename) size ]
+				   ifAbsent: [ 1 ]);
+		  startColumn: 1;
+		  endColumn: (filename asFileReference
+				   ifExists: [ (self class getLines: filename) last size ]
+				   ifAbsent: [ 1 ]);
+		  fileName: (self class getBasename: filename);
+		  yourself
 ]
 
 { #category : #'grammar-helper' }
@@ -318,22 +346,18 @@ PP2FortranSrcParser >> programFile [
 
 	"(self token: 'ProgramFile') , metaInfo , (self haskellList: programUnit)"
 
-	^ super programFile ==> [ :nodes | | progFile filename |
-	  filename := (nodes second
-				               at: 'miFilename'
-				               ifPresent: [ :node | node ]
-				               ifAbsent: [ '' ]).
+	^ super programFile ==> [ :nodes | 
+	  | progFile filename |
+	  filename := nodes second
+		              at: 'miFilename'
+		              ifPresent: [ :node | node ]
+		              ifAbsent: [ '' ].
 	  progFile := (self newEntity: FamixFortranProgramFile)
 		              version:
 			              (nodes second at: 'miVersion' ifAbsent: [ '' ]);
-		              filename: filename asFileReference basename;
-						  sourceAnchor: ((self newEntity: FamixFortranIndexedFileAnchor)
-		  							startLine: 1;
-		  							endLine: (filename asFileReference ifExists: [ filename asFileReference contents lines size ] ifAbsent: [ 1 ] );
-		  							startColumn: 1;
-		  							endColumn: (filename asFileReference ifExists: [ filename asFileReference contents lines last size ] ifAbsent: [ 1 ] );
-		  							fileName: filename asFileReference basename;
-		  							yourself);
+		              filename: (self class getBasename: filename);
+		              sourceAnchor: (self newIndexedFileAnchor: filename);
+		              name: (self class getBasename: filename);
 		              yourself.
 	  nodes third do: [ :progUnit | progFile addProgramUnit: progUnit ] ]
 ]
