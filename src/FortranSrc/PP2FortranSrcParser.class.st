@@ -296,6 +296,12 @@ PP2FortranSrcParser >> model: anObject [
 	model := anObject
 ]
 
+{ #category : #'grammar-block' }
+PP2FortranSrcParser >> newComment: aBoolean [
+
+	^ aBoolean ifTrue: [ self newEntity: FamixEsopeComment ] ifFalse: [ self newEntity: FamixFortranComment ]
+]
+
 { #category : #'private-creation' }
 PP2FortranSrcParser >> newEntity: aClass [
 	^ aClass new mooseModel: model; yourself
@@ -348,13 +354,9 @@ PP2FortranSrcParser >> programFile [
 
 	^ super programFile ==> [ :nodes | 
 	  | progFile filename |
-	  filename := nodes second
-		              at: 'miFilename'
-		              ifPresent: [ :node | node ]
-		              ifAbsent: [ '' ].
+	  filename := nodes second at: 'miFilename' ifPresent: [ :node | node ] ifAbsent: [ '' ].
 	  progFile := (self newEntity: FamixFortranProgramFile)
-		              version:
-			              (nodes second at: 'miVersion' ifAbsent: [ '' ]);
+		              version: (nodes second at: 'miVersion' ifAbsent: [ '' ]);
 		              filename: (self class getBasename: filename);
 		              sourceAnchor: (self newIndexedFileAnchor: filename);
 		              name: (self class getBasename: filename);
@@ -403,7 +405,7 @@ PP2FortranSrcParser >> puSubroutine [
 	, (self maybe: programUnit)"
 
 	^ super puSubroutine ==> [ :nodes | 
-	  | subroutine |
+	  | subroutine | 
 	  subroutine := self ensureSubroutine: nodes third.
 	  subroutine sourceAnchor: nodes first second.
 	  nodes fourth = 'Nothing' ifFalse: [ 

@@ -51,22 +51,17 @@ PP2FortranSrcParserTest >> testBlCommentEsope [
 	(332:1)-(332:25)
 	(Comment "ESO  segact,alist")'
 		       rule: #blComment.
-
 	comment := 'ESO  segact,alist'.
-
 	self assert: ast content equals: comment.
-
 	self
-		assert: (parser model allWithType: FamixFortranComment) size
+		assert: (parser model allWithType: FamixEsopeComment) size
 		equals: 1.
-
 	self
-		assert:
-		(parser model allWithType: FamixFortranComment) first content
+		assert: (parser model allWithType: FamixEsopeComment) first content
 		equals: comment.
-
-	self assert:
-		(parser model allWithType: FamixFortranComment) first isEsope
+	self
+		assert: (parser model allWithType: FamixEsopeComment) first class
+		equals: FamixEsopeComment
 ]
 
 { #category : #'tests-block' }
@@ -399,7 +394,7 @@ PP2FortranSrcParserTest >> testFullFileString [
 		equals: 'glsget'
 ]
 
-{ #category : #tests }
+{ #category : #'tests - allnodes' }
 PP2FortranSrcParserTest >> testFullFileValrma [
 
 	| ast |
@@ -507,6 +502,29 @@ PP2FortranSrcParserTest >> testProgramFileNoEmpty [
 
 	self assert: progFile programUnits size equals: 1.
 	self assert: progFile programUnits first name equals: 'subrtn'
+]
+
+{ #category : #'tests-programFile' }
+PP2FortranSrcParserTest >> testProgramFileWithPuMain [
+
+	| ast program |
+	ast := self parse: 'ProgramFile (MetaInfo
+	{miVersion = Fortran77,
+	miFilename = "file.f"})	
+	[PUMain ()
+	(1:7)-(13:9)
+	(Just "circle")
+	[]
+	Nothing]' rule: #programFile.
+	self assert: (parser model allWithType: FamixFortranProgram) size equals: 1.
+
+	program := (parser model allWithType: FamixFortranProgram) first.
+
+	self assert: program name equals: 'circle'.
+
+	self assertEmpty: program comments.
+
+	self assertEmpty: program programUnits
 ]
 
 { #category : #'tests-programUnit' }

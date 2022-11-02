@@ -27642,6 +27642,19 @@ PP2FortranSrcGrammarTest >> testProgramFilePUSubRoutine [
 		rule: #programFile
 ]
 
+{ #category : #'tests-programFile' }
+PP2FortranSrcGrammarTest >> testProgramFileWithPuMain [
+
+	self parse: 'ProgramFile (MetaInfo
+	{miVersion = Fortran77,
+	miFilename = "file.f"})	
+	[PUMain ()
+	(1:7)-(13:9)
+	(Just "circle")
+	[]
+	Nothing]' rule: #programFile.
+]
+
 { #category : #'tests-programUnit' }
 PP2FortranSrcGrammarTest >> testPuComment [
 
