@@ -77,13 +77,10 @@ PP2FortranSrcParser >> blComment [
 	" (self prelude: 'BlComment')
 	, comment"
 
-	^ super blComment ==> [ :nodes | 
-	  (self newEntity: FamixFortranComment)
-		  content: nodes second second;
-		isEsope:
-			  (nodes second second beginsWith: 'ESO' caseSensitive: false);
-		sourceAnchor: nodes first second;
-		yourself ]
+	^ super blComment ==> [ :nodes | | aComment |
+		aComment := self newComment: (self isEsope: nodes).
+		aComment content: nodes second second; sourceAnchor: nodes first second.
+		aComment ]
 ]
 
 { #category : #'grammar-block' }
@@ -221,6 +218,12 @@ PP2FortranSrcParser >> initialize [
 	stack := Stack new.
 	model := FamixFortranModel new.
 	srcFortran := ''
+]
+
+{ #category : #'private - utility' }
+PP2FortranSrcParser >> isEsope: nodes [
+
+	^ nodes second second beginsWith: 'ESO' caseSensitive: false
 ]
 
 { #category : #'grammar-helper' }
