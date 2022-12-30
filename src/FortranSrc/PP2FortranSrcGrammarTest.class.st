@@ -1,6 +1,6 @@
 Class {
 	#name : #PP2FortranSrcGrammarTest,
-	#superclass : #PP2CompositeNodeTest,
+	#superclass : #PPCompositeParserTest,
 	#category : #'FortranSrc-Tests'
 }
 

@@ -1,6 +1,6 @@
 Class {
 	#name : #PP2FortranSrcGrammar,
-	#superclass : #PP2CompositeNode,
+	#superclass : #PPCompositeParser,
 	#instVars : [
 		'any',
 		'programFile',
@@ -92,7 +92,7 @@ PP2FortranSrcGrammar >> aList: aRule [
 
 { #category : #token }
 PP2FortranSrcGrammar >> any [
-	^ #any asPParser token trim
+	^ #any asParser token trim
 
 ]
 
@@ -395,7 +395,7 @@ PP2FortranSrcGrammar >> impList [
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> impRange [
 
-	^ (self prelude: 'ImpRange') , tkString , #space asPParser star
+	^ (self prelude: 'ImpRange') , tkString , #space asParser star
 	  , tkString
 ]
 
@@ -512,7 +512,7 @@ PP2FortranSrcGrammar >> prefixSuffix [
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> prelude: aString [
 
-	^ aString asPParser trim , emptyTuple , srcSpan
+	^ aString asParser trim , emptyTuple , srcSpan
 ]
 
 { #category : #'grammar-helper' }
@@ -684,7 +684,7 @@ PP2FortranSrcGrammar >> tkComma [
 { #category : #token }
 PP2FortranSrcGrammar >> tkIdentifier [
 
-	^ #word asPParser plus flatten trim
+	^ #word asParser plus flatten trim
 ]
 
 { #category : #token }
@@ -695,21 +695,21 @@ PP2FortranSrcGrammar >> tkNothing [
 
 { #category : #token }
 PP2FortranSrcGrammar >> tkNumber [
-	^ #digit asPParser plus flatten trim
+	^ #digit asParser plus flatten trim
 ]
 
 { #category : #token }
 PP2FortranSrcGrammar >> tkString [
 
-	^ $" asPParser
-	  , ('\"' asPParser / $" asPParser negate) star flatten
-	  , $" asPParser
+	^ $" asParser
+	  , ('\"' asParser / $" asParser negate) star flatten
+	  , $" asParser
 ]
 
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> token: aString [
 
-	^  aString asPParser flatten trim
+	^  aString asParser flatten trim
 ]
 
 { #category : #'grammar-declaration' }
