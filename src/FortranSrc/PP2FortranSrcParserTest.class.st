@@ -53,15 +53,6 @@ PP2FortranSrcParserTest >> testBlCommentEsope [
 		       rule: #blComment.
 	comment := 'ESO  segact,alist'.
 	self assert: ast content equals: comment.
-	self
-		assert: (parser model allWithType: FamixEsopeComment) size
-		equals: 1.
-	self
-		assert: (parser model allWithType: FamixEsopeComment) first content
-		equals: comment.
-	self
-		assert: (parser model allWithType: FamixEsopeComment) first class
-		equals: FamixEsopeComment
 ]
 
 { #category : #'tests-block' }
@@ -91,6 +82,29 @@ PP2FortranSrcParserTest >> testBlStatement [
 		equals: 1.
 	self assert: ast candidates size equals: 1.
 	self assert: ast candidates first name equals: 'edmess'.
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testEsoAr [
+
+	| ast |
+	ast := self parse: self class stgbrkAstEso rule: #start.
+	self assert: ast first name equals: 'stgbrk'.
+	self assert: ast first comments size equals: 131.
+	self assert: ast first outgoingInvocations size equals: 16.
+	self
+		assert: ast first outgoingInvocations last signature
+		equals: 'ESOar(ESOat(rlist,elist),ESOat(rlist,ilist))=ms'.
+	self
+		assert: ast first outgoingInvocations first sender name
+		equals: 'stgbrk'.
+	self
+		assert: ast first outgoingInvocations first candidates size
+		equals: 1.
+
+	self
+		assert: ast first outgoingInvocations last candidates first name
+		equals: 'esoar'
 ]
 
 { #category : #'tests-expression' }
@@ -185,6 +199,30 @@ PP2FortranSrcParserTest >> testExpValueVariable [
 
 	self assert: ast second equals: 'ValVariable'.
 	self assert: ast third equals: 'status'
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullAstWithMultipleProcedure [
+
+	| ast |
+	ast := self parse: self class fullAst rule: #start.
+	1halt.
+	self assert: ast first name equals: 'stgbrk'.
+	self assert: ast first comments size equals: 140.
+	self assert: ast first outgoingInvocations size equals: 22.
+	self
+		assert: ast first outgoingInvocations first signature
+		equals: 'CALLOOOWIN(OO4,0,''STGBRK 20 RLIST '',OO1,2+NLIST)'.
+	self
+		assert: ast first outgoingInvocations first sender name
+		equals: 'stgbrk'.
+	self
+		assert: ast first outgoingInvocations first candidates size
+		equals: 1.
+
+	self
+		assert: ast first outgoingInvocations first candidates first name
+		equals: 'ooowin'
 ]
 
 { #category : #'tests - allnodes' }
@@ -504,6 +542,32 @@ PP2FortranSrcParserTest >> testProgramFileNoEmpty [
 	self assert: progFile programUnits first name equals: 'subrtn'
 ]
 
+{ #category : #'tests-programUnit' }
+PP2FortranSrcParserTest >> testProgramFileNoEmptyTmp [
+
+	| ast progFile |
+	ast := self
+		       parse: 'ProgramFile (MetaInfo
+                     {miVersion = Fortran77,
+                      miFilename = "/Users/sow/Documents/framacode/demo/build/f77_intrinsics.f"})
+            [PUMain ()
+	(1:7)-(302:9)
+	(Nothing, Nothing)
+	"subrtn"
+	Nothing
+		[]
+	Nothing]'
+		       rule: #programFile.
+	self
+		assert: (parser model allWithType: FamixFortranProgramFile) size
+		equals: 1.
+
+	progFile := (parser model allWithType: FamixFortranProgramFile) first.
+
+	self assert: progFile programUnits size equals: 1.
+	self assert: progFile programUnits first name equals: 'subrtn'
+]
+
 { #category : #'tests-programFile' }
 PP2FortranSrcParserTest >> testProgramFileWithPuMain [
 
@@ -525,6 +589,750 @@ PP2FortranSrcParserTest >> testProgramFileWithPuMain [
 	self assertEmpty: program comments.
 
 	self assertEmpty: program programUnits
+]
+
+{ #category : #'tests-programUnit' }
+PP2FortranSrcParserTest >> testProgramFileWithPuMainTmp [
+
+	| ast progFile |
+	ast := self
+		       parse: 'ProgramFile (MetaInfo
+   {miVersion = Fortran77,
+   miFilename = "f77_intrinsics.f"})
+	[PUMain ()
+   (1:7)-(95:9)
+   (Just "main")
+	[BlComment ()
+                               (3:1)-(3:72)
+                               (Comment "*********************************************************************72"),
+                     BlComment () (4:1)-(4:1) (Comment ""),
+                     BlComment ()
+                               (5:1)-(5:47)
+                               (Comment "c main is the main program for f77_intrinsics."),
+                     BlComment () (6:1)-(6:1) (Comment ""),
+                     BlComment () (7:1)-(7:14) (Comment "  discussion:"),
+                     BlComment () (8:1)-(8:1) (Comment ""),
+                     BlComment ()
+                               (9:1)-(9:55)
+                               (Comment "    f77_intrinsics tests fortran77 intrinsic routines."),
+                     BlComment () (10:1)-(10:1) (Comment ""),
+                     BlComment () (11:1)-(11:13) (Comment "  licensing:"),
+                     BlComment () (12:1)-(12:1) (Comment ""),
+                     BlComment ()
+                               (13:1)-(13:57)
+                               (Comment "    this code is distributed under the gnu lgpl license."),
+                     BlComment () (14:1)-(14:1) (Comment ""),
+                     BlComment () (15:1)-(15:12) (Comment "  modified:"),
+                     BlComment () (16:1)-(16:1) (Comment ""),
+                     BlComment ()
+                               (17:1)-(17:17)
+                               (Comment "    02 june 2007"),
+                     BlComment () (18:1)-(18:1) (Comment ""),
+                     BlComment () (19:1)-(19:10) (Comment "  author:"),
+                     BlComment () (20:1)-(20:1) (Comment ""),
+                     BlComment ()
+                               (21:1)-(21:18)
+                               (Comment "    john burkardt"),
+                     BlComment () (22:1)-(22:1) (Comment ""),
+                     BlStatement ()
+                                 (23:7)-(23:19)
+                                 Nothing
+                                 (StImplicit () (23:7)-(23:19) Nothing),
+                     BlStatement ()
+                                 (25:7)-(25:24)
+                                 Nothing
+                                 (StCall ()
+                                         (25:7)-(25:24)
+                                         (ExpValue ()
+                                                   (25:12)-(25:20)
+                                                   (ValVariable "timestamp"))
+                                         (Just AList () (25:22)-(25:24) [])),
+                     BlStatement ()
+                                 (27:7)-(27:28)
+                                 Nothing
+                                 (StWrite ()
+                                          (27:7)-(27:28)
+                                          (AList ()
+                                                 (27:13)-(27:24)
+                                                 [ControlPair ()
+                                                              (27:15)-(27:15)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (27:15)-(27:15)
+                                                                        ValStar),
+                                                  ControlPair ()
+                                                              (27:18)-(27:22)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (27:18)-(27:22)
+                                                                        (ValString "(a)"))])
+                                          (Just AList ()
+                                                      (27:26)-(27:28)
+                                                      [ExpValue ()
+                                                                (27:26)-(27:28)
+                                                                (ValString " ")])),
+                     BlStatement ()
+                                 (28:7)-(28:41)
+                                 Nothing
+                                 (StWrite ()
+                                          (28:7)-(28:41)
+                                          (AList ()
+                                                 (28:13)-(28:24)
+                                                 [ControlPair ()
+                                                              (28:15)-(28:15)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (28:15)-(28:15)
+                                                                        ValStar),
+                                                  ControlPair ()
+                                                              (28:18)-(28:22)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (28:18)-(28:22)
+                                                                        (ValString "(a)"))])
+                                          (Just AList ()
+                                                      (28:26)-(28:41)
+                                                      [ExpValue ()
+                                                                (28:26)-(28:41)
+                                                                (ValString "F77_INTRINSICS")])),
+                     BlStatement ()
+                                 (29:7)-(29:46)
+                                 Nothing
+                                 (StWrite ()
+                                          (29:7)-(29:46)
+                                          (AList ()
+                                                 (29:13)-(29:24)
+                                                 [ControlPair ()
+                                                              (29:15)-(29:15)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (29:15)-(29:15)
+                                                                        ValStar),
+                                                  ControlPair ()
+                                                              (29:18)-(29:22)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (29:18)-(29:22)
+                                                                        (ValString "(a)"))])
+                                          (Just AList ()
+                                                      (29:26)-(29:46)
+                                                      [ExpValue ()
+                                                                (29:26)-(29:46)
+                                                                (ValString "  FORTRAN77 version")])),
+                     BlStatement ()
+                                 (30:7)-(30:62)
+                                 Nothing
+                                 (StWrite ()
+                                          (30:7)-(30:62)
+                                          (AList ()
+                                                 (30:13)-(30:24)
+                                                 [ControlPair ()
+                                                              (30:15)-(30:15)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (30:15)-(30:15)
+                                                                        ValStar),
+                                                  ControlPair ()
+                                                              (30:18)-(30:22)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (30:18)-(30:22)
+                                                                        (ValString "(a)"))])
+                                          (Just AList ()
+                                                      (30:26)-(30:62)
+                                                      [ExpValue ()
+                                                                (30:26)-(30:62)
+                                                                (ValString "  Test FORTRAN77 intrinsic library.")])),
+                     BlStatement ()
+                                 (32:7)-(32:19)
+                                 Nothing
+                                 (StCall ()
+                                         (32:7)-(32:19)
+                                         (ExpValue ()
+                                                   (32:12)-(32:19)
+                                                   (ValVariable "test_abs"))
+                                         Nothing),
+                     BlStatement ()
+                                 (33:7)-(33:20)
+                                 Nothing
+                                 (StCall ()
+                                         (33:7)-(33:20)
+                                         (ExpValue ()
+                                                   (33:12)-(33:20)
+                                                   (ValVariable "test_acos"))
+                                         Nothing),
+                     BlStatement ()
+                                 (34:7)-(34:21)
+                                 Nothing
+                                 (StCall ()
+                                         (34:7)-(34:21)
+                                         (ExpValue ()
+                                                   (34:12)-(34:21)
+                                                   (ValVariable "test_aimag"))
+                                         Nothing),
+                     BlStatement ()
+                                 (35:7)-(35:20)
+                                 Nothing
+                                 (StCall ()
+                                         (35:7)-(35:20)
+                                         (ExpValue ()
+                                                   (35:12)-(35:20)
+                                                   (ValVariable "test_aint"))
+                                         Nothing),
+                     BlStatement ()
+                                 (36:7)-(36:21)
+                                 Nothing
+                                 (StCall ()
+                                         (36:7)-(36:21)
+                                         (ExpValue ()
+                                                   (36:12)-(36:21)
+                                                   (ValVariable "test_anint"))
+                                         Nothing),
+                     BlStatement ()
+                                 (37:7)-(37:20)
+                                 Nothing
+                                 (StCall ()
+                                         (37:7)-(37:20)
+                                         (ExpValue ()
+                                                   (37:12)-(37:20)
+                                                   (ValVariable "test_asin"))
+                                         Nothing),
+                     BlStatement ()
+                                 (38:7)-(38:20)
+                                 Nothing
+                                 (StCall ()
+                                         (38:7)-(38:20)
+                                         (ExpValue ()
+                                                   (38:12)-(38:20)
+                                                   (ValVariable "test_atan"))
+                                         Nothing),
+                     BlStatement ()
+                                 (39:7)-(39:21)
+                                 Nothing
+                                 (StCall ()
+                                         (39:7)-(39:21)
+                                         (ExpValue ()
+                                                   (39:12)-(39:21)
+                                                   (ValVariable "test_atan2"))
+                                         Nothing),
+                     BlStatement ()
+                                 (40:7)-(40:21)
+                                 Nothing
+                                 (StCall ()
+                                         (40:7)-(40:21)
+                                         (ExpValue ()
+                                                   (40:12)-(40:21)
+                                                   (ValVariable "test_btest"))
+                                         Nothing),
+                     BlStatement ()
+                                 (41:7)-(41:20)
+                                 Nothing
+                                 (StCall ()
+                                         (41:7)-(41:20)
+                                         (ExpValue ()
+                                                   (41:12)-(41:20)
+                                                   (ValVariable "test_char"))
+                                         Nothing),
+                     BlStatement ()
+                                 (42:7)-(42:21)
+                                 Nothing
+                                 (StCall ()
+                                         (42:7)-(42:21)
+                                         (ExpValue ()
+                                                   (42:12)-(42:21)
+                                                   (ValVariable "test_cmplx"))
+                                         Nothing),
+                     BlStatement ()
+                                 (43:7)-(43:21)
+                                 Nothing
+                                 (StCall ()
+                                         (43:7)-(43:21)
+                                         (ExpValue ()
+                                                   (43:12)-(43:21)
+                                                   (ValVariable "test_conjg"))
+                                         Nothing),
+                     BlStatement ()
+                                 (44:7)-(44:22)
+                                 Nothing
+                                 (StCall ()
+                                         (44:7)-(44:22)
+                                         (ExpValue ()
+                                                   (44:12)-(44:22)
+                                                   (ValVariable "test_cos_c4"))
+                                         Nothing),
+                     BlStatement ()
+                                 (45:7)-(45:22)
+                                 Nothing
+                                 (StCall ()
+                                         (45:7)-(45:22)
+                                         (ExpValue ()
+                                                   (45:12)-(45:22)
+                                                   (ValVariable "test_cos_r8"))
+                                         Nothing),
+                     BlStatement ()
+                                 (46:7)-(46:20)
+                                 Nothing
+                                 (StCall ()
+                                         (46:7)-(46:20)
+                                         (ExpValue ()
+                                                   (46:12)-(46:20)
+                                                   (ValVariable "test_cosh"))
+                                         Nothing),
+                     BlStatement ()
+                                 (47:7)-(47:20)
+                                 Nothing
+                                 (StCall ()
+                                         (47:7)-(47:20)
+                                         (ExpValue ()
+                                                   (47:12)-(47:20)
+                                                   (ValVariable "test_dble"))
+                                         Nothing),
+                     BlStatement ()
+                                 (48:7)-(48:19)
+                                 Nothing
+                                 (StCall ()
+                                         (48:7)-(48:19)
+                                         (ExpValue ()
+                                                   (48:12)-(48:19)
+                                                   (ValVariable "test_dim"))
+                                         Nothing),
+                     BlStatement ()
+                                 (49:7)-(49:21)
+                                 Nothing
+                                 (StCall ()
+                                         (49:7)-(49:21)
+                                         (ExpValue ()
+                                                   (49:12)-(49:21)
+                                                   (ValVariable "test_dprod"))
+                                         Nothing),
+                     BlStatement ()
+                                 (50:7)-(50:19)
+                                 Nothing
+                                 (StCall ()
+                                         (50:7)-(50:19)
+                                         (ExpValue ()
+                                                   (50:12)-(50:19)
+                                                   (ValVariable "test_exp"))
+                                         Nothing),
+                     BlStatement ()
+                                 (51:7)-(51:23)
+                                 Nothing
+                                 (StCall ()
+                                         (51:7)-(51:23)
+                                         (ExpValue ()
+                                                   (51:12)-(51:23)
+                                                   (ValVariable "test_iand_i4"))
+                                         Nothing),
+                     BlStatement ()
+                                 (52:7)-(52:21)
+                                 Nothing
+                                 (StCall ()
+                                         (52:7)-(52:21)
+                                         (ExpValue ()
+                                                   (52:12)-(52:21)
+                                                   (ValVariable "test_ibclr"))
+                                         Nothing),
+                     BlStatement ()
+                                 (53:7)-(53:21)
+                                 Nothing
+                                 (StCall ()
+                                         (53:7)-(53:21)
+                                         (ExpValue ()
+                                                   (53:12)-(53:21)
+                                                   (ValVariable "test_ibits"))
+                                         Nothing),
+                     BlStatement ()
+                                 (54:7)-(54:21)
+                                 Nothing
+                                 (StCall ()
+                                         (54:7)-(54:21)
+                                         (ExpValue ()
+                                                   (54:12)-(54:21)
+                                                   (ValVariable "test_ibset"))
+                                         Nothing),
+                     BlStatement ()
+                                 (55:7)-(55:21)
+                                 Nothing
+                                 (StCall ()
+                                         (55:7)-(55:21)
+                                         (ExpValue ()
+                                                   (55:12)-(55:21)
+                                                   (ValVariable "test_ichar"))
+                                         Nothing),
+                     BlStatement ()
+                                 (56:7)-(56:23)
+                                 Nothing
+                                 (StCall ()
+                                         (56:7)-(56:23)
+                                         (ExpValue ()
+                                                   (56:12)-(56:23)
+                                                   (ValVariable "test_ieor_i4"))
+                                         Nothing),
+                     BlStatement ()
+                                 (57:7)-(57:21)
+                                 Nothing
+                                 (StCall ()
+                                         (57:7)-(57:21)
+                                         (ExpValue ()
+                                                   (57:12)-(57:21)
+                                                   (ValVariable "test_index"))
+                                         Nothing),
+                     BlStatement ()
+                                 (58:7)-(58:19)
+                                 Nothing
+                                 (StCall ()
+                                         (58:7)-(58:19)
+                                         (ExpValue ()
+                                                   (58:12)-(58:19)
+                                                   (ValVariable "test_int"))
+                                         Nothing),
+                     BlStatement ()
+                                 (59:7)-(59:22)
+                                 Nothing
+                                 (StCall ()
+                                         (59:7)-(59:22)
+                                         (ExpValue ()
+                                                   (59:12)-(59:22)
+                                                   (ValVariable "test_ior_i4"))
+                                         Nothing),
+                     BlStatement ()
+                                 (60:7)-(60:21)
+                                 Nothing
+                                 (StCall ()
+                                         (60:7)-(60:21)
+                                         (ExpValue ()
+                                                   (60:12)-(60:21)
+                                                   (ValVariable "test_ishft"))
+                                         Nothing),
+                     BlStatement ()
+                                 (61:7)-(61:22)
+                                 Nothing
+                                 (StCall ()
+                                         (61:7)-(61:22)
+                                         (ExpValue ()
+                                                   (61:12)-(61:22)
+                                                   (ValVariable "test_ishftc"))
+                                         Nothing),
+                     BlStatement ()
+                                 (62:7)-(62:19)
+                                 Nothing
+                                 (StCall ()
+                                         (62:7)-(62:19)
+                                         (ExpValue ()
+                                                   (62:12)-(62:19)
+                                                   (ValVariable "test_len"))
+                                         Nothing),
+                     BlStatement ()
+                                 (63:7)-(63:24)
+                                 Nothing
+                                 (StCall ()
+                                         (63:7)-(63:24)
+                                         (ExpValue ()
+                                                   (63:12)-(63:24)
+                                                   (ValVariable "test_len_trim"))
+                                         Nothing),
+                     BlStatement ()
+                                 (64:7)-(64:19)
+                                 Nothing
+                                 (StCall ()
+                                         (64:7)-(64:19)
+                                         (ExpValue ()
+                                                   (64:12)-(64:19)
+                                                   (ValVariable "test_lge"))
+                                         Nothing),
+                     BlStatement ()
+                                 (65:7)-(65:19)
+                                 Nothing
+                                 (StCall ()
+                                         (65:7)-(65:19)
+                                         (ExpValue ()
+                                                   (65:12)-(65:19)
+                                                   (ValVariable "test_lgt"))
+                                         Nothing),
+                     BlStatement ()
+                                 (66:7)-(66:19)
+                                 Nothing
+                                 (StCall ()
+                                         (66:7)-(66:19)
+                                         (ExpValue ()
+                                                   (66:12)-(66:19)
+                                                   (ValVariable "test_lle"))
+                                         Nothing),
+                     BlStatement ()
+                                 (67:7)-(67:19)
+                                 Nothing
+                                 (StCall ()
+                                         (67:7)-(67:19)
+                                         (ExpValue ()
+                                                   (67:12)-(67:19)
+                                                   (ValVariable "test_llt"))
+                                         Nothing),
+                     BlStatement ()
+                                 (68:7)-(68:19)
+                                 Nothing
+                                 (StCall ()
+                                         (68:7)-(68:19)
+                                         (ExpValue ()
+                                                   (68:12)-(68:19)
+                                                   (ValVariable "test_log"))
+                                         Nothing),
+                     BlStatement ()
+                                 (69:7)-(69:21)
+                                 Nothing
+                                 (StCall ()
+                                         (69:7)-(69:21)
+                                         (ExpValue ()
+                                                   (69:12)-(69:21)
+                                                   (ValVariable "test_log10"))
+                                         Nothing),
+                     BlStatement ()
+                                 (70:7)-(70:19)
+                                 Nothing
+                                 (StCall ()
+                                         (70:7)-(70:19)
+                                         (ExpValue ()
+                                                   (70:12)-(70:19)
+                                                   (ValVariable "test_max"))
+                                         Nothing),
+                     BlStatement ()
+                                 (71:7)-(71:19)
+                                 Nothing
+                                 (StCall ()
+                                         (71:7)-(71:19)
+                                         (ExpValue ()
+                                                   (71:12)-(71:19)
+                                                   (ValVariable "test_min"))
+                                         Nothing),
+                     BlStatement ()
+                                 (72:7)-(72:22)
+                                 Nothing
+                                 (StCall ()
+                                         (72:7)-(72:22)
+                                         (ExpValue ()
+                                                   (72:12)-(72:22)
+                                                   (ValVariable "test_mod_i4"))
+                                         Nothing),
+                     BlStatement ()
+                                 (73:7)-(73:22)
+                                 Nothing
+                                 (StCall ()
+                                         (73:7)-(73:22)
+                                         (ExpValue ()
+                                                   (73:12)-(73:22)
+                                                   (ValVariable "test_mod_r4"))
+                                         Nothing),
+                     BlStatement ()
+                                 (74:7)-(74:22)
+                                 Nothing
+                                 (StCall ()
+                                         (74:7)-(74:22)
+                                         (ExpValue ()
+                                                   (74:12)-(74:22)
+                                                   (ValVariable "test_mvbits"))
+                                         Nothing),
+                     BlStatement ()
+                                 (75:7)-(75:20)
+                                 Nothing
+                                 (StCall ()
+                                         (75:7)-(75:20)
+                                         (ExpValue ()
+                                                   (75:12)-(75:20)
+                                                   (ValVariable "test_nint"))
+                                         Nothing),
+                     BlStatement ()
+                                 (76:7)-(76:22)
+                                 Nothing
+                                 (StCall ()
+                                         (76:7)-(76:22)
+                                         (ExpValue ()
+                                                   (76:12)-(76:22)
+                                                   (ValVariable "test_not_i4"))
+                                         Nothing),
+                     BlStatement ()
+                                 (77:7)-(77:23)
+                                 Nothing
+                                 (StCall ()
+                                         (77:7)-(77:23)
+                                         (ExpValue ()
+                                                   (77:12)-(77:23)
+                                                   (ValVariable "test_real_c4"))
+                                         Nothing),
+                     BlStatement ()
+                                 (78:7)-(78:20)
+                                 Nothing
+                                 (StCall ()
+                                         (78:7)-(78:20)
+                                         (ExpValue ()
+                                                   (78:12)-(78:20)
+                                                   (ValVariable "test_sign"))
+                                         Nothing),
+                     BlStatement ()
+                                 (79:7)-(79:22)
+                                 Nothing
+                                 (StCall ()
+                                         (79:7)-(79:22)
+                                         (ExpValue ()
+                                                   (79:12)-(79:22)
+                                                   (ValVariable "test_sin_r8"))
+                                         Nothing),
+                     BlStatement ()
+                                 (80:7)-(80:20)
+                                 Nothing
+                                 (StCall ()
+                                         (80:7)-(80:20)
+                                         (ExpValue ()
+                                                   (80:12)-(80:20)
+                                                   (ValVariable "test_sinh"))
+                                         Nothing),
+                     BlStatement ()
+                                 (81:7)-(81:20)
+                                 Nothing
+                                 (StCall ()
+                                         (81:7)-(81:20)
+                                         (ExpValue ()
+                                                   (81:12)-(81:20)
+                                                   (ValVariable "test_sqrt"))
+                                         Nothing),
+                     BlStatement ()
+                                 (82:7)-(82:19)
+                                 Nothing
+                                 (StCall ()
+                                         (82:7)-(82:19)
+                                         (ExpValue ()
+                                                   (82:12)-(82:19)
+                                                   (ValVariable "test_tan"))
+                                         Nothing),
+                     BlStatement ()
+                                 (83:7)-(83:20)
+                                 Nothing
+                                 (StCall ()
+                                         (83:7)-(83:20)
+                                         (ExpValue ()
+                                                   (83:12)-(83:20)
+                                                   (ValVariable "test_tanh"))
+                                         Nothing),
+                     BlComment () (84:1)-(84:1) (Comment ""),
+                     BlComment () (85:1)-(85:13) (Comment "  terminate."),
+                     BlComment () (86:1)-(86:1) (Comment ""),
+                     BlStatement ()
+                                 (87:7)-(87:28)
+                                 Nothing
+                                 (StWrite ()
+                                          (87:7)-(87:28)
+                                          (AList ()
+                                                 (87:13)-(87:24)
+                                                 [ControlPair ()
+                                                              (87:15)-(87:15)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (87:15)-(87:15)
+                                                                        ValStar),
+                                                  ControlPair ()
+                                                              (87:18)-(87:22)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (87:18)-(87:22)
+                                                                        (ValString "(a)"))])
+                                          (Just AList ()
+                                                      (87:26)-(87:28)
+                                                      [ExpValue ()
+                                                                (87:26)-(87:28)
+                                                                (ValString " ")])),
+                     BlStatement ()
+                                 (88:7)-(88:41)
+                                 Nothing
+                                 (StWrite ()
+                                          (88:7)-(88:41)
+                                          (AList ()
+                                                 (88:13)-(88:24)
+                                                 [ControlPair ()
+                                                              (88:15)-(88:15)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (88:15)-(88:15)
+                                                                        ValStar),
+                                                  ControlPair ()
+                                                              (88:18)-(88:22)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (88:18)-(88:22)
+                                                                        (ValString "(a)"))])
+                                          (Just AList ()
+                                                      (88:26)-(88:41)
+                                                      [ExpValue ()
+                                                                (88:26)-(88:41)
+                                                                (ValString "F77_INTRINSICS")])),
+                     BlStatement ()
+                                 (89:7)-(89:53)
+                                 Nothing
+                                 (StWrite ()
+                                          (89:7)-(89:53)
+                                          (AList ()
+                                                 (89:13)-(89:24)
+                                                 [ControlPair ()
+                                                              (89:15)-(89:15)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (89:15)-(89:15)
+                                                                        ValStar),
+                                                  ControlPair ()
+                                                              (89:18)-(89:22)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (89:18)-(89:22)
+                                                                        (ValString "(a)"))])
+                                          (Just AList ()
+                                                      (89:26)-(89:53)
+                                                      [ExpValue ()
+                                                                (89:26)-(89:53)
+                                                                (ValString "  Normal end of execution.")])),
+                     BlStatement ()
+                                 (91:7)-(91:28)
+                                 Nothing
+                                 (StWrite ()
+                                          (91:7)-(91:28)
+                                          (AList ()
+                                                 (91:13)-(91:24)
+                                                 [ControlPair ()
+                                                              (91:15)-(91:15)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (91:15)-(91:15)
+                                                                        ValStar),
+                                                  ControlPair ()
+                                                              (91:18)-(91:22)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (91:18)-(91:22)
+                                                                        (ValString "(a)"))])
+                                          (Just AList ()
+                                                      (91:26)-(91:28)
+                                                      [ExpValue ()
+                                                                (91:26)-(91:28)
+                                                                (ValString " ")])),
+                     BlStatement ()
+                                 (92:7)-(92:24)
+                                 Nothing
+                                 (StCall ()
+                                         (92:7)-(92:24)
+                                         (ExpValue ()
+                                                   (92:12)-(92:20)
+                                                   (ValVariable "timestamp"))
+                                         (Just AList () (92:22)-(92:24) [])),
+                     BlStatement ()
+                                 (94:7)-(94:10)
+                                 Nothing
+                                 (StStop () (94:7)-(94:10) Nothing)]]
+	Nothing]'
+		       rule: #programFile.
+	self
+		assert: (parser model allWithType: FamixFortranProgramFile) size
+		equals: 1.
+
+	progFile := (parser model allWithType: FamixFortranProgramFile) first.
+
+	self assert: progFile programUnits size equals: 1.
+	self assert: progFile programUnits first name equals: 'subrtn'
 ]
 
 { #category : #'tests-programUnit' }
@@ -852,7 +1660,10 @@ PP2FortranSrcParserTest >> testValue [
 	ast := self parse: 'ValIntrinsic "abs"' rule: #value.
 
 	self assert: ast first equals: 'ValIntrinsic'.
-	self assert: ast second equals: 'abs'
+	self assert: ast second equals: 'abs'.
+	
+	ast := self parse: 'ValStar' rule: #value.
+	self assert: ast equals: 'ValStar'
 ]
 
 { #category : #tests }

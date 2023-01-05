@@ -73,7 +73,8 @@ Class {
 		'haskellListOfString',
 		'maybeOfString',
 		'valLogical',
-		'stFunction'
+		'stFunction',
+		'stPrint'
 	],
 	#category : #'FortranSrc-Parser'
 }
@@ -646,6 +647,13 @@ PP2FortranSrcGrammar >> stIfLogical [
 	, (self parens: statement)
 ]
 
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stPrint [
+	^ (self prelude: 'StPrint')
+	, (self parens: expression)
+	, (self maybe: (self justAList: expression))
+]
+
 { #category : #accessing }
 PP2FortranSrcGrammar >> start [
 	^programFile
@@ -663,7 +671,7 @@ PP2FortranSrcGrammar >> statement [
 	  /
 	  ((self prelude: 'StGotoUnconditional') , (self parens: expression))
 	  / stCall / (self prelude: 'StReturn' maybe: expression)
-	  / (self prelude: 'StContinue') / stFunction 
+	  / (self prelude: 'StContinue') / stFunction / stPrint
 	"/ stStructure / stIntent / stOptional / stPublic / stPrivate / stProtected / stSave"
 	"/ stAsynchronous / stPointer / stTarget / stValue / stVolatile / stData / stAutomatic / ststatic / stNamelist / stParameter / stExternal / stIntrinsic"
 	"/ stFormat"
@@ -672,7 +680,7 @@ PP2FortranSrcGrammar >> statement [
 	" / stIfArithmetic / stSelectCase / stCase / stEndcase"
 	" / stPointerAssign / stLabelAssign"
 	" / stGotoAssigned / stGotoComputed"
-	"/ ststop / stPause / stRead / stRead2 / stWrite / stPrint / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum / stFormatBogus"
+	"/ ststop / stPause / stRead / stRead2 / stWrite  / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum / stFormatBogus"
 ]
 
 { #category : #'grammar-helper' }
@@ -755,9 +763,9 @@ PP2FortranSrcGrammar >> value [
 	  / ((self token: 'ValIntrinsic') , tkString)
 	  / ((self token: 'ValOperator') , tkString)
 	  / ((self token: 'ValType') , tkString)
+	  / (self token: 'ValStar')
 	"/ valReal / valComplex"
 	"/ valBoz"
 	/ valLogical
-	"/ valAssignment"
-	"/ valStar / valColon"
+	"/ valAssignment / valColon"
 ]

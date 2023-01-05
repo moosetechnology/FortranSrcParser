@@ -77,9 +77,12 @@ PP2FortranSrcParser >> blComment [
 	" (self prelude: 'BlComment')
 	, comment"
 
-	^ super blComment ==> [ :nodes | | aComment |
-		aComment := self newComment: (self isEsope: nodes).
-		aComment content: nodes second second; sourceAnchor: nodes first second.
+	^ super blComment ==> [ :nodes | | aComment content |
+		content := nodes second second.
+		aComment := (self newEntity: FamixFortranComment) 
+				content: content;
+				isEsope: (content beginsWith: 'eso' caseSensitive: false);
+				sourceAnchor: nodes first second.
 		aComment ]
 ]
 
@@ -195,7 +198,7 @@ PP2FortranSrcParser >> getSignature: aNode [
 
 	^ self srcFortran asFileReference
 		  readStreamDo: [ :stream | 
-			  stream contents copyFrom: aNode startPos to: aNode endPos ]
+			  stream contents copyFrom: aNode startPos to: aNode endPos + 1 ]
 		  ifAbsent: [ '' ]
 ]
 
@@ -310,6 +313,12 @@ PP2FortranSrcParser >> newEntity: aClass [
 	^ aClass new mooseModel: model; yourself
 ]
 
+{ #category : #'grammar-block' }
+PP2FortranSrcParser >> newEsopeEntity: aText [
+	^ (aText includesSubstring: 'segact') ifTrue: [ (self newEntity: FamixEsopeSegAct) ] ifFalse: [  ]
+	
+]
+
 { #category : #'private-creation' }
 PP2FortranSrcParser >> newIndexedFileAnchor: filename [
 
@@ -386,6 +395,7 @@ PP2FortranSrcParser >> puMain [
 
 	^ super puMain ==> [ :nodes | 
 	  | program |
+
 	  program := (self newEntity: FamixFortranProgram)
 		             name: (nodes second = 'Nothing'
 				              ifTrue: [ '' ]
@@ -531,6 +541,15 @@ PP2FortranSrcParser >> stIfLogical [
 		 ]
 ]
 
+{ #category : #'grammar-statement' }
+PP2FortranSrcParser >> stPrint [
+	" (self prelude: 'StPrint')
+	, (self parens: expression)
+	, (self justAList: expression)"
+	
+	^ super stPrint ==> [ :nodes | nodes ]
+]
+
 { #category : #'accessing - tests' }
 PP2FortranSrcParser >> stack [
 
@@ -618,7 +637,7 @@ PP2FortranSrcParser >> value [
 	/ valBoz
 	/ valLogical
 	/ valAssignment
-	/ valStar / valColon"
+	/ (self token: 'ValStar') / valColon"
 
-	^ super value ==> [ :nodes | {nodes first. nodes second} ]
+	^ super value ==> [ :nodes | nodes isArray ifTrue: [ {nodes first. nodes second} ] ifFalse: [ nodes ]  ]
 ]
