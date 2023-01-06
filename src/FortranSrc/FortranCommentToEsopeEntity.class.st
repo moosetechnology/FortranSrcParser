@@ -3,22 +3,10 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'model',
-		'dictionary'
+		'keywordClassMap'
 	],
 	#category : #'FortranSrc-Esope'
 }
-
-{ #category : #accessing }
-FortranCommentToEsopeEntity >> dictionary [
-
-	^ dictionary
-]
-
-{ #category : #accessing }
-FortranCommentToEsopeEntity >> dictionary: anObject [
-
-	dictionary := anObject
-]
 
 { #category : #'private - utility' }
 FortranCommentToEsopeEntity >> esopePrefix [
@@ -28,12 +16,11 @@ FortranCommentToEsopeEntity >> esopePrefix [
 { #category : #'private - utility' }
 FortranCommentToEsopeEntity >> getClass: aString [
 
-	| aKey |
-	aKey := self dictionary keys select: [ :each | 
-		        aString includesSubstring: each caseSensitive: false ].
-	^ aKey size = 1
-		  ifTrue: [ self dictionary at: aKey first ifAbsent: [  ] ]
-		  ifFalse: [  ]
+	^keywordClassMap
+		detect: [ :assoc | aString includesSubstring: assoc key caseSensitive: false ]
+		ifOne: [ :assoc | assoc value ]
+		ifNone: [ self ]
+	
 ]
 
 { #category : #initialization }
@@ -41,14 +28,14 @@ FortranCommentToEsopeEntity >> initialize [
 
 	super initialize.
 
-	dictionary := Dictionary newFrom: { 
+	keywordClassMap := OrderedCollection newFrom: { 
 			              (#segact -> FamixEsopeSegact).
 			              (#segini -> FamixEsopeSegini).
 			              (#segsup -> FamixEsopeSegsup).
 			              (#segdes -> FamixEsopeSegdes).
 			              (#segadj -> FamixEsopeSegadj).
-			              (#pointeur -> FamixEsopePointerType).
-			              (#segment -> FamixEsopeSegment) }
+			              (#pointe -> FamixEsopePointer).
+			              (#segmen -> FamixEsopeSegment) }
 ]
 
 { #category : #accessing }
@@ -68,11 +55,19 @@ FortranCommentToEsopeEntity >> newEntity: anEntity [
 
 	| aClass |
 	aClass := self getClass: anEntity content.
-	^ aClass ifNotNil: [ 
-		  aClass := (aClass newFromFortranComment: anEntity) 
-			            mooseModel: model;
-			            yourself.
-		  aClass ]
+	^ aClass
+		  ifNotNil: [ aClass newFromFortranComment: anEntity ]
+		  ifNil: [ nil ]
+]
+
+{ #category : #'private - utility' }
+FortranCommentToEsopeEntity >> newEntityComment: aFortranComment [
+
+	| aClass |
+	aClass := self getClass: aFortranComment content.
+	^ aClass
+		  ifNotNil: [ aClass newEntity: aFortranComment ]
+		  ifNil: [ FamixEsopeUnknown new comment: aFortranComment ]
 ]
 
 { #category : #'private - utility' }
@@ -102,13 +97,23 @@ FortranCommentToEsopeEntity >> processSegment [
 ]
 
 { #category : #utilities }
-FortranCommentToEsopeEntity >> transform: entities [
+FortranCommentToEsopeEntity >> transformComment [
 
-	entities do: [ :anEntity | self newEntity: anEntity ]
+	((self model allWithSubTypesOf: FamixFortranFunction) select:
+		 #isEsope) do: [ :aFortranComment | 
+		self newEntityComment: aFortranComment ]
 ]
 
 { #category : #utilities }
-FortranCommentToEsopeEntity >> transformFortranCommentToEsopeEntity [
+FortranCommentToEsopeEntity >> transformFortranToEsopeEntity [
 
-	self transform: (self model allComments select: #isEsope)
+	self transformComment.
+	self transformFunction.
+]
+
+{ #category : #utilities }
+FortranCommentToEsopeEntity >> transformFunction [
+
+	((self model allWithSubTypesOf: FamixFortranFunction) select:
+		 #isEsope) do: [ :anEntity | self newEntity: anEntity ]
 ]
