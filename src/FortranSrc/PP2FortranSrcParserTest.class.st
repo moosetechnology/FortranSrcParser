@@ -127,6 +127,38 @@ PP2FortranSrcParserTest >> testExpFunctionCall [
 ]
 
 { #category : #'tests-expression' }
+PP2FortranSrcParserTest >> testExpFunctionCallWithParameters [
+
+	| ast |
+	ast := self
+		       parse: 'ExpFunctionCall ()
+	(21:13)-(21:25)
+   (ExpValue ()
+   		(21:13)-(21:17)
+   		(ValVariable "esosl"))
+   (Just AList ()
+       (21:19)-(21:24)
+       [Argument ()
+           (21:19)-(21:20)
+           Nothing
+           (ArgExpr (ExpValue ()
+           (21:19)-(21:20)
+           (ValVariable "t1"))),
+       Argument ()
+           (21:22)-(21:24)
+           Nothing
+          (ArgExpr (ExpValue ()
+             (21:22)-(21:24)
+             (ValVariable "tab")))])'
+		       rule: #expFunctionCall.
+	self assert: ast candidates size equals: 1.
+	self assert: ast candidates first name equals: 'esosl'.
+	self assert: ast candidates first parameters size equals: 2.
+	self assert: ast candidates first parameters first name equals: 't1'.
+	self assert: ast candidates first parameters last name equals: 'tab'.
+]
+
+{ #category : #'tests-expression' }
 PP2FortranSrcParserTest >> testExpUnary [
 
 	| ast |

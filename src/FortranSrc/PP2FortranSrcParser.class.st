@@ -95,6 +95,29 @@ PP2FortranSrcParser >> blStatement [
 	^ super blStatement ==> [ :nodes | nodes third ]
 ]
 
+{ #category : #'grammar-expression' }
+PP2FortranSrcParser >> createInvocation: nodes to: candidate [
+
+	^ (self newEntity: FamixFortranInvocation)
+		  addCandidate: candidate;
+		  sourceAnchor: nodes;
+		  signature: (self getSignature: nodes);
+		  yourself
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcParser >> createParameters: nodes to: candidate [
+
+	nodes do: [ :n | 
+		| parameter |
+		parameter := FamixFortranParameter new
+			             name: n third second third;
+			             mooseModel: self model;
+			             sourceAnchor: n third second first;
+			             yourself.
+		parameter setOwner: candidate ]
+]
+
 { #category : #'grammar-programUnit' }
 PP2FortranSrcParser >> ensureFunction: aName [
 
@@ -161,11 +184,8 @@ PP2FortranSrcParser >> expFunctionCall [
 	  candidate := self
 		               ensureFunction: nodes second third
 		               intrinsic: nodes second second = 'ValIntrinsic'.
-	  (self newEntity: FamixFortranInvocation)
-		  addCandidate: candidate;
-		  sourceAnchor: nodes first second;
-		  signature: (self getSignature: nodes first second);
-		  yourself ]
+	  self createParameters: nodes third second to: candidate.
+	  self createInvocation: nodes first second to: candidate ]
 ]
 
 { #category : #'grammar-expression' }
