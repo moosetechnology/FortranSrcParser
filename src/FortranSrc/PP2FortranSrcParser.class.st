@@ -322,21 +322,9 @@ PP2FortranSrcParser >> model: anObject [
 	model := anObject
 ]
 
-{ #category : #'grammar-block' }
-PP2FortranSrcParser >> newComment: aBoolean [
-
-	^ aBoolean ifTrue: [ self newEntity: FamixEsopeComment ] ifFalse: [ self newEntity: FamixFortranComment ]
-]
-
 { #category : #'private-creation' }
 PP2FortranSrcParser >> newEntity: aClass [
 	^ aClass new mooseModel: model; yourself
-]
-
-{ #category : #'grammar-block' }
-PP2FortranSrcParser >> newEsopeEntity: aText [
-	^ (aText includesSubstring: 'segact') ifTrue: [ (self newEntity: FamixEsopeSegAct) ] ifFalse: [  ]
-	
 ]
 
 { #category : #'private-creation' }
