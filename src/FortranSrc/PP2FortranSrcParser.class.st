@@ -109,11 +109,11 @@ PP2FortranSrcParser >> createInvocation: nodes to: candidate [
 PP2FortranSrcParser >> createParameters: nodes to: candidate [
 
 	nodes do: [ :n | 
-		| parameter |
-		parameter := FamixFortranParameter new
-			             name: n third second third;
-			             mooseModel: self model;
-			             sourceAnchor: n third second first;
+		| parameter aName |
+		aName := n third second.
+		parameter := (self newEntity: FamixFortranParameter)
+			             name: (aName isArray ifTrue: [ aName third asString ] ifFalse: [ aName sourceText]) ;
+			             sourceAnchor: (aName isArray ifTrue: [ aName first ] ifFalse: [ aName sourceAnchor]);
 			             yourself.
 		parameter setOwner: candidate ]
 ]

@@ -108,7 +108,7 @@ FortranCommentToEsopeEntity >> transformComment [
 FortranCommentToEsopeEntity >> transformFortranToEsopeEntity [
 
 	self transformComment.
-	self transformFunction.
+	self transformFunction
 ]
 
 { #category : #utilities }
