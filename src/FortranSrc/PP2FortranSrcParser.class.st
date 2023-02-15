@@ -522,6 +522,15 @@ PP2FortranSrcParser >> stExpressionAssign [
 	^ super stExpressionAssign ==> [ :nodes | nodes ]
 ]
 
+{ #category : #'grammar-metaInfo' }
+PP2FortranSrcParser >> stExternal [
+
+	"(self prelude: 'StExternal')
+	  , (self parens: (self aList: expression))"
+
+	^ super stExternal ==> [ :nodes | nodes ]
+]
+
 { #category : #'grammar-statement' }
 PP2FortranSrcParser >> stFunction [
 
@@ -622,6 +631,14 @@ PP2FortranSrcParser >> valInteger [
 ]
 
 { #category : #'grammar-expression' }
+PP2FortranSrcParser >> valStar [
+
+	"self token: 'ValStar'"
+
+	^ super valStar ==> [ :nodes | nodes ]
+]
+
+{ #category : #'grammar-expression' }
 PP2FortranSrcParser >> valString [
 
 	"(self token: 'ValString') , tkString"
@@ -647,5 +664,11 @@ PP2FortranSrcParser >> value [
 	/ valAssignment
 	/ (self token: 'ValStar') / valColon"
 
-	^ super value ==> [ :nodes | nodes isArray ifTrue: [ {nodes first. nodes second} ] ifFalse: [ nodes ]  ]
+	^ super value ==> [ :nodes | 
+	  nodes isArray
+		  ifTrue: [ 
+			  { 
+				  nodes first.
+				  nodes second } ]
+		  ifFalse: [ nodes ] ]
 ]

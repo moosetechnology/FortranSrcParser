@@ -74,7 +74,12 @@ Class {
 		'maybeOfString',
 		'valLogical',
 		'stFunction',
-		'stPrint'
+		'stPrint',
+		'valStar',
+		'stExternal',
+		'stWrite',
+		'controlPair',
+		'stExit'
 	],
 	#category : #'FortranSrc-Parser'
 }
@@ -266,6 +271,13 @@ PP2FortranSrcGrammar >> commonGroup [
 	, (self parens: (self aList: declarator))
 ]
 
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> controlPair [
+
+	^ (self prelude: 'ControlPair') , (self maybe: tkString)
+	  , (self parens: expression)
+]
+
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> declarator [
 
@@ -338,7 +350,7 @@ PP2FortranSrcGrammar >> expUnary [
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expValue [
 
-	^ (self prelude: 'ExpValue') , (self parens: value)
+	^ (self prelude: 'ExpValue') , ((self parens: value) / valStar)
 ]
 
 { #category : #'grammar-expression' }
@@ -513,7 +525,7 @@ PP2FortranSrcGrammar >> prefixSuffix [
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> prelude: aString [
 
-	^ aString asPParser trim , emptyTuple , srcSpan
+	^ aString asPParser flatten trim , emptyTuple , srcSpan
 ]
 
 { #category : #'grammar-helper' }
@@ -627,10 +639,24 @@ PP2FortranSrcGrammar >> stDeclaration [
 ]
 
 { #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stExit [
+
+	^ (self prelude: 'StExit')
+	  , (self maybe: expression)
+]
+
+{ #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> stExpressionAssign [
 	^ ((self prelude: 'StExpressionAssign')
 	, (self parens: expression)
 	, (self parens: expression))
+]
+
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stExternal [
+
+	^ (self prelude: 'StExternal')
+	  , (self parens: (self aList: expression))
 ]
 
 { #category : #'grammar-statement' }
@@ -654,6 +680,14 @@ PP2FortranSrcGrammar >> stPrint [
 	, (self maybe: (self justAList: expression))
 ]
 
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stWrite [
+
+	^ (self prelude: 'StWrite')
+	  , (self parens: (self aList: controlPair))
+	  , (self maybe: (self aList: expression))
+]
+
 { #category : #accessing }
 PP2FortranSrcGrammar >> start [
 	^programFile
@@ -671,16 +705,16 @@ PP2FortranSrcGrammar >> statement [
 	  /
 	  ((self prelude: 'StGotoUnconditional') , (self parens: expression))
 	  / stCall / (self prelude: 'StReturn' maybe: expression)
-	  / (self prelude: 'StContinue') / stFunction / stPrint
+	  / (self prelude: 'StContinue') / stFunction / stPrint / stExternal / stWrite / stExit
 	"/ stStructure / stIntent / stOptional / stPublic / stPrivate / stProtected / stSave"
-	"/ stAsynchronous / stPointer / stTarget / stValue / stVolatile / stData / stAutomatic / ststatic / stNamelist / stParameter / stExternal / stIntrinsic"
+	"/ stAsynchronous / stPointer / stTarget / stValue / stVolatile / stData / stAutomatic / ststatic / stNamelist / stParameter  / stIntrinsic"
 	"/ stFormat"
 
-	"/ stEntry / stInclude / stDo / stDoWhile / stEnddo / stCycle / stExit "
+	"/ stEntry / stInclude / stDo / stDoWhile / stEnddo / stCycle  "
 	" / stIfArithmetic / stSelectCase / stCase / stEndcase"
 	" / stPointerAssign / stLabelAssign"
 	" / stGotoAssigned / stGotoComputed"
-	"/ ststop / stPause / stRead / stRead2 / stWrite  / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum / stFormatBogus"
+	"/ ststop / stPause / stRead / stRead2 / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum / stFormatBogus"
 ]
 
 { #category : #'grammar-helper' }
@@ -723,7 +757,7 @@ PP2FortranSrcGrammar >> tkString [
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> token: aString [
 
-	^  aString asPParser flatten trim
+	^ aString asPParser flatten trim
 ]
 
 { #category : #'grammar-declaration' }
@@ -734,6 +768,7 @@ PP2FortranSrcGrammar >> typeSpec [
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> unaryOp [
+
 	^ (self token: 'Plus') /
 	(self token: 'Minus') /
 	(self token: 'Not') /
@@ -755,15 +790,22 @@ PP2FortranSrcGrammar >> valLogical [
 ]
 
 { #category : #'grammar-expression' }
+PP2FortranSrcGrammar >> valStar [
+
+	^ self token: 'ValStar'
+]
+
+{ #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> value [
 
-	^ valInteger / ((self token: 'ValString') , tkString)
+	^ valInteger 
+	  / ((self token: 'ValString') , tkString)
 	  / ((self token: 'ValHollerith') , tkString)
 	  / ((self token: 'ValVariable') , tkString)
 	  / ((self token: 'ValIntrinsic') , tkString)
 	  / ((self token: 'ValOperator') , tkString)
 	  / ((self token: 'ValType') , tkString)
-	  / (self token: 'ValStar')
+	  "/ (self token: 'ValStar')"
 	"/ valReal / valComplex"
 	"/ valBoz"
 	/ valLogical
