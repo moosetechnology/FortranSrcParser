@@ -305,6 +305,60 @@ PP2FortranSrcParserTest >> testProgramFileNoEmpty [
 ]
 
 { #category : #'tests-programFile' }
+PP2FortranSrcParserTest >> testProgramFileWithMultipleProgramUnits [
+
+	| ast program |
+	ast := self parse: 'ProgramFile (MetaInfo
+	{miVersion = Fortran77,
+	miFilename = "file.f"})	
+	[PUComment ()
+		(25:1)-(25:73)
+      (Comment "234567890123456789012345678901234567890123456789012345678901234567890123"),
+	PUMain ()
+		(1:7)-(13:9)
+		(Just "circle")
+		[]
+		Nothing,
+	PUSubroutine ()
+		(38:7)-(43:9)
+		(Nothing, Nothing)
+		"mysub"
+		Nothing
+		[]
+	   Nothing,
+	PUFunction ()
+		(45:7)-(49:9)
+		(Just TypeSpec () (45:7)-(45:13) TypeInteger Nothing)
+		(Nothing, Nothing)
+		"ifunc"
+		(Just AList ()
+			(45:31)-(45:31)
+			[ExpValue ()
+				(45:31)-(45:31)
+				(ValVariable "k")])
+		Nothing
+		[]
+		Nothing,
+	PUBlockData ()
+		(51:7)-(54:9)
+		(Just "myblck")
+		[],
+	PUComment ()
+		(55:1)-(55:72)
+		(Comment "----------------------------------------------------------------------^")
+	]' rule: #programFile.
+	self assert: (parser model allWithType: FamixFortranProgram) size equals: 1.
+
+	program := (parser model allWithType: FamixFortranProgram) first.
+
+	self assert: program name equals: 'circle'.
+
+	self assertEmpty: program comments.
+
+	self assertEmpty: program programUnits
+]
+
+{ #category : #'tests-programFile' }
 PP2FortranSrcParserTest >> testProgramFileWithPuMain [
 
 	| ast program |
@@ -325,6 +379,52 @@ PP2FortranSrcParserTest >> testProgramFileWithPuMain [
 	self assertEmpty: program comments.
 
 	self assertEmpty: program programUnits
+]
+
+{ #category : #'tests-programUnit' }
+PP2FortranSrcParserTest >> testPuBlockData [
+
+	| ast  |
+	ast := self parse: 'PUBlockData ()
+		(51:7)-(54:9)
+		(Just "myblck")
+		[]' rule: #puBlockData.
+	self assert: ast name equals: 'myblck'.
+]
+
+{ #category : #'tests-programUnit' }
+PP2FortranSrcParserTest >> testPuFunction [
+
+	| ast |
+	ast := self
+		       parse: 'PUFunction ()
+	(1:7)-(103:9)
+	(Just TypeSpec () (1:7)-(1:13) TypeInteger Nothing)
+	(Nothing, Nothing)
+	"findbk"
+	(Just AList ()
+		(1:31)-(1:39)
+		[ExpValue ()
+			(1:31)-(1:33)
+			(ValVariable "lib"),
+		ExpValue ()
+			(1:35)-(1:39)
+			(ValVariable "title")])
+	Nothing
+	[]
+	Nothing'
+		       rule: #puFunction.
+
+	self assert: ast parameters size equals: 2.
+	self assert: ast parameters first name equals: 'lib'.
+	self assert: ast parameters last name equals: 'title'.
+	self assert: ast name equals: 'findbk'.
+	self flag: #FIXME. "self assert: ast body equals: 0."
+	self assert: ast sourceAnchor startLine equals: 1.
+	self assert: ast sourceAnchor startColumn equals: 7.	
+	self assert: ast sourceAnchor endLine equals: 103.
+	self assert: ast sourceAnchor endColumn equals: 9.	
+
 ]
 
 { #category : #'tests-programUnit' }
@@ -369,6 +469,7 @@ PP2FortranSrcParserTest >> testPuSubroutine [
 		[]
 	Nothing'
 		       rule: #puSubroutine.
+
 	self
 		assert: (parser model allWithType: FamixFortranSubroutine) size
 		equals: 1.
@@ -379,6 +480,14 @@ PP2FortranSrcParserTest >> testPuSubroutine [
 	self assert: subroutine name value equals: 'subrtn'.
 
 	self assert: subroutine parameters size equals: 1.
+	
+	self assert: subroutine sourceAnchor startLine equals: 1.
+
+	self assert: subroutine sourceAnchor endLine equals: 302.
+	
+	self assert: subroutine sourceAnchor startColumn equals: 7.
+
+	self assert: subroutine sourceAnchor endColumn equals: 9.
 
 	self assert: subroutine parameters first name equals: 'status'.
 
