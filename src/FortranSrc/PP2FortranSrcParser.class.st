@@ -118,7 +118,22 @@ PP2FortranSrcParser >> createParameters: nodes to: candidate [
 		parameter setOwner: candidate ]
 ]
 
-{ #category : #'grammar-programUnit' }
+{ #category : #'private-creation' }
+PP2FortranSrcParser >> ensureBlockdata: aName [
+
+	| aBlockdata candidates |
+	aBlockdata := self model allWithType: FamixFortranBlockData.
+
+	candidates := aBlockdata select: [ :each | each name = aName ].
+	^ candidates
+		  ifEmpty: [ 
+			  (self newEntity: FamixFortranBlockData)
+				  name: aName;
+				  yourself ]
+		  ifNotEmpty: [ candidates first ]
+]
+
+{ #category : #'private-creation' }
 PP2FortranSrcParser >> ensureFunction: aName [
 
 	| externalProcedures candidates |
@@ -136,7 +151,7 @@ PP2FortranSrcParser >> ensureFunction: aName [
 		  ifNotEmpty: [ candidates first]
 ]
 
-{ #category : #'grammar-programUnit' }
+{ #category : #'private-creation' }
 PP2FortranSrcParser >> ensureFunction: aName intrinsic: aBoolean [
 
 	| externalProcedures candidates |
@@ -155,7 +170,7 @@ PP2FortranSrcParser >> ensureFunction: aName intrinsic: aBoolean [
 		  ifNotEmpty: [ candidates first ]
 ]
 
-{ #category : #'grammar-programUnit' }
+{ #category : #'private-creation' }
 PP2FortranSrcParser >> ensureSubroutine: aName [
 
 	| externalProcedures candidates |
@@ -385,6 +400,20 @@ PP2FortranSrcParser >> programFile [
 ]
 
 { #category : #'grammar-programUnit' }
+PP2FortranSrcParser >> puBlockData [
+
+	" (self prelude: 'PUBlockData')
+	, (self maybe: tkString)
+	, (self haskellList: block)"
+
+	^ super puBlockData ==> [ :nodes | 
+	  | aBlockdata |
+		aBlockdata := self ensureBlockdata: nodes second.
+		aBlockdata.
+	   ]
+]
+
+{ #category : #'grammar-programUnit' }
 PP2FortranSrcParser >> puComment [
 
 	"(self prelude: 'PUComment') , comment"
@@ -393,6 +422,42 @@ PP2FortranSrcParser >> puComment [
 	  (self newEntity: FamixFortranComment)
 		  content: nodes second second;
 		  yourself ]
+]
+
+{ #category : #'grammar-programUnit' }
+PP2FortranSrcParser >> puFunction [
+
+	" (self prelude: 'PUFunction')
+	, (self maybe: typeSpec)
+	, prefixSuffix
+	, tkString
+	, ((self token: 'Nothing') / (self justAList: expression))
+	, (self maybe: expression)
+	, (self haskellList: block)
+	, (self maybe: programUnit)"
+
+	^ super puFunction ==> [ :nodes | 
+	  | aFunction |
+	  aFunction := self ensureFunction: nodes fourth.
+	  aFunction sourceAnchor: nodes first second.
+
+	  nodes fifth = 'Nothing' ifFalse: [ 
+		  nodes fifth second do: [ :node | 
+			  aFunction addParameter: ((self newEntity: FamixFortranParameter)
+					   sourceAnchor: node first;
+					   name: node third value;
+					   yourself) ] ].
+	  nodes seventh do: [ :aBlockNode | 
+		  aBlockNode isArray
+			  ifFalse: [ 
+				  aBlockNode setOwner: aFunction
+				  "aBlockNode isInvocation ifTrue: [ 1 halt ]" ]
+			  ifTrue: [ 
+				  (aBlockNode flattened select: [ :entity | 
+					   entity class = FamixFortranInvocation or: [ 
+						   entity class = FamixFortranComment ] ]) do: [ :anEntity | 
+					  anEntity setOwner: aFunction ] ] ].
+	  aFunction ]
 ]
 
 { #category : #'grammar-programUnit' }

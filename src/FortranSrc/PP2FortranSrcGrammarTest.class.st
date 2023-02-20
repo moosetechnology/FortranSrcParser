@@ -9135,6 +9135,16 @@ PP2FortranSrcGrammarTest >> testProgramFileWithPuMain [
 ]
 
 { #category : #'tests-programUnit' }
+PP2FortranSrcGrammarTest >> testPuBlockData [
+
+	| ast  |
+	ast := self parse: 'PUBlockData ()
+		(51:7)-(54:9)
+		(Just "myblck")
+		[]' rule: #puBlockData.
+]
+
+{ #category : #'tests-programUnit' }
 PP2FortranSrcGrammarTest >> testPuComment [
 
 	self
@@ -9142,6 +9152,28 @@ PP2FortranSrcGrammarTest >> testPuComment [
 	(4:1)-(4:19)
 	(Comment "== entrees ==")'
 		rule: #puComment
+]
+
+{ #category : #'tests-programUnit' }
+PP2FortranSrcGrammarTest >> testPuFunction [
+	self
+		parse: 'PUFunction ()
+	(1:7)-(103:9)
+	(Just TypeSpec () (1:7)-(1:13) TypeInteger Nothing)
+	(Nothing, Nothing)
+	"findbk"
+	(Just AList ()
+		(1:31)-(1:39)
+		[ExpValue ()
+			(1:31)-(1:33)
+			(ValVariable "lib"),
+		ExpValue ()
+			(1:35)-(1:39)
+			(ValVariable "title")])
+	Nothing
+	[]
+	Nothing'
+		rule: #puFunction
 ]
 
 { #category : #tests }

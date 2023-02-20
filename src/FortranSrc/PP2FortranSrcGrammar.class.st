@@ -566,6 +566,7 @@ PP2FortranSrcGrammar >> puComment [
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puFunction [
+
 	^ (self prelude: 'PUFunction')
 	, (self maybe: typeSpec)
 	, prefixSuffix
