@@ -382,6 +382,17 @@ PP2FortranSrcParserTest >> testProgramFileWithPuMain [
 ]
 
 { #category : #'tests-programUnit' }
+PP2FortranSrcParserTest >> testPuBlockData [
+
+	| ast  |
+	ast := self parse: 'PUBlockData ()
+		(51:7)-(54:9)
+		(Just "myblck")
+		[]' rule: #puBlockData.
+	self assert: ast name equals: 'myblck'.
+]
+
+{ #category : #'tests-programUnit' }
 PP2FortranSrcParserTest >> testPuFunction [
 
 	| ast |
