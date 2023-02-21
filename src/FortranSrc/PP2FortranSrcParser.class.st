@@ -475,6 +475,17 @@ PP2FortranSrcParser >> puMain [
 				              ifFalse: [ nodes second ]);
 		             yourself.
 	  self flag: #TODO. "gerer les élements du block"
+	 nodes third do: [ :aBlockNode | 
+		aBlockNode isArray
+			  ifFalse: [ 
+				  aBlockNode setOwner: program
+				  "aBlockNode isInvocation ifTrue: [ 1 halt ]" ]
+			  ifTrue: [ 
+				  (aBlockNode flattened select: [ :entity | 
+					   entity class = FamixFortranInvocation or: [ 
+						   entity class = FamixFortranComment ] ]) do: [ :anEntity | 
+					  anEntity setOwner: program ] ]
+		].
 	  nodes fourth = 'Nothing' ifFalse: [ 
 		  nodes fourth do: [ :progUnit | progUnit container: program ] ].
 	  program ]

@@ -1082,7 +1082,7 @@ PP2FortranSrcGrammarTest class >> exampleAST [
 
 	^ 'ProgramFile (MetaInfo
                      {miVersion = Fortran77,
-                      miFilename = "example.f"})
+                      miFilename = "/demo-bib/build/example.f"})
             [PUComment ()
                        (1:1)-(1:72)
                        (Comment "23456789012345678901234567890123456789012345678901234567890123456789012"),
@@ -1383,6 +1383,492 @@ cESO  segsup, t1
 
       end
 
+'
+]
+
+{ #category : #'filesytem-inmemory' }
+PP2FortranSrcGrammarTest class >> exampleWithMultipleProgUnit [
+
+	^ (self workDir / '/demo-bib/build/example.f') ensureCreateFile writeStreamDo: [ 
+		  :stream | stream << self exampleWithMultipleProgUnitFortran ]
+]
+
+{ #category : #'AST-fortranSrc' }
+PP2FortranSrcGrammarTest class >> exampleWithMultipleProgUnitAST [
+
+	^ 'ProgramFile (MetaInfo
+                     {miVersion = Fortran77,
+                      miFilename = "/demo-bib/build/example.f"})
+            [PUComment ()
+                       (1:1)-(1:51)
+                       (Comment " npac f77 example 001, showing source code layout."),
+             PUComment ()
+                       (2:1)-(2:70)
+                       (Comment "        1         2         3         4         5         6         7"),
+             PUComment ()
+                       (3:1)-(3:73)
+                       (Comment "---------------this is a comment---------------------------------------v"),
+             PUComment ()
+                       (4:1)-(4:47)
+                       (Comment "ol. 1    : blank, or a \"c\" or \"*\" for comments"),
+             PUComment ()
+                       (5:1)-(5:38)
+                       (Comment "ol. 1-5  : statement label (optional)"),
+             PUComment ()
+                       (6:1)-(6:52)
+                       (Comment "ol. 6    : continuation of previous line (optional)"),
+             PUComment ()
+                       (7:1)-(7:22)
+                       (Comment "ol. 7-72 : statements"),
+             PUComment ()
+                       (8:1)-(8:57)
+                       (Comment "ol. 73-80: sequence number (optional, rarely used today)"),
+             PUComment ()
+                       (9:1)-(9:17)
+                       (Comment " program layout:"),
+             PUComment ()
+                       (10:1)-(10:72)
+                       (Comment "----------------------------------------------------------------------+"),
+             PUComment ()
+                       (11:1)-(11:72)
+                       (Comment " block data, function program, subroutine                             |"),
+             PUComment ()
+                       (12:1)-(12:72)
+                       (Comment "-----------------+----------------+-----------------------------------+"),
+             PUComment ()
+                       (13:1)-(13:72)
+                       (Comment " format          | parameter      | implicit                          |"),
+             PUComment ()
+                       (14:1)-(14:72)
+                       (Comment "                 |                +-----------------------------------+"),
+             PUComment ()
+                       (15:1)-(15:72)
+                       (Comment "                 |                | type declarations and other spec  |"),
+             PUComment ()
+                       (16:1)-(16:72)
+                       (Comment "                 |                | statement: common, dimension, save|"),
+             PUComment ()
+                       (17:1)-(17:72)
+                       (Comment "                 |                | equivalence, external, intrinsic  |"),
+             PUComment ()
+                       (18:1)-(18:73)
+                       (Comment "                 +----------------+-----------------------------------+ "),
+             PUComment ()
+                       (19:1)-(19:74)
+                       (Comment "                 | data           | statement functions               |  "),
+             PUComment ()
+                       (20:1)-(20:72)
+                       (Comment "                 |                +-----------------------------------+"),
+             PUComment ()
+                       (21:1)-(21:72)
+                       (Comment "                 |                | executable statements             |"),
+             PUComment ()
+                       (22:1)-(22:88)
+                       (Comment "-----------------+----------------+-----------------------------------+                "),
+             PUComment ()
+                       (23:1)-(23:74)
+                       (Comment " end                                                                  |  "),
+             PUComment ()
+                       (24:1)-(24:72)
+                       (Comment "----------------------------------------------------------------------+"),
+             PUComment ()
+                       (25:1)-(25:73)
+                       (Comment "234567890123456789012345678901234567890123456789012345678901234567890123"),
+             PUMain ()
+                    (26:7)-(36:9)
+                    (Just "myprog")
+                    [BlStatement ()
+                                 (27:7)-(27:22)
+                                 Nothing
+                                 (StDeclaration ()
+                                                (27:7)-(27:22)
+                                                (TypeSpec ()
+                                                          (27:7)-(27:13)
+                                                          TypeInteger
+                                                          Nothing)
+                                                Nothing
+                                                (AList ()
+                                                       (27:15)-(27:22)
+                                                       [Declarator ()
+                                                                   (27:15)-(27:15)
+                                                                   (ExpValue ()
+                                                                             (27:15)-(27:15)
+                                                                             (ValVariable "i"))
+                                                                   ScalarDecl
+                                                                   Nothing
+                                                                   Nothing,
+                                                        Declarator ()
+                                                                   (27:18)-(27:22)
+                                                                   (ExpValue ()
+                                                                             (27:18)-(27:22)
+                                                                             (ValVariable "ifunc"))
+                                                                   ScalarDecl
+                                                                   Nothing
+                                                                   Nothing])),
+                     BlStatement ()
+                                 (28:7)-(28:22)
+                                 Nothing
+                                 (StCommon ()
+                                           (28:7)-(28:22)
+                                           (AList ()
+                                                  (28:14)-(28:22)
+                                                  [CommonGroup ()
+                                                               (28:14)-(28:22)
+                                                               (Just ExpValue ()
+                                                                              (28:14)-(28:20)
+                                                                              (ValVariable "mycom"))
+                                                               (AList ()
+                                                                      (28:22)-(28:22)
+                                                                      [Declarator ()
+                                                                                  (28:22)-(28:22)
+                                                                                  (ExpValue ()
+                                                                                            (28:22)-(28:22)
+                                                                                            (ValVariable "i"))
+                                                                                  ScalarDecl
+                                                                                  Nothing
+                                                                                  Nothing])])),
+                     BlStatement ()
+                                 (29:7)-(29:30)
+                                 Nothing
+                                 (StWrite ()
+                                          (29:7)-(29:30)
+                                          (AList ()
+                                                 (29:12)-(29:18)
+                                                 [ControlPair ()
+                                                              (29:13)-(29:13)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (29:13)-(29:13)
+                                                                        (ValInteger "6"
+                                                                                    Nothing)),
+                                                  ControlPair ()
+                                                              (29:15)-(29:17)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (29:15)-(29:17)
+                                                                        (ValInteger "100"
+                                                                                    Nothing))])
+                                          (Just AList ()
+                                                      (29:20)-(29:30)
+                                                      [ExpValue ()
+                                                                (29:20)-(29:30)
+                                                                (ValString "Hello Ken")])),
+                     BlStatement ()
+                                 (30:3)-(30:18)
+                                 (Just ExpValue ()
+                                                (30:3)-(30:5)
+                                                (ValInteger "100" Nothing))
+                                 (StFormatBogus () (30:7)-(30:18) "(1x,a)"),
+                     BlStatement ()
+                                 (31:7)-(31:18)
+                                 Nothing
+                                 (StExpressionAssign ()
+                                                     (31:7)-(31:18)
+                                                     (ExpValue ()
+                                                               (31:7)-(31:7)
+                                                               (ValVariable "i"))
+                                                     (ExpBinary ()
+                                                                (31:11)-(31:18)
+                                                                Addition
+                                                                (ExpValue ()
+                                                                          (31:11)-(31:11)
+                                                                          (ValVariable "i"))
+                                                                (ExpValue ()
+                                                                          (31:15)-(31:18)
+                                                                          (ValInteger "1000"
+                                                                                      Nothing)))),
+                     BlStatement ()
+                                 (32:7)-(32:16)
+                                 Nothing
+                                 (StCall ()
+                                         (32:7)-(32:16)
+                                         (ExpValue ()
+                                                   (32:12)-(32:16)
+                                                   (ValVariable "mysub"))
+                                         Nothing),
+                     BlStatement ()
+                                 (33:7)-(33:20)
+                                 Nothing
+                                 (StExpressionAssign ()
+                                                     (33:7)-(33:20)
+                                                     (ExpValue ()
+                                                               (33:7)-(33:7)
+                                                               (ValVariable "i"))
+                                                     (ExpFunctionCall ()
+                                                                      (33:11)-(33:20)
+                                                                      (ExpValue ()
+                                                                                (33:11)-(33:15)
+                                                                                (ValVariable "ifunc"))
+                                                                      (Just AList ()
+                                                                                  (33:18)-(33:18)
+                                                                                  [Argument ()
+                                                                                            (33:18)-(33:18)
+                                                                                            Nothing
+                                                                                            (ArgExpr (ExpValue ()
+                                                                                                               (33:18)-(33:18)
+                                                                                                               (ValVariable "i")))]))),
+                     BlStatement ()
+                                 (34:7)-(34:18)
+                                 Nothing
+                                 (StWrite ()
+                                          (34:7)-(34:18)
+                                          (AList ()
+                                                 (34:12)-(34:16)
+                                                 [ControlPair ()
+                                                              (34:13)-(34:13)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (34:13)-(34:13)
+                                                                        (ValInteger "6"
+                                                                                    Nothing)),
+                                                  ControlPair ()
+                                                              (34:15)-(34:15)
+                                                              Nothing
+                                                              (ExpValue ()
+                                                                        (34:15)-(34:15)
+                                                                        ValStar)])
+                                          (Just AList ()
+                                                      (34:18)-(34:18)
+                                                      [ExpValue ()
+                                                                (34:18)-(34:18)
+                                                                (ValVariable "i")])),
+                     BlStatement ()
+                                 (35:7)-(35:10)
+                                 Nothing
+                                 (StStop () (35:7)-(35:10) Nothing)]
+                    Nothing,
+             PUSubroutine ()
+                          (38:7)-(43:9)
+                          (Nothing, Nothing)
+                          "mysub"
+                          Nothing
+                          [BlStatement ()
+                                       (39:7)-(39:15)
+                                       Nothing
+                                       (StDeclaration ()
+                                                      (39:7)-(39:15)
+                                                      (TypeSpec ()
+                                                                (39:7)-(39:13)
+                                                                TypeInteger
+                                                                Nothing)
+                                                      Nothing
+                                                      (AList ()
+                                                             (39:15)-(39:15)
+                                                             [Declarator ()
+                                                                         (39:15)-(39:15)
+                                                                         (ExpValue ()
+                                                                                   (39:15)-(39:15)
+                                                                                   (ValVariable "i"))
+                                                                         ScalarDecl
+                                                                         Nothing
+                                                                         Nothing])),
+                           BlStatement ()
+                                       (40:7)-(40:22)
+                                       Nothing
+                                       (StCommon ()
+                                                 (40:7)-(40:22)
+                                                 (AList ()
+                                                        (40:14)-(40:22)
+                                                        [CommonGroup ()
+                                                                     (40:14)-(40:22)
+                                                                     (Just ExpValue ()
+                                                                                    (40:14)-(40:20)
+                                                                                    (ValVariable "mycom"))
+                                                                     (AList ()
+                                                                            (40:22)-(40:22)
+                                                                            [Declarator ()
+                                                                                        (40:22)-(40:22)
+                                                                                        (ExpValue ()
+                                                                                                  (40:22)-(40:22)
+                                                                                                  (ValVariable "i"))
+                                                                                        ScalarDecl
+                                                                                        Nothing
+                                                                                        Nothing])])),
+                           BlStatement ()
+                                       (41:7)-(41:15)
+                                       Nothing
+                                       (StExpressionAssign ()
+                                                           (41:7)-(41:15)
+                                                           (ExpValue ()
+                                                                     (41:7)-(41:7)
+                                                                     (ValVariable "i"))
+                                                           (ExpBinary ()
+                                                                      (41:11)-(41:15)
+                                                                      Addition
+                                                                      (ExpValue ()
+                                                                                (41:11)-(41:11)
+                                                                                (ValVariable "i"))
+                                                                      (ExpValue ()
+                                                                                (41:15)-(41:15)
+                                                                                (ValInteger "1"
+                                                                                            Nothing)))),
+                           BlStatement ()
+                                       (42:7)-(42:12)
+                                       Nothing
+                                       (StReturn () (42:7)-(42:12) Nothing)]
+                          Nothing,
+             PUFunction ()
+                        (45:7)-(49:9)
+                        (Just TypeSpec () (45:7)-(45:13) TypeInteger Nothing)
+                        (Nothing, Nothing)
+                        "ifunc"
+                        (Just AList ()
+                                    (45:31)-(45:31)
+                                    [ExpValue ()
+                                              (45:31)-(45:31)
+                                              (ValVariable "k")])
+                        Nothing
+                        [BlStatement ()
+                                     (46:7)-(46:15)
+                                     Nothing
+                                     (StDeclaration ()
+                                                    (46:7)-(46:15)
+                                                    (TypeSpec ()
+                                                              (46:7)-(46:13)
+                                                              TypeInteger
+                                                              Nothing)
+                                                    Nothing
+                                                    (AList ()
+                                                           (46:15)-(46:15)
+                                                           [Declarator ()
+                                                                       (46:15)-(46:15)
+                                                                       (ExpValue ()
+                                                                                 (46:15)-(46:15)
+                                                                                 (ValVariable "k"))
+                                                                       ScalarDecl
+                                                                       Nothing
+                                                                       Nothing])),
+                         BlStatement ()
+                                     (47:7)-(47:19)
+                                     Nothing
+                                     (StExpressionAssign ()
+                                                         (47:7)-(47:19)
+                                                         (ExpValue ()
+                                                                   (47:7)-(47:11)
+                                                                   (ValVariable "ifunc"))
+                                                         (ExpBinary ()
+                                                                    (47:15)-(47:19)
+                                                                    Multiplication
+                                                                    (ExpValue ()
+                                                                              (47:15)-(47:15)
+                                                                              (ValVariable "k"))
+                                                                    (ExpValue ()
+                                                                              (47:19)-(47:19)
+                                                                              (ValVariable "k")))),
+                         BlStatement ()
+                                     (48:7)-(48:12)
+                                     Nothing
+                                     (StReturn () (48:7)-(48:12) Nothing)]
+                        Nothing,
+             PUBlockData ()
+                         (51:7)-(54:9)
+                         (Just "myblck")
+                         [BlStatement ()
+                                      (52:7)-(52:22)
+                                      Nothing
+                                      (StCommon ()
+                                                (52:7)-(52:22)
+                                                (AList ()
+                                                       (52:14)-(52:22)
+                                                       [CommonGroup ()
+                                                                    (52:14)-(52:22)
+                                                                    (Just ExpValue ()
+                                                                                   (52:14)-(52:20)
+                                                                                   (ValVariable "mycom"))
+                                                                    (AList ()
+                                                                           (52:22)-(52:22)
+                                                                           [Declarator ()
+                                                                                       (52:22)-(52:22)
+                                                                                       (ExpValue ()
+                                                                                                 (52:22)-(52:22)
+                                                                                                 (ValVariable "i"))
+                                                                                       ScalarDecl
+                                                                                       Nothing
+                                                                                       Nothing])])),
+                          BlStatement ()
+                                      (53:7)-(53:20)
+                                      Nothing
+                                      (StData ()
+                                              (53:7)-(53:20)
+                                              (AList ()
+                                                     (53:12)-(53:20)
+                                                     [DataGroup ()
+                                                                (53:12)-(53:20)
+                                                                (AList ()
+                                                                       (53:12)-(53:12)
+                                                                       [ExpValue ()
+                                                                                 (53:12)-(53:12)
+                                                                                 (ValVariable "i")])
+                                                                (AList ()
+                                                                       (53:15)-(53:19)
+                                                                       [ExpValue ()
+                                                                                 (53:15)-(53:19)
+                                                                                 (ValInteger "12345"
+                                                                                             Nothing)])]))],
+             PUComment ()
+                       (55:1)-(55:72)
+                       (Comment "----------------------------------------------------------------------^")]
+'
+]
+
+{ #category : #'fortran77-annoted' }
+PP2FortranSrcGrammarTest class >> exampleWithMultipleProgUnitFortran [
+
+	^ 'C NPAC F77 EXAMPLE 001, SHOWING SOURCE CODE LAYOUT.
+C        1         2         3         4         5         6         7
+C---------------THIS IS A COMMENT---------------------------------------V
+Col. 1    : Blank, or a "c" or "*" for comments
+Col. 1-5  : Statement label (optional)
+Col. 6    : Continuation of previous line (optional)
+Col. 7-72 : Statements
+Col. 73-80: Sequence number (optional, rarely used today)
+C Program Layout:
+C----------------------------------------------------------------------+
+C Block data, function program, subroutine                             |
+C-----------------+----------------+-----------------------------------+
+C FORMAT          | PARAMETER      | IMPLICIT                          |
+C                 |                +-----------------------------------+
+C                 |                | type declarations and other spec  |
+C                 |                | statement: COMMON, DIMENSION, SAVE|
+C                 |                | EQUIVALENCE, EXTERNAL, INTRINSIC  |
+C                 +----------------+-----------------------------------+ 
+C                 | DATA           | statement functions               |  
+C                 |                +-----------------------------------+
+C                 |                | executable statements             |
+C-----------------+----------------+-----------------------------------+                
+C END                                                                  |  
+C----------------------------------------------------------------------+
+C234567890123456789012345678901234567890123456789012345678901234567890123
+      program myprog
+      integer i, ifunc
+      common /mycom/ i
+      write(6,100) ''Hello Ken''
+  100 format(1x,A)
+      i = i + 1000
+      call mysub
+      i = ifunc( i )
+      write(6,*) i
+      stop
+      end
+
+      subroutine mysub
+      integer i
+      common /mycom/ i
+      i = i + 1
+      return
+      end
+
+      integer function ifunc( k )
+      integer k
+      ifunc = k * k
+      return
+      end
+   
+      block data myblck
+      common /mycom/ i
+      data i /12345/
+      end
+C----------------------------------------------------------------------^
 '
 ]
 
@@ -8699,6 +9185,25 @@ PP2FortranSrcGrammarTest >> testControlPair [
 
 ]
 
+{ #category : #'tests-expression' }
+PP2FortranSrcGrammarTest >> testDataGroup [
+
+	self
+		parse: 'DataGroup ()
+	(53:12)-(53:20)
+	(AList ()
+		(53:12)-(53:12)
+		[ExpValue ()
+			(53:12)-(53:12)
+			(ValVariable "i")])
+	(AList ()
+		(53:15)-(53:19)
+		[ExpValue ()
+			(53:15)-(53:19)
+			(ValInteger "12345" Nothing)])'
+		rule: #dataGroup
+]
+
 { #category : #'tests-declaration' }
 PP2FortranSrcGrammarTest >> testDeclarator [
 
@@ -8894,6 +9399,13 @@ PP2FortranSrcGrammarTest >> testFullFileExample [
 ]
 
 { #category : #'tests - allnodes' }
+PP2FortranSrcGrammarTest >> testFullFileExampleWithMultipleProgUnit [
+
+	self class exampleWithMultipleProgUnit.
+	self parse: self class exampleWithMultipleProgUnitAST rule: #start.
+]
+
+{ #category : #'tests - allnodes' }
 PP2FortranSrcGrammarTest >> testFullFileFindbk [
 
 	self class findbk.
@@ -8924,8 +9436,10 @@ PP2FortranSrcGrammarTest >> testFullFileMain [
 { #category : #'tests - allnodes' }
 PP2FortranSrcGrammarTest >> testFullFileNewbook [
 
-	self class newbook.
-	self parse: self class newbookAST rule: #start.
+	| ast |
+	self class newbook. 
+	ast := self parse: self class newbookAST rule: #start.
+	ast halt.
 ]
 
 { #category : #'tests - allnodes' }
@@ -9005,6 +9519,7 @@ PP2FortranSrcGrammarTest >> testImpRange [
 
 { #category : #'tests-expression' }
 PP2FortranSrcGrammarTest >> testIxRange [
+
 	self
 		parse: 'IxRange ()
 	(157:45)-(157:72)
@@ -9270,6 +9785,29 @@ PP2FortranSrcGrammarTest >> testStCommon [
 		rule: #statement
 ]
 
+{ #category : #'tests-expression' }
+PP2FortranSrcGrammarTest >> testStData [
+
+	self
+		parse: 'StData ()
+	(53:7)-(53:20)
+	(AList ()
+	(53:12)-(53:20)
+	[DataGroup ()
+		(53:12)-(53:20)
+		(AList ()
+			(53:12)-(53:12)
+			[ExpValue ()
+				(53:12)-(53:12)
+				(ValVariable "i")])
+		(AList ()
+			(53:15)-(53:19)
+			[ExpValue ()
+				(53:15)-(53:19)
+				(ValInteger "12345" Nothing)])])'
+		rule: #stData
+]
+
 { #category : #'tests-statement' }
 PP2FortranSrcGrammarTest >> testStDeclaration [
 	self
@@ -9344,6 +9882,14 @@ PP2FortranSrcGrammarTest >> testStExternal [
 			(61:16)-(61:20)
 			(ValVariable "mypnt")])'
 		rule: #stExternal.
+
+]
+
+{ #category : #tests }
+PP2FortranSrcGrammarTest >> testStFormatBogus [
+	self
+		parse: 'StFormatBogus () (30:7)-(30:18) "(1x,a)"'
+		rule: #stFormatBogus.
 
 ]
 
@@ -9437,6 +9983,12 @@ PP2FortranSrcGrammarTest >> testStReturn [
 		(300:44)-(300:46)
 		(ValVariable "var"))'
 		rule: #statement
+]
+
+{ #category : #'tests-expression' }
+PP2FortranSrcGrammarTest >> testStStop [
+
+	self parse: 'StStop () (35:7)-(35:10) Nothing' rule: #stStop
 ]
 
 { #category : #'tests-expression' }

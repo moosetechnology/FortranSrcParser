@@ -317,7 +317,16 @@ PP2FortranSrcParserTest >> testProgramFileWithMultipleProgramUnits [
 	PUMain ()
 		(1:7)-(13:9)
 		(Just "circle")
-		[]
+		[BlStatement ()
+			(32:7)-(32:16)
+			Nothing
+			(StCall ()
+				(32:7)-(32:16)
+				(ExpValue ()
+					(32:12)-(32:16)
+					(ValVariable "mysub"))
+			Nothing)
+		]
 		Nothing,
 	PUSubroutine ()
 		(38:7)-(43:9)
@@ -347,6 +356,7 @@ PP2FortranSrcParserTest >> testProgramFileWithMultipleProgramUnits [
 		(55:1)-(55:72)
 		(Comment "----------------------------------------------------------------------^")
 	]' rule: #programFile.
+ast halt.
 	self assert: (parser model allWithType: FamixFortranProgram) size equals: 1.
 
 	program := (parser model allWithType: FamixFortranProgram) first.
