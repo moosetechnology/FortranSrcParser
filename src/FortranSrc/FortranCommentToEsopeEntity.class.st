@@ -16,10 +16,10 @@ FortranCommentToEsopeEntity >> esopePrefix [
 { #category : #'private - utility' }
 FortranCommentToEsopeEntity >> getClass: aString [
 
-	^keywordClassMap
+	^ keywordClassMap
 		detect: [ :assoc | aString includesSubstring: assoc key caseSensitive: false ]
 		ifOne: [ :assoc | assoc value ]
-		ifNone: [ self ]
+		ifNone: [ ]
 	
 ]
 
@@ -29,13 +29,17 @@ FortranCommentToEsopeEntity >> initialize [
 	super initialize.
 
 	keywordClassMap := OrderedCollection newFrom: { 
-			              (#segact -> FamixEsopeSegact).
-			              (#segini -> FamixEsopeSegini).
-			              (#segsup -> FamixEsopeSegsup).
-			              (#segdes -> FamixEsopeSegdes).
-			              (#segadj -> FamixEsopeSegadj).
-			              (#pointe -> FamixEsopePointer).
-			              (#segmen -> FamixEsopeSegment) }
+			                   (#segact -> FamixEsopeSegact).
+			                   (#segini -> FamixEsopeSegini).
+			                   (#segsup -> FamixEsopeSegsup).
+			                   (#segdes -> FamixEsopeSegdes).
+			                   (#segadj -> FamixEsopeSegadj).
+			                   (#pointeur -> FamixEsopePointer).
+			                   (#segment -> FamixEsopeSegment).
+			                   (#esoar -> FamixEsopeEsoAr).
+			                   (#esoat -> FamixEsopeEsoAt).
+			                   (#esosl -> FamixEsopeEsoSl).
+			 }
 ]
 
 { #category : #accessing }
@@ -54,10 +58,10 @@ FortranCommentToEsopeEntity >> model: anObject [
 FortranCommentToEsopeEntity >> newEntity: anEntity [
 
 	| aClass |
-	aClass := self getClass: anEntity content.
+	aClass := self getClass: anEntity name.
 	^ aClass
-		  ifNotNil: [ aClass newFromFortranComment: anEntity ]
-		  ifNil: [ nil ]
+		  ifNotNil: [ aClass newFromFortranFunction: anEntity ]
+		  ifNil: [ ]
 ]
 
 { #category : #'private - utility' }
@@ -99,7 +103,7 @@ FortranCommentToEsopeEntity >> processSegment [
 { #category : #utilities }
 FortranCommentToEsopeEntity >> transformComment [
 
-	((self model allWithSubTypesOf: FamixFortranFunction) select:
+	((self model allWithSubTypesOf: FamixFortranComment) select:
 		 #isEsope) do: [ :aFortranComment | 
 		self newEntityComment: aFortranComment ]
 ]
