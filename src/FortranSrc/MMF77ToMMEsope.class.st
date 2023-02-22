@@ -1,5 +1,5 @@
 Class {
-	#name : #FortranCommentToEsopeEntity,
+	#name : #MMF77ToMMEsope,
 	#superclass : #Object,
 	#instVars : [
 		'model',
@@ -9,22 +9,24 @@ Class {
 }
 
 { #category : #'private - utility' }
-FortranCommentToEsopeEntity >> esopePrefix [
+MMF77ToMMEsope >> esopePrefix [
 	^ 'ceso'
 ]
 
 { #category : #'private - utility' }
-FortranCommentToEsopeEntity >> getClass: aString [
+MMF77ToMMEsope >> getClass: aString [
 
+	| aKey |
+	aKey := (aString trim removePrefix: 'eso') trim.
 	^ keywordClassMap
-		detect: [ :assoc | aString includesSubstring: assoc key caseSensitive: false ]
-		ifOne: [ :assoc | assoc value ]
-		ifNone: [ ]
-	
+		  detect: [ :assoc | 
+		  aKey beginsWith: assoc key caseSensitive: false ]
+		  ifOne: [ :assoc | assoc value ]
+		  ifNone: [  ]
 ]
 
 { #category : #initialization }
-FortranCommentToEsopeEntity >> initialize [
+MMF77ToMMEsope >> initialize [
 
 	super initialize.
 
@@ -43,19 +45,19 @@ FortranCommentToEsopeEntity >> initialize [
 ]
 
 { #category : #accessing }
-FortranCommentToEsopeEntity >> model [
+MMF77ToMMEsope >> model [
 
 	^ model
 ]
 
 { #category : #accessing }
-FortranCommentToEsopeEntity >> model: anObject [
+MMF77ToMMEsope >> model: anObject [
 
 	model := anObject
 ]
 
 { #category : #'private - utility' }
-FortranCommentToEsopeEntity >> newEntity: anEntity [
+MMF77ToMMEsope >> newEntity: anEntity [
 
 	| aClass |
 	aClass := self getClass: anEntity name.
@@ -65,7 +67,7 @@ FortranCommentToEsopeEntity >> newEntity: anEntity [
 ]
 
 { #category : #'private - utility' }
-FortranCommentToEsopeEntity >> newEntityComment: aFortranComment [
+MMF77ToMMEsope >> newEntityComment: aFortranComment [
 
 	| aClass |
 	aClass := self getClass: aFortranComment content.
@@ -75,7 +77,7 @@ FortranCommentToEsopeEntity >> newEntityComment: aFortranComment [
 ]
 
 { #category : #'private - utility' }
-FortranCommentToEsopeEntity >> processSegment [
+MMF77ToMMEsope >> processSegment [
 
 	| segments |
 	segments := (self model allWithType: FamixEsopeSegment) asCollection.
@@ -101,7 +103,7 @@ FortranCommentToEsopeEntity >> processSegment [
 ]
 
 { #category : #utilities }
-FortranCommentToEsopeEntity >> transformComment [
+MMF77ToMMEsope >> transformComment [
 
 	((self model allWithSubTypesOf: FamixFortranComment) select:
 		 #isEsope) do: [ :aFortranComment | 
@@ -109,14 +111,14 @@ FortranCommentToEsopeEntity >> transformComment [
 ]
 
 { #category : #utilities }
-FortranCommentToEsopeEntity >> transformFortranToEsopeEntity [
+MMF77ToMMEsope >> transformFortranToEsopeEntity [
 
 	self transformComment.
 	self transformFunction
 ]
 
 { #category : #utilities }
-FortranCommentToEsopeEntity >> transformFunction [
+MMF77ToMMEsope >> transformFunction [
 
 	((self model allWithSubTypesOf: FamixFortranFunction) select:
 		 #isEsope) do: [ :anEntity | self newEntity: anEntity ]
