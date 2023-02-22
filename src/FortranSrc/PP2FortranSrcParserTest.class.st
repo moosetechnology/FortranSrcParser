@@ -211,10 +211,251 @@ PP2FortranSrcParserTest >> testExpValueVariable [
 ]
 
 { #category : #'tests - allnodes' }
-PP2FortranSrcParserTest >> testFullAstWithMultipleProcedure [
+PP2FortranSrcParserTest >> testFullFileBorbk [
+
+	| ast |
+	self class borbk.
+	ast := self parse: self class borbkAST rule: #start.
+
+	self assert: ast size equals: 1.
+	self assert: ast first parameters size equals: 3.
+	self assert: ast first comments size equals: 56.
+
+	self assert: ast first class equals: FamixFortranSubroutine.
+	self assert: ast first name equals: 'borbk'.
+	self assert: ast first container filename equals: 'borbk.0.e.f'.
+
+	self
+		assertCollection: (ast first parameters collect: [ :p | p name ])
+		hasSameElements: { #lib. #name. #title }.
+	
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileExample [
+
+	| ast |
+	self class example.
+	ast := self parse: self class exampleAST rule: #start.
+
+	self assert: ast size equals: 2.
+	self assert: ast second parameters size equals: 4.
+	self assert: ast second comments size equals: 6.
+
+	self assert: ast second class equals: FamixFortranSubroutine.
+	self assert: ast second name equals: 'mynew'.
+	self assert: ast second container filename equals: 'example.f'.
+	self
+		assert: ast second container programUnits first content
+		equals:
+		'23456789012345678901234567890123456789012345678901234567890123456789012'.
+
+	self
+		assertCollection: (ast second parameters collect: [ :p | p name ])
+		hasSameElements: { #t1. #sizea. #start. #step }
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileExampleWithMultipleProgUnit [
+
+	| ast puComments puOthers |
+	self class exampleWithMultipleProgUnit.
+	ast := self
+		       parse: self class exampleWithMultipleProgUnitAST
+		       rule: #start.
 
 
-	self flag: #TODO. "create a test with multiple PU in same ProgramFile"
+	puComments := ast select: [ :pu | pu class = FamixFortranComment ].
+	puOthers := ast select: [ :pu | pu class ~= FamixFortranComment ].
+	self assert: ast size equals: 30.
+	self assert: puComments size equals: 26.
+	self assert: puOthers first outgoingInvocations size equals: 2.
+
+
+	self
+		assertCollection: (puOthers collect: [ :pu | pu class ])
+		hasSameElements: { 
+				FamixFortranProgram.
+				FamixFortranSubroutine.
+				FamixFortranFunction.
+				FamixFortranBlockData }.
+	self
+		assertCollection: (puOthers collect: [ :pu | pu name ])
+		hasSameElements: { #myprog. #mysub. #ifunc. #myblck }.
+	self assert: ast first container filename equals: 'example.f'.
+	
+	self flag: #FIXME. "this function had only one parameter, but it seem it have two
+	possible problem can be using the actual argument as a parameter "
+	self assert: puOthers third parameters size equals: 1.
+	self assert: puOthers first parameters name equals: #k.
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileFindbk [
+
+	| ast |
+	self class findbk.
+	ast := self parse: self class findbkAST rule: #start.
+
+	self assert: ast size equals: 1.
+	self assert: ast first parameters size equals: 2.
+	self assert: ast first comments size equals: 50.
+
+	self assert: ast first class equals: FamixFortranFunction.
+	self assert: ast first name equals: 'findbk'.
+	self assert: ast first container filename equals: 'findbk.0.e.f'.
+
+	self
+		assertCollection: (ast first parameters collect: [ :p | p name ])
+		hasSameElements: { #lib. #title }.
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileFindur [
+
+	| ast |
+	self class findur.
+	ast := self parse: self class findurAST rule: #start.
+
+	self assert: ast size equals: 1.
+	self assert: ast first parameters size equals: 2.
+	self assert: ast first comments size equals: 50.
+
+	self assert: ast first class equals: FamixFortranFunction.
+	self assert: ast first name equals: 'findur'.
+	self assert: ast first container filename equals: 'findur.0.e.f'.
+
+	self
+		assertCollection: (ast first parameters collect: [ :p | p name ])
+		hasSameElements: { #lib. #name }.
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileLibpnt [
+
+	| ast |
+	self class libpnt.
+	ast := self parse: self class libpntAST rule: #start.
+
+	self assert: ast size equals: 1.
+	self assert: ast first parameters size equals: 1.
+	self assert: ast first comments size equals: 66.
+
+	self assert: ast first class equals: FamixFortranSubroutine.
+	self assert: ast first name equals: 'libprt'.
+	self assert: ast first container filename equals: 'libpnt.0.e.f'.
+
+	self
+		assert: ast first parameters first name
+		equals: #lib.
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileMain [
+
+	| ast |
+	self class main.
+	ast := self parse: self class mainAST rule: #start.
+
+	self assert: ast size equals: 1.
+	self assert: ast first comments size equals: 41.
+
+	self assert: ast first class equals: FamixFortranProgram.
+	self assert: ast first name equals: 'main'.
+	self assert: ast first container filename equals: 'main.0.e.f'.
+
+	self assert: ast first outgoingInvocations size equals: 10.
+
+	self flag: #FIXME. "idea:
+	- it would be nice to have a Map of invocable and the number of their invocations:
+		e.g: in main.0.e.f => newbook -> (2, list of arguments and their values).
+	"
+	self
+		assertCollection: (ast first outgoingInvocations collect: [ :inv | 
+				 inv candidates first name ])
+		hasSameElements:
+			{ #ooossg. #newlib. #newbook. #newbook. #newuser. #newuser. #borbk.
+			#relbk. #libprt. #ooostp }
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileNewbook [
+
+	| ast |
+	self class newbook. 
+	ast := self parse: self class newbookAST rule: #start.
+
+	self assert: ast size equals: 1.
+	self assert: ast first parameters size equals: 4.
+	self assert: ast first comments size equals: 55.
+
+	self assert: ast first class equals: FamixFortranSubroutine.
+	self assert: ast first name equals: 'newbook'.
+	self assert: ast first container filename equals: 'newbook.0.e.f'.
+
+	self
+		assertCollection: (ast first parameters collect: [ :p | p name ])
+		hasSameElements: { #lib.  #title . #pages. #udc }.
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileNewlib [
+
+	| ast |
+	self class newlib.
+	ast := self parse: self class newlibAST rule: #start.
+
+	self assert: ast size equals: 1.
+	self assert: ast first parameters size equals: 1.
+	self assert: ast first comments size equals: 48.
+
+	self assert: ast first class equals: FamixFortranSubroutine.
+	self assert: ast first name equals: 'newlib'.
+	self assert: ast first container filename equals: 'newlib.0.e.f'.
+
+	self
+		assertCollection: (ast first parameters collect: [ :p | p name ])
+		hasSameElements: { #lib }.
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileNewuser [
+
+	| ast |
+	self class newuser.
+	ast := self parse: self class newuserAST rule: #start.
+
+	self assert: ast size equals: 1.
+	self assert: ast first parameters size equals: 2.
+	self assert: ast first comments size equals: 57.
+
+	self assert: ast first class equals: FamixFortranSubroutine.
+	self assert: ast first name equals: 'newuser'.
+	self assert: ast first container filename equals: 'newuser.0.e.f'.
+
+	self
+		assertCollection: (ast first parameters collect: [ :p | p name ])
+		hasSameElements: { #lib. #name }.
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFullFileRelbk [
+
+	| ast |
+	self class relbk.
+	ast := self parse: self class relbkAST rule: #start.
+
+	self assert: ast size equals: 1.
+	self assert: ast first parameters size equals: 3.
+	self assert: ast first comments size equals: 62.
+
+	self assert: ast first class equals: FamixFortranSubroutine.
+	self assert: ast first name equals: 'relbk'.
+	self assert: ast first container filename equals: 'relbk.0.e.f'.
+
+	self
+		assertCollection: (ast first parameters collect: [ :p | p name ])
+		hasSameElements: { #lib. #name. #title }.
 ]
 
 { #category : #tests }
@@ -356,7 +597,7 @@ PP2FortranSrcParserTest >> testProgramFileWithMultipleProgramUnits [
 		(55:1)-(55:72)
 		(Comment "----------------------------------------------------------------------^")
 	]' rule: #programFile.
-ast halt.
+
 	self assert: (parser model allWithType: FamixFortranProgram) size equals: 1.
 
 	program := (parser model allWithType: FamixFortranProgram) first.

@@ -9436,10 +9436,9 @@ PP2FortranSrcGrammarTest >> testFullFileMain [
 { #category : #'tests - allnodes' }
 PP2FortranSrcGrammarTest >> testFullFileNewbook [
 
-	| ast |
 	self class newbook. 
-	ast := self parse: self class newbookAST rule: #start.
-	ast halt.
+	self parse: self class newbookAST rule: #start.
+
 ]
 
 { #category : #'tests - allnodes' }
