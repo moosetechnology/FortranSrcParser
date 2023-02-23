@@ -1,94 +1,26 @@
 Class {
-	#name : #PP2FortranSrcParserTest,
+	#name : #PP2FortranSrcParserFromASTTest,
 	#superclass : #PP2FortranSrcGrammarTest,
 	#category : #'FortranSrc-Tests'
 }
 
 { #category : #accessing }
-PP2FortranSrcParserTest >> parserClass [
+PP2FortranSrcParserFromASTTest >> parserClass [
 	^ PP2FortranSrcParser 
 ]
 
 { #category : #running }
-PP2FortranSrcParserTest >> setUp [
+PP2FortranSrcParserFromASTTest >> setUp [
 
 	super setUp.
 	parser := self parserInstance.
-	parser model: FamixFortranModel new
-]
-
-{ #category : #'tests-block' }
-PP2FortranSrcParserTest >> testBlComment [
-
-	| ast comment |
-	ast := self
-		       parse: 'BlComment ()
-	(4:1)-(4:19)
-	(Comment "     some comment  ")'
-		       rule: #blComment.
-
-	comment := '     some comment  '.
-
-	self assert: ast content equals: comment.
-	
-	self
-		assert:
-		(parser model allWithType: FamixFortranComment) size 
-		equals: 1.
-
-	self
-		assert:
-		(parser model allWithType: FamixFortranComment) first content
-		equals: comment
-]
-
-{ #category : #'tests-block' }
-PP2FortranSrcParserTest >> testBlCommentEsope [
-
-	| ast comment |
-	ast := self
-		       parse: 'BlComment ()
-	(332:1)-(332:25)
-	(Comment "ESO  segact,alist")'
-		       rule: #blComment.
-	comment := 'ESO  segact,alist'.
-	self assert: ast content equals: comment.
-]
-
-{ #category : #'tests-block' }
-PP2FortranSrcParserTest >> testBlStatement [
-
-	| ast |
-	ast := self
-		       parse: 'BlStatement ()
-	(62:7)-(62:18)
-	Nothing
-	(StCall ()
-	(108:7)-(108:45)
-	(ExpValue ()
-		(108:12)-(108:17)
-		(ValVariable "edmess"))
-	(Just AList ()
-		(108:18)-(108:45)
-		[Argument ()
-			(108:19)-(108:44)
-			Nothing
-			(ArgExpr (ExpValue ()                                                                        					(108:19)-(108:44)
-					(ValString "valrma: routine en echec")))]))'
-		       rule: #blStatement.
-
-	self
-		assert: (parser model allWithType: FamixFortranInvocation) size
-		equals: 1.
-	self assert: ast candidates size equals: 1.
-	self assert: ast candidates first name equals: 'edmess'.
 ]
 
 { #category : #'tests-expression' }
-PP2FortranSrcParserTest >> testExpFunctionCall [
+PP2FortranSrcParserFromASTTest >> testExpFunctionCall [
 
-	| ast |
-	ast := self
+	| iast |
+	iast := self
 		       parse: 'ExpFunctionCall ()
 	(118:10)-(118:47)
 	(ExpValue ()
@@ -98,16 +30,18 @@ PP2FortranSrcParserTest >> testExpFunctionCall [
 		(118:14)-(118:46)
 		[])'
 		       rule: #expFunctionCall.
-	self assert: ast candidates size equals: 1.
-	self assert: ast candidates first name equals: 'abs'.
-	self assert: ast candidates first isIntrinsic.
+
+	self assert: iast size equals: 1.
+	self assert: iast anyOne class equals: IASTInvocation.
+	self assert: iast anyOne name equals: 'abs'.
+	self assert: iast anyOne isIntrinsic.
 ]
 
 { #category : #'tests-expression' }
-PP2FortranSrcParserTest >> testExpFunctionCallWithParameters [
+PP2FortranSrcParserFromASTTest >> testExpFunctionCallWithParameters [
 
-	| ast |
-	ast := self
+	| iast node |
+	iast := self
 		       parse: 'ExpFunctionCall ()
 	(21:13)-(21:25)
    (ExpValue ()
@@ -128,15 +62,29 @@ PP2FortranSrcParserTest >> testExpFunctionCallWithParameters [
              (21:22)-(21:24)
              (ValVariable "tab")))])'
 		       rule: #expFunctionCall.
-	self assert: ast candidates size equals: 1.
-	self assert: ast candidates first name equals: 'esosl'.
-	self assert: ast candidates first parameters size equals: 2.
-	self assert: ast candidates first parameters first name equals: 't1'.
-	self assert: ast candidates first parameters last name equals: 'tab'.
+
+
+	self assert: iast size equals: 3.
+	
+	node := iast first.
+	self assert: node class equals: IASTInvocation.
+	self assert: node name equals: 'esosl'.
+	self deny: node isIntrinsic.
+
+	node := iast second.
+	self assert: node class equals: IASTVarAccess.
+	self assert: node name equals: 't1'.
+	self deny: node isAssigned.
+
+	node := iast third.
+	self assert: node class equals: IASTVarAccess.
+	self assert: node name equals: 'tab'.
+	self deny: node isAssigned.
+
 ]
 
 { #category : #'tests-expression' }
-PP2FortranSrcParserTest >> testExpUnary [
+PP2FortranSrcParserFromASTTest >> testExpUnary [
 
 	| ast |
 	ast := self
@@ -155,7 +103,7 @@ PP2FortranSrcParserTest >> testExpUnary [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testExpValueInteger [
+PP2FortranSrcParserFromASTTest >> testExpValueInteger [
 
 	| ast |
 	ast := self
@@ -169,7 +117,7 @@ PP2FortranSrcParserTest >> testExpValueInteger [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testExpValueString [
+PP2FortranSrcParserFromASTTest >> testExpValueString [
 
 	| ast |
 	ast := self
@@ -183,7 +131,7 @@ PP2FortranSrcParserTest >> testExpValueString [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testExpValueType [
+PP2FortranSrcParserFromASTTest >> testExpValueType [
 
 	| ast |
 	ast := self
@@ -197,7 +145,7 @@ PP2FortranSrcParserTest >> testExpValueType [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testExpValueVariable [
+PP2FortranSrcParserFromASTTest >> testExpValueVariable [
 
 	| ast |
 	ast := self
@@ -211,7 +159,7 @@ PP2FortranSrcParserTest >> testExpValueVariable [
 ]
 
 { #category : #'tests - allnodes' }
-PP2FortranSrcParserTest >> testFullFileBorbk [
+PP2FortranSrcParserFromASTTest >> testFullFileBorbk [
 
 	| ast |
 	self class borbk.
@@ -232,7 +180,7 @@ PP2FortranSrcParserTest >> testFullFileBorbk [
 ]
 
 { #category : #'tests - allnodes' }
-PP2FortranSrcParserTest >> testFullFileExample [
+PP2FortranSrcParserFromASTTest >> testFullFileExample [
 
 	| ast |
 	self class example.
@@ -256,7 +204,7 @@ PP2FortranSrcParserTest >> testFullFileExample [
 ]
 
 { #category : #'tests - allnodes' }
-PP2FortranSrcParserTest >> testFullFileExampleWithMultipleProgUnit [
+PP2FortranSrcParserFromASTTest >> testFullFileExampleWithMultipleProgUnit [
 
 	| ast puComments puOthers |
 	self class exampleWithMultipleProgUnit.
@@ -291,7 +239,7 @@ PP2FortranSrcParserTest >> testFullFileExampleWithMultipleProgUnit [
 ]
 
 { #category : #'tests - allnodes' }
-PP2FortranSrcParserTest >> testFullFileFindbk [
+PP2FortranSrcParserFromASTTest >> testFullFileFindbk [
 
 	| ast |
 	self class findbk.
@@ -311,7 +259,7 @@ PP2FortranSrcParserTest >> testFullFileFindbk [
 ]
 
 { #category : #'tests - allnodes' }
-PP2FortranSrcParserTest >> testFullFileFindur [
+PP2FortranSrcParserFromASTTest >> testFullFileFindur [
 
 	| ast |
 	self class findur.
@@ -331,7 +279,7 @@ PP2FortranSrcParserTest >> testFullFileFindur [
 ]
 
 { #category : #'tests - allnodes' }
-PP2FortranSrcParserTest >> testFullFileLibpnt [
+PP2FortranSrcParserFromASTTest >> testFullFileLibpnt [
 
 	| ast |
 	self class libpnt.
@@ -351,7 +299,7 @@ PP2FortranSrcParserTest >> testFullFileLibpnt [
 ]
 
 { #category : #'tests - allnodes' }
-PP2FortranSrcParserTest >> testFullFileMain [
+PP2FortranSrcParserFromASTTest >> testFullFileMain [
 
 	| ast |
 	self class main.
@@ -379,7 +327,7 @@ PP2FortranSrcParserTest >> testFullFileMain [
 ]
 
 { #category : #'tests - allnodes' }
-PP2FortranSrcParserTest >> testFullFileNewbook [
+PP2FortranSrcParserFromASTTest >> testFullFileNewbook [
 
 	| ast |
 	self class newbook. 
@@ -399,7 +347,7 @@ PP2FortranSrcParserTest >> testFullFileNewbook [
 ]
 
 { #category : #'tests - allnodes' }
-PP2FortranSrcParserTest >> testFullFileNewlib [
+PP2FortranSrcParserFromASTTest >> testFullFileNewlib [
 
 	| ast |
 	self class newlib.
@@ -419,7 +367,7 @@ PP2FortranSrcParserTest >> testFullFileNewlib [
 ]
 
 { #category : #'tests - allnodes' }
-PP2FortranSrcParserTest >> testFullFileNewuser [
+PP2FortranSrcParserFromASTTest >> testFullFileNewuser [
 
 	| ast |
 	self class newuser.
@@ -439,7 +387,7 @@ PP2FortranSrcParserTest >> testFullFileNewuser [
 ]
 
 { #category : #'tests - allnodes' }
-PP2FortranSrcParserTest >> testFullFileRelbk [
+PP2FortranSrcParserFromASTTest >> testFullFileRelbk [
 
 	| ast |
 	self class relbk.
@@ -459,59 +407,7 @@ PP2FortranSrcParserTest >> testFullFileRelbk [
 ]
 
 { #category : #'tests - allnodes' }
-PP2FortranSrcParserTest >> testFunctionWithInvocation [
-
-	| ast |
-	ast := self
-		       parse: '       program myprog
-      i = ifunc (i)
-      end
-
-      integer function ifunc( k )
-      return
-      end
- '
-		       rule: #start.
-
-
-	self assert: ast second name equals: 'ifunc'.
-	self assert: ast second parameters size equals: 1.
-	self assert: ast second parameters first name equals: #k
-]
-
-{ #category : #tests }
-PP2FortranSrcParserTest >> testHaskellList [
-
-	| list |
-	list := self parse: '[]' rule: #haskellListOfString.
-	self assertEmpty: list.
-]
-
-{ #category : #tests }
-PP2FortranSrcParserTest >> testHaskellListNotEmpty [
-
-	| list |
-	list := self parse: '["aa", "bb", "cc"]' rule: #haskellListOfString.
-	self assert: list size equals: 3.
-	self assert: list first equals: 'aa'.
-	self assert: list second  equals: 'bb'.
-	self assert: list third equals: 'cc'
-]
-
-{ #category : #'tests-programUnit' }
-PP2FortranSrcParserTest >> testMaybe [
-
-	self assert: (self parse: '(Just "circle")' rule: #maybeOfString) equals: 'circle'.
-]
-
-{ #category : #'tests-programUnit' }
-PP2FortranSrcParserTest >> testMaybeNothing [
-
-	self assert: (self parse: 'Nothing' rule: #maybeOfString) equals: 'Nothing'
-]
-
-{ #category : #'tests - allnodes' }
-PP2FortranSrcParserTest >> testMultipleProgUnit [
+PP2FortranSrcParserFromASTTest >> testMultipleProgUnit [
 
 	| ast |
 	ast := self
@@ -540,14 +436,8 @@ PP2FortranSrcParserTest >> testMultipleProgUnit [
 	self assert: ast third parameters first name equals: #k
 ]
 
-{ #category : #'tests-block' }
-PP2FortranSrcParserTest >> testPosition [
-
-	self assert: (self parse: '(1:7)' rule: #position) equals: 1 @ 7.
-]
-
 { #category : #'tests-programUnit' }
-PP2FortranSrcParserTest >> testProgramFileEmpty [
+PP2FortranSrcParserFromASTTest >> testProgramFileEmpty [
 
 	| ast programFile |
 	ast := self
@@ -571,7 +461,7 @@ PP2FortranSrcParserTest >> testProgramFileEmpty [
 ]
 
 { #category : #'tests-programUnit' }
-PP2FortranSrcParserTest >> testProgramFileNoEmpty [
+PP2FortranSrcParserFromASTTest >> testProgramFileNoEmpty [
 
 	| ast progFile |
 	ast := self
@@ -597,7 +487,7 @@ PP2FortranSrcParserTest >> testProgramFileNoEmpty [
 ]
 
 { #category : #'tests-programFile' }
-PP2FortranSrcParserTest >> testProgramFileWithMultipleProgramUnits [
+PP2FortranSrcParserFromASTTest >> testProgramFileWithMultipleProgramUnits [
 
 	| ast program |
 	ast := self parse: 'ProgramFile (MetaInfo
@@ -661,7 +551,7 @@ PP2FortranSrcParserTest >> testProgramFileWithMultipleProgramUnits [
 ]
 
 { #category : #'tests-programFile' }
-PP2FortranSrcParserTest >> testProgramFileWithPuMain [
+PP2FortranSrcParserFromASTTest >> testProgramFileWithPuMain [
 
 	| ast program |
 	ast := self parse: 'ProgramFile (MetaInfo
@@ -684,7 +574,7 @@ PP2FortranSrcParserTest >> testProgramFileWithPuMain [
 ]
 
 { #category : #'tests-programUnit' }
-PP2FortranSrcParserTest >> testPuBlockData [
+PP2FortranSrcParserFromASTTest >> testPuBlockData [
 
 	| ast  |
 	ast := self parse: 'PUBlockData ()
@@ -695,7 +585,7 @@ PP2FortranSrcParserTest >> testPuBlockData [
 ]
 
 { #category : #'tests-programUnit' }
-PP2FortranSrcParserTest >> testPuFunction [
+PP2FortranSrcParserFromASTTest >> testPuFunction [
 
 	| ast |
 	ast := self
@@ -730,7 +620,7 @@ PP2FortranSrcParserTest >> testPuFunction [
 ]
 
 { #category : #'tests-programUnit' }
-PP2FortranSrcParserTest >> testPuMain [
+PP2FortranSrcParserFromASTTest >> testPuMain [
 
 	| ast program |
 	ast := self
@@ -755,7 +645,7 @@ PP2FortranSrcParserTest >> testPuMain [
 ]
 
 { #category : #'tests-programUnit' }
-PP2FortranSrcParserTest >> testPuSubroutine [
+PP2FortranSrcParserFromASTTest >> testPuSubroutine [
 
 	| ast subroutine |
 	ast := self
@@ -797,7 +687,7 @@ PP2FortranSrcParserTest >> testPuSubroutine [
 ]
 
 { #category : #'tests-programUnit' }
-PP2FortranSrcParserTest >> testPuSubroutineWithComment [
+PP2FortranSrcParserFromASTTest >> testPuSubroutineWithComment [
 
 	| ast subroutine |
 	ast := self
@@ -831,7 +721,7 @@ PP2FortranSrcParserTest >> testPuSubroutineWithComment [
 ]
 
 { #category : #'tests-programUnit' }
-PP2FortranSrcParserTest >> testPuSubroutineWithNoParameter [
+PP2FortranSrcParserFromASTTest >> testPuSubroutineWithNoParameter [
 
 	| ast subroutine |
 	ast := self
@@ -857,7 +747,7 @@ PP2FortranSrcParserTest >> testPuSubroutineWithNoParameter [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testPuSubroutineWithSeveralParameters [
+PP2FortranSrcParserFromASTTest >> testPuSubroutineWithSeveralParameters [
 
 	| subroutine |
 	self
@@ -910,7 +800,7 @@ PP2FortranSrcParserTest >> testPuSubroutineWithSeveralParameters [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testPuSubroutineWithSubroutineCall [
+PP2FortranSrcParserFromASTTest >> testPuSubroutineWithSubroutineCall [
 
 	| ast invocations |
 	ast := self
@@ -943,7 +833,7 @@ PP2FortranSrcParserTest >> testPuSubroutineWithSubroutineCall [
 ]
 
 { #category : #'tests-programUnit' }
-PP2FortranSrcParserTest >> testSrcSpan [
+PP2FortranSrcParserFromASTTest >> testSrcSpan [
 	| ast |
 	ast := self
 		parse: '(1:7)-(302:9)'
@@ -956,7 +846,7 @@ PP2FortranSrcParserTest >> testSrcSpan [
 ]
 
 { #category : #'tests-statement' }
-PP2FortranSrcParserTest >> testStCall [
+PP2FortranSrcParserFromASTTest >> testStCall [
 
 	| ast |
 	ast := self
@@ -978,7 +868,7 @@ PP2FortranSrcParserTest >> testStCall [
 ]
 
 { #category : #'tests-programUnit' }
-PP2FortranSrcParserTest >> testStExternal [
+PP2FortranSrcParserFromASTTest >> testStExternal [
 
 	
 	| ast |
@@ -995,7 +885,7 @@ PP2FortranSrcParserTest >> testStExternal [
 ]
 
 { #category : #'tests-statement' }
-PP2FortranSrcParserTest >> testStFunction [
+PP2FortranSrcParserFromASTTest >> testStFunction [
 
 	| ast |
 	ast := self
@@ -1020,13 +910,13 @@ PP2FortranSrcParserTest >> testStFunction [
 ]
 
 { #category : #'tests-programUnit' }
-PP2FortranSrcParserTest >> testTkNumber [
+PP2FortranSrcParserFromASTTest >> testTkNumber [
 
 	self assert: (self parse: '42' rule: #tkNumber) equals: 42
 ]
 
 { #category : #'tests-programUnit' }
-PP2FortranSrcParserTest >> testTkString [
+PP2FortranSrcParserFromASTTest >> testTkString [
 
 	| ast |
 	ast := self
@@ -1037,7 +927,7 @@ PP2FortranSrcParserTest >> testTkString [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testValInteger [
+PP2FortranSrcParserFromASTTest >> testValInteger [
 
 	| ast |
 	ast := self
@@ -1049,7 +939,7 @@ PP2FortranSrcParserTest >> testValInteger [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testValStar [
+PP2FortranSrcParserFromASTTest >> testValStar [
 
 	| ast |
 	ast := self
@@ -1060,7 +950,7 @@ PP2FortranSrcParserTest >> testValStar [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testValString [
+PP2FortranSrcParserFromASTTest >> testValString [
 
 	| ast |
 	ast := self
@@ -1072,7 +962,7 @@ PP2FortranSrcParserTest >> testValString [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testValue [
+PP2FortranSrcParserFromASTTest >> testValue [
 
 	| ast |
 	ast := self parse: 'ValInteger "42" Nothing' rule: #value.
@@ -1098,7 +988,7 @@ PP2FortranSrcParserTest >> testValue [
 ]
 
 { #category : #tests }
-PP2FortranSrcParserTest >> testValueInteger [
+PP2FortranSrcParserFromASTTest >> testValueInteger [
 
 	| ast |
 	ast := self
