@@ -458,6 +458,27 @@ PP2FortranSrcParserTest >> testFullFileRelbk [
 		hasSameElements: { #lib. #name. #title }.
 ]
 
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testFunctionWithInvocation [
+
+	| ast |
+	ast := self
+		       parse: '       program myprog
+      i = ifunc (i)
+      end
+
+      integer function ifunc( k )
+      return
+      end
+ '
+		       rule: #start.
+
+
+	self assert: ast second name equals: 'ifunc'.
+	self assert: ast second parameters size equals: 1.
+	self assert: ast second parameters first name equals: #k
+]
+
 { #category : #tests }
 PP2FortranSrcParserTest >> testHaskellList [
 
@@ -487,6 +508,36 @@ PP2FortranSrcParserTest >> testMaybe [
 PP2FortranSrcParserTest >> testMaybeNothing [
 
 	self assert: (self parse: 'Nothing' rule: #maybeOfString) equals: 'Nothing'
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserTest >> testMultipleProgUnit [
+
+	| ast |
+	ast := self
+		       parse: '       program myprog
+      write(6,*) i
+      end
+
+      subroutine mysub
+      return
+      end
+
+      integer function ifunc( k )
+      return
+      end
+ '
+		       rule: #start.
+
+	self assert: ast first name equals: 'myprog'.
+
+	self assert: ast second name equals: 'mysub'.
+	self assert: ast second parameters size equals: 0.
+
+
+	self assert: ast third name equals: 'ifunc'.
+	self assert: ast third parameters size equals: 1.
+	self assert: ast third parameters first name equals: #k
 ]
 
 { #category : #'tests-block' }

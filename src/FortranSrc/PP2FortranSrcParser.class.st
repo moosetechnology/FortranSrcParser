@@ -71,6 +71,17 @@ PP2FortranSrcParser >> argument [
 		 ]
 ]
 
+{ #category : #'grammar-expression' }
+PP2FortranSrcParser >> argumentExpression [
+
+	"((self token: 'ArgExpr'), (self parens: expression))
+	/ ((self prelude: 'ArgExprVar') , tkString)"
+	
+	^ super argumentExpression ==> [ :nodes | 1halt. ]
+
+	
+]
+
 { #category : #'grammar-block' }
 PP2FortranSrcParser >> blComment [
 	
@@ -195,12 +206,14 @@ PP2FortranSrcParser >> expFunctionCall [
 	  , (self maybe: (self aList: argument))"
 
 	^ super expFunctionCall ==> [ :nodes | 
-	  | candidate |
+	  | candidate | 1halt.
 	  candidate := self
 		               ensureFunction: nodes second third
 		               intrinsic: nodes second second = 'ValIntrinsic'.
-	  self createParameters: nodes third second to: candidate.
-	  self createInvocation: nodes first second to: candidate ]
+	  "self createParameters: nodes third second to: candidate."
+	  self createInvocation: nodes first second to: candidate.
+	candidate
+	 ]
 ]
 
 { #category : #'grammar-expression' }
@@ -221,7 +234,7 @@ PP2FortranSrcParser >> expValue [
 
 	"(self prelude: 'ExpValue') , (self parens: value)"
 
-	^ super expValue ==> [ :nodes | 
+	^ super expValue ==> [ :nodes | 1halt.
 	  { 
 		  nodes first second.
 		  nodes second first.

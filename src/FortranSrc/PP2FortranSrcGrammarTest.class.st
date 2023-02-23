@@ -8978,6 +8978,39 @@ PP2FortranSrcGrammarTest class >> workDir [
 	^ FileSystem memory workingDirectory / '/demo-bib/build'
 ]
 
+{ #category : #running }
+PP2FortranSrcGrammarTest >> astHaskell: sourceCode [
+
+	| filename |
+	filename := './codeToParse.f'.
+	filename asFileReference writeStreamDo: [ :stream | 
+		stream truncate.
+		stream << (sourceCode copy replaceAll: Character cr with: Character lf) ].
+
+	LibC runCommand: (' ' join: { 
+				 self haskellParserPath.
+				 filename .
+				 '> ./output.f.ast'.
+				 '2> ./error.log' })
+]
+
+{ #category : #running }
+PP2FortranSrcGrammarTest >> haskellParserPath [
+
+	^ '/Users/sow/Perso/demo-bib/parser/fortran-src'
+]
+
+{ #category : #running }
+PP2FortranSrcGrammarTest >> parse: sourceCode rule: aRule [
+
+	self astHaskell: sourceCode.
+	^ super
+		  parse: ('./output.f.ast' asFileReference readStream contents
+				   replaceAll: Character lf
+				   with: Character cr)
+		  rule: aRule
+]
+
 { #category : #accessing }
 PP2FortranSrcGrammarTest >> parserClass [
 	^ PP2FortranSrcGrammar 
@@ -9406,6 +9439,25 @@ PP2FortranSrcGrammarTest >> testFullFileExampleWithMultipleProgUnit [
 ]
 
 { #category : #'tests - allnodes' }
+PP2FortranSrcGrammarTest >> testFullFileExampleWithMultipleProgUnit2 [
+
+	self
+		parse: '      program myprog
+      write(6,*) i
+      end
+
+      subroutine mysub
+      return
+      end
+
+      integer function ifunc( k )
+      return
+      end
+'
+		rule: #start
+]
+
+{ #category : #'tests - allnodes' }
 PP2FortranSrcGrammarTest >> testFullFileFindbk [
 
 	self class findbk.
@@ -9460,6 +9512,18 @@ PP2FortranSrcGrammarTest >> testFullFileRelbk [
 
 	self class relbk.
 	self parse: self class relbkAST rule: #start.
+]
+
+{ #category : #'tests-block' }
+PP2FortranSrcGrammarTest >> testHelloWorld [
+	self
+		parse: 'C234567890123456789012345678901234567890123456789012345678901234567890123
+      program myprog
+         write(*,*) ''Hello World!''
+      end
+C----------------------------------------------------------------------^
+'
+		rule: #start
 ]
 
 { #category : #'tests-declaration' }
