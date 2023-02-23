@@ -9000,17 +9000,6 @@ PP2FortranSrcGrammarTest >> haskellParserPath [
 	^ '/Users/sow/Perso/demo-bib/parser/fortran-src'
 ]
 
-{ #category : #running }
-PP2FortranSrcGrammarTest >> parse: sourceCode rule: aRule [
-
-	self astHaskell: sourceCode.
-	^ super
-		  parse: ('./output.f.ast' asFileReference readStream contents
-				   replaceAll: Character lf
-				   with: Character cr)
-		  rule: aRule
-]
-
 { #category : #accessing }
 PP2FortranSrcGrammarTest >> parserClass [
 	^ PP2FortranSrcGrammar 
@@ -9516,14 +9505,17 @@ PP2FortranSrcGrammarTest >> testFullFileRelbk [
 
 { #category : #'tests-block' }
 PP2FortranSrcGrammarTest >> testHelloWorld [
-	self
-		parse: 'C234567890123456789012345678901234567890123456789012345678901234567890123
+	| iast |
+	iast := self
+		parse: 'C23456789
       program myprog
          write(*,*) ''Hello World!''
       end
 C----------------------------------------------------------------------^
 '
-		rule: #start
+		rule: #start.
+		
+	self assert: iast class equals: IASTMainProgram .
 ]
 
 { #category : #'tests-declaration' }

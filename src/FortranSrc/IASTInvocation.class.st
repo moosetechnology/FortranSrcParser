@@ -1,20 +1,20 @@
 Class {
 	#name : #IASTInvocation,
-	#superclass : #IASTAbstractEntity,
+	#superclass : #IASTEntityRef,
 	#instVars : [
-		'procedureName'
+		'isIntrinsic'
 	],
 	#category : #'FortranSrc-intrermediateAST'
 }
 
 { #category : #accessing }
-IASTInvocation >> procedureName [
+IASTInvocation >> isIntrinsic [
 
-	^ procedureName
+	^ isIntrinsic
 ]
 
 { #category : #accessing }
-IASTInvocation >> procedureName: anObject [
+IASTInvocation >> isIntrinsic: anObject [
 
-	procedureName := anObject
+	isIntrinsic := anObject
 ]

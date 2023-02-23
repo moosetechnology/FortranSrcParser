@@ -3,23 +3,21 @@ Class {
 	#superclass : #IASTAbstractEntity,
 	#instVars : [
 		'name',
-		'varDecls',
-		'varAccesses',
-		'invocations'
+		'body'
 	],
 	#category : #'FortranSrc-intrermediateAST'
 }
 
 { #category : #accessing }
-IASTProgramUnit >> invocations [
+IASTProgramUnit >> body [
 
-	^ invocations
+	^ body
 ]
 
 { #category : #accessing }
-IASTProgramUnit >> invocations: anObject [
+IASTProgramUnit >> body: anObject [
 
-	invocations := anObject
+	body := anObject
 ]
 
 { #category : #accessing }
@@ -32,28 +30,4 @@ IASTProgramUnit >> name [
 IASTProgramUnit >> name: anObject [
 
 	name := anObject
-]
-
-{ #category : #accessing }
-IASTProgramUnit >> varAccesses [
-
-	^ varAccesses
-]
-
-{ #category : #accessing }
-IASTProgramUnit >> varAccesses: anObject [
-
-	varAccesses := anObject
-]
-
-{ #category : #accessing }
-IASTProgramUnit >> varDecls [
-
-	^ varDecls
-]
-
-{ #category : #accessing }
-IASTProgramUnit >> varDecls: anObject [
-
-	varDecls := anObject
 ]

@@ -1,20 +1,20 @@
 Class {
 	#name : #IASTVarAccess,
-	#superclass : #IASTAbstractEntity,
+	#superclass : #IASTEntityRef,
 	#instVars : [
-		'variableName'
+		'isAssigned'
 	],
 	#category : #'FortranSrc-intrermediateAST'
 }
 
 { #category : #accessing }
-IASTVarAccess >> variableName [
+IASTVarAccess >> isAssigned [
 
-	^ variableName
+	^ isAssigned
 ]
 
 { #category : #accessing }
-IASTVarAccess >> variableName: anObject [
+IASTVarAccess >> isAssigned: anObject [
 
-	variableName := anObject
+	isAssigned := anObject
 ]

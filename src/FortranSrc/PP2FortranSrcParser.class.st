@@ -88,13 +88,12 @@ PP2FortranSrcParser >> blComment [
 	" (self prelude: 'BlComment')
 	, comment"
 
-	^ super blComment ==> [ :nodes | | aComment content |
-		content := nodes second second.
-		aComment := (self newEntity: FamixFortranComment) 
-				content: content;
-				isEsope: (content beginsWith: 'eso' caseSensitive: false);
-				sourceAnchor: nodes first second.
-		aComment ]
+	^ super blComment ==> [ :nodes |
+		IASTComment new
+			text: nodes second second ;
+			sourceAnchor: nodes first second ;
+			yourself
+	]
 ]
 
 { #category : #'grammar-block' }
@@ -232,13 +231,14 @@ PP2FortranSrcParser >> expUnary [
 { #category : #'grammar-expression' }
 PP2FortranSrcParser >> expValue [
 
-	"(self prelude: 'ExpValue') , (self parens: value)"
+	"(self prelude: 'ExpValue') , ((self parens: value) / valStar)"
 
-	^ super expValue ==> [ :nodes | 1halt.
-	  { 
-		  nodes first second.
-		  nodes second first.
-		  nodes second second } ]
+	^ super expValue ==> [ :nodes |
+		IASTVarAccess new
+			sourceAnchor: nodes first second ;
+			entityName: nodes second first ;
+			yourself
+	]
 ]
 
 { #category : #'private-helper' }
@@ -401,15 +401,14 @@ PP2FortranSrcParser >> programFile [
 	"(self token: 'ProgramFile') , metaInfo , (self haskellList: programUnit)"
 
 	^ super programFile ==> [ :nodes | 
-	  | progFile filename |
-	  filename := nodes second at: 'miFilename' ifPresent: [ :node | node ] ifAbsent: [ '' ].
-	  progFile := (self newEntity: FamixFortranProgramFile)
-		              version: (nodes second at: 'miVersion' ifAbsent: [ '' ]);
-		              filename: (self class getBasename: filename);
-		              sourceAnchor: (self newIndexedFileAnchor: filename);
-		              name: (self class getBasename: filename);
-		              yourself.
-	  nodes third do: [ :progUnit | progFile addProgramUnit: progUnit ] ]
+	| progFile |
+
+	progFile := IASTProgramFile new.
+	progFile
+		filename: (nodes second at: 'miFilename' ifPresent: [ :node | node ] ifAbsent: [ '' ]) ;
+		version: (nodes second at: 'miVersion' ifAbsent: [ '' ]);
+		progUnits: nodes third.
+	progFile ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -431,10 +430,12 @@ PP2FortranSrcParser >> puComment [
 
 	"(self prelude: 'PUComment') , comment"
 
-	^ super puComment ==> [ :nodes | 
-	  (self newEntity: FamixFortranComment)
-		  content: nodes second second;
-		  yourself ]
+	^ super puComment ==> [ :nodes |
+		IASTComment new
+			text: nodes second second ;
+			sourceAnchor: nodes first second ;
+			yourself
+	]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -450,27 +451,17 @@ PP2FortranSrcParser >> puFunction [
 	, (self maybe: programUnit)"
 
 	^ super puFunction ==> [ :nodes | 
-	  | aFunction |
-	  aFunction := self ensureFunction: nodes fourth.
-	  aFunction sourceAnchor: nodes first second.
-
-	  nodes fifth = 'Nothing' ifFalse: [ 
-		  nodes fifth second do: [ :node | 
-			  aFunction addParameter: ((self newEntity: FamixFortranParameter)
-					   sourceAnchor: node first;
-					   name: node third value;
-					   yourself) ] ].
-	  nodes seventh do: [ :aBlockNode | 
-		  aBlockNode isArray
-			  ifFalse: [ 
-				  aBlockNode setOwner: aFunction
-				  "aBlockNode isInvocation ifTrue: [ 1 halt ]" ]
-			  ifTrue: [ 
-				  (aBlockNode flattened select: [ :entity | 
-					   entity class = FamixFortranInvocation or: [ 
-						   entity class = FamixFortranComment ] ]) do: [ :anEntity | 
-					  anEntity setOwner: aFunction ] ] ].
-	  aFunction ]
+	| aFunction |
+	aFunction := IASTFunction new.
+	aFunction
+		name: nodes fourth ;
+		sourceAnchor: nodes first second ;
+		parameters: (nodes fifth = 'Nothing'
+			ifTrue: [ #() ]
+			ifFalse: [ nodes fifth second ]) ;
+		returnType: nodes second ";
+		body: nodes seventh".
+	 aFunction ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -480,28 +471,15 @@ PP2FortranSrcParser >> puMain [
 	  , (self haskellList: block) , (self maybe: programUnit)"
 
 	^ super puMain ==> [ :nodes | 
-	  | program |
+	| program |
 
-	  program := (self newEntity: FamixFortranProgram)
-		             name: (nodes second = 'Nothing'
-				              ifTrue: [ '' ]
-				              ifFalse: [ nodes second ]);
-		             yourself.
-	  self flag: #TODO. "gerer les élements du block"
-	 nodes third do: [ :aBlockNode | 
-		aBlockNode isArray
-			  ifFalse: [ 
-				  aBlockNode setOwner: program
-				  "aBlockNode isInvocation ifTrue: [ 1 halt ]" ]
-			  ifTrue: [ 
-				  (aBlockNode flattened select: [ :entity | 
-					   entity class = FamixFortranInvocation or: [ 
-						   entity class = FamixFortranComment ] ]) do: [ :anEntity | 
-					  anEntity setOwner: program ] ]
-		].
-	  nodes fourth = 'Nothing' ifFalse: [ 
-		  nodes fourth do: [ :progUnit | progUnit container: program ] ].
-	  program ]
+	program := IASTMainProgram new.
+	program 
+		name: (nodes second = 'Nothing'
+			ifTrue: [ '** No name given **' ]
+			ifFalse: [ nodes second ]);
+		body: nodes third.
+	program ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -706,6 +684,17 @@ PP2FortranSrcParser >> tkString [
 	  , $"" asPParser"
 
 	^ super tkString ==> [ :nodes | nodes second]
+]
+
+{ #category : #'grammar-declaration' }
+PP2FortranSrcParser >> typeSpec [
+
+	"(self prelude: 'TypeSpec') , baseType , (self maybe: selector)"
+	^super typeSpec ==> [ :nodes |
+		IASTTypeRef new
+			entityName: nodes second ;
+			yourself
+	]
 ]
 
 { #category : #'grammar-expression' }

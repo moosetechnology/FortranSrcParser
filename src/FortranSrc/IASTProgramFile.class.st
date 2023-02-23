@@ -4,24 +4,10 @@ Class {
 	#instVars : [
 		'filename',
 		'version',
-		'name',
-		'comments',
 		'progUnits'
 	],
 	#category : #'FortranSrc-intrermediateAST'
 }
-
-{ #category : #accessing }
-IASTProgramFile >> comments [
-
-	^ comments
-]
-
-{ #category : #accessing }
-IASTProgramFile >> comments: anObject [
-
-	comments := anObject
-]
 
 { #category : #accessing }
 IASTProgramFile >> filename [
@@ -33,18 +19,6 @@ IASTProgramFile >> filename [
 IASTProgramFile >> filename: anObject [
 
 	filename := anObject
-]
-
-{ #category : #accessing }
-IASTProgramFile >> name [
-
-	^ name
-]
-
-{ #category : #accessing }
-IASTProgramFile >> name: anObject [
-
-	name := anObject
 ]
 
 { #category : #accessing }
