@@ -13305,6 +13305,26 @@ PP2FortranSrcGrammarTest >> testFullPuCommentAndProgram [
 		rule: #start
 ]
 
+{ #category : #'tests - allnodes' }
+PP2FortranSrcGrammarTest >> testIfElseIfClause [
+
+	self parse: '(ExpValue ()
+       (4:20)-(4:20)
+       (ValVariable "b"),
+    [BlStatement ()
+       (5:13)-(5:17)
+       Nothing
+       (StExpressionAssign ()
+           (5:13)-(5:17)
+           (ExpValue ()
+             (5:13)-(5:13)
+             (ValVariable "i"))
+               (ExpValue ()
+                 (5:17)-(5:17)
+                 (ValInteger "2" Nothing)))])'
+		  rule: #ifElseIfClause.
+]
+
 { #category : #'tests-declaration' }
 PP2FortranSrcGrammarTest >> testImpCharacter [
 

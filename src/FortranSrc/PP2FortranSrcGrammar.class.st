@@ -86,7 +86,8 @@ Class {
 		'dataGroup',
 		'justAListNewOfExpression',
 		'impElementNew',
-		'nonEmptyList'
+		'nonEmptyList',
+		'ifElseIfClause'
 	],
 	#category : #'FortranSrc-Parser'
 }
@@ -270,18 +271,16 @@ PP2FortranSrcGrammar >> blForAll [
 
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blIf [
+	
+	"https://github.com/camfort/fortran-src/blob/416ce763fd9cde24415b1eee2e5ee7966ae0045c/src/Language/Fortran/AST.hs#L342"
 
 	^ (self prelude: 'BlIf')
 	, (self maybe: expression)
 	, (self maybe: tkString)
 	, (self parens: 
-						(self parens:  expression, tkComma , (self haskellList: block))
+						ifElseIfClause
 					 , (self token: ':|') ":| -> It is the constructor for a non-empty list"
-					 , (self haskellList: 
-								(self parens:  expression
-							 , tkComma
-							 , (self haskellList: block))
-						)
+					 , (self haskellList: ifElseIfClause)
 	  )
 	, (self maybe: (self haskellList: block))
 	, (self maybe: expression)
@@ -488,6 +487,12 @@ PP2FortranSrcGrammar >> haskellListOfString [
 	"rule to test method #haskellList:"
 
 	^ self aListNew: tkString
+]
+
+{ #category : #'grammar-block' }
+PP2FortranSrcGrammar >> ifElseIfClause [
+
+	^ (self parens:  expression, tkComma , (self haskellList: block))
 ]
 
 { #category : #'grammar-declaration' }
