@@ -13359,7 +13359,7 @@ PP2FortranSrcGrammarTest >> testImpElement [
 	impElementSpan = (2:25)-(2:27),
 	impElementFrom = ''a'',
 	impElementTo = Just ''z''}'
-		rule: #impElementNew
+		rule: #impElement
 ]
 
 { #category : #'tests-declaration' }
@@ -13419,21 +13419,6 @@ PP2FortranSrcGrammarTest >> testIxSingle [
 		(72:23)-(72:23)
 		(ValInteger "1" Nothing))'
 		rule: #ixSingle
-]
-
-{ #category : #'tests-declaration' }
-PP2FortranSrcGrammarTest >> testJustAListNew [
-
-	self
-		parse: '(Just AList {alistAnno = (),
-	alistSpan = (1:23)-(1:26),
-	alistList = [ExpValue ()
-						(1:23)-(1:23)
-						(ValVariable "k"),
-					ExpValue ()
-						(1:26)-(1:26)
-						(ValVariable "l")]})'
-		rule: #justAListNewOfExpression
 ]
 
 { #category : #'tests-metaInfo' }
