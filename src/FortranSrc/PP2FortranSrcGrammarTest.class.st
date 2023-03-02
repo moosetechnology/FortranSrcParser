@@ -12483,6 +12483,22 @@ PP2FortranSrcGrammarTest >> testArgumentExpression [
 		rule: #argumentExpression
 ]
 
+{ #category : #'tests-declaration' }
+PP2FortranSrcGrammarTest >> testArrayDecl [
+
+	self
+		parse: 'ArrayDecl (AList
+   {alistAnno = (),
+   alistSpan = (2:17)-(2:20),
+   alistList = [DimensionDeclarator {dimDeclAnno = (),
+      dimDeclSpan = (2:17)-(2:20),
+      dimDeclLower = Nothing,
+      dimDeclUpper = Just ExpValue ()
+         (2:17)-(2:20)
+         (ValInteger "1000" Nothing)}]})'
+		rule: #declaratorType
+]
+
 { #category : #tests }
 PP2FortranSrcGrammarTest >> testAttribute [
 
@@ -12940,19 +12956,21 @@ PP2FortranSrcGrammarTest >> testDeclarator [
 
 { #category : #'tests-declaration' }
 PP2FortranSrcGrammarTest >> testDeclaratorType [
+	
 	self
 		parse: 'ScalarDecl'
 		rule: #declaratorType.
 
 	self
-		parse: '(ArrayDecl (AList ()
-	(64:29)-(64:29)
-	[DimensionDeclarator ()
-		(64:29)-(64:29)
-		Nothing
-		(Just ExpValue ()
-			(64:29)-(64:29)
-			(ValInteger "2" Nothing))]))'
+		parse: 'ArrayDecl (AList
+   {alistAnno = (),
+   alistSpan = (2:17)-(2:20),
+   alistList = [DimensionDeclarator {dimDeclAnno = (),
+      dimDeclSpan = (2:17)-(2:20),
+      dimDeclLower = Nothing,
+      dimDeclUpper = Just ExpValue ()
+         (2:17)-(2:20)
+         (ValInteger "1000" Nothing)}]})'
 		rule: #declaratorType
 ]
 
@@ -12960,12 +12978,12 @@ PP2FortranSrcGrammarTest >> testDeclaratorType [
 PP2FortranSrcGrammarTest >> testDimensionDeclarator [
 
 	self
-		parse: 'DimensionDeclarator ()
-	(64:29)-(64:29)
-	Nothing
-	(Just ExpValue ()
-		(64:29)-(64:29)
-		(ValInteger "2" Nothing))'
+		parse: 'DimensionDeclarator {dimDeclAnno = (),
+   dimDeclSpan = (2:17)-(2:20),
+   dimDeclLower = Nothing,
+   dimDeclUpper = Just ExpValue ()
+      (2:17)-(2:20)
+      (ValInteger "1000" Nothing)}'
 		rule: #dimensionDeclarator
 ]
 
@@ -13330,7 +13348,7 @@ PP2FortranSrcGrammarTest >> testImpCharacter [
 
 	self
 		parse: '''a'''
-		rule: #impCharacter
+		rule: #tkChar
 ]
 
 { #category : #'tests-declaration' }
@@ -13888,12 +13906,18 @@ PP2FortranSrcGrammarTest >> testStEquivalence [
 
 	self
 		parse: 'StEquivalence ()
-					 (72:7)-(72:46)
-					 (AList ()
-						(72:18)-(72:46)
-						[AList ()
-						    (72:18)-(72:46)
-						    []])'
+  (2:10)-(2:27)
+  (AList
+    {alistAnno = (),
+    alistSpan = (2:22)-(2:27),
+    alistList = [AList {alistAnno = (),
+      alistSpan = (2:22)-(2:27),
+      alistList = [ExpValue ()
+        (2:23)-(2:23)
+        (ValVariable "i"),
+           ExpValue ()
+            (2:26)-(2:26)
+            (ValVariable "j")]}]})'
 		rule: #statement
 ]
 
@@ -14148,11 +14172,11 @@ PP2FortranSrcGrammarTest >> testStWrite [
 ]
 
 { #category : #'tests-token' }
-PP2FortranSrcGrammarTest >> testTkImpCharacter [
+PP2FortranSrcGrammarTest >> testTkChar [
 
 	self
 		parse: '''a'''
-		rule: #impCharacter
+		rule: #tkChar
 ]
 
 { #category : #'tests-token' }
@@ -14160,13 +14184,6 @@ PP2FortranSrcGrammarTest >> testTkStringEmpty [
 	self
 		parse: '""'
 		rule: #tkString
-]
-
-{ #category : #'tests-token' }
-PP2FortranSrcGrammarTest >> testTkStringNew [
-	self
-		parse: '''a'''
-		rule: #impCharacter
 ]
 
 { #category : #'tests-token' }

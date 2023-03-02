@@ -3,91 +3,91 @@ Class {
 	#superclass : #PP2CompositeNode,
 	#instVars : [
 		'any',
-		'programFile',
+		'argument',
+		'argumentExpression',
+		'attribute',
+		'baseType',
+		'binaryOp',
+		'blAssociate',
+		'blCase',
+		'blComment',
+		'blDo',
+		'blDoWhile',
+		'blForAll',
+		'blIf',
+		'blStatement',
+		'block',
+		'comment',
+		'commonGroup',
+		'controlPair',
+		'dataGroup',
+		'declarator',
+		'declaratorType',
+		'dimensionDeclarator',
+		'doSpecification',
+		'emptyTuple',
+		'expBinary',
+		'expFunctionCall',
+		'expSubscript',
+		'expUnary',
+		'expValue',
+		'expression',
+		'forallHeader',
+		'haskellListOfString',
+		'ifElseIfClause',
+		'impElement',
+		'impElementNew',
+		'impList',
+		'impRange',
+		'index',
+		'intent',
+		'ixRange',
+		'ixSingle',
+		'justAListNewOfExpression',
+		'lastPos',
+		'maybeOfString',
 		'metaInfo',
-		'miVersion',
 		'miFilename',
 		'miParameters',
+		'miVersion',
+		'nonEmptyList',
+		'position',
+		'prefixSuffix',
+		'programFile',
 		'programUnit',
+		'puBlockData',
+		'puComment',
+		'puFunction',
 		'puMain',
 		'puModule',
 		'puSubroutine',
-		'puFunction',
-		'puBlockData',
-		'puComment',
-		'srcSpan',
-		'prefixSuffix',
-		'position',
-		'tkNothing',
-		'tkString',
-		'tkNumber',
-		'tkIdentifier',
-		'tkComma',
-		'emptyTuple',
-		'expression',
-		'expValue',
-		'value',
-		'block',
-		'blComment',
-		'comment',
-		'blStatement',
-		'statement',
-		'impList',
-		'typeSpec',
-		'impElement',
-		'impCharacter',
-		'impRange',
-		'baseType',
 		'selector',
-		'stDeclaration',
-		'attribute',
-		'declarator',
-		'dimensionDeclarator',
-		'intent',
-		'declaratorType',
-		'commonGroup',
-		'valInteger',
-		'ixSingle',
-		'ixRange',
-		'expSubscript',
-		'index',
-		'expBinary',
-		'expUnary',
-		'unaryOp',
-		'binaryOp',
-		'stExpressionAssign',
+		'srcSpan',
 		'stCall',
-		'argument',
-		'argumentExpression',
-		'blDo',
-		'doSpecification',
-		'expFunctionCall',
-		'blIf',
-		'lastPos',
-		'stIfLogical',
-		'forallHeader',
-		'blForAll',
-		'blCase',
-		'blDoWhile',
-		'blAssociate',
-		'haskellListOfString',
-		'maybeOfString',
-		'valLogical',
-		'stFunction',
-		'stPrint',
-		'valStar',
-		'stExternal',
-		'stWrite',
-		'controlPair',
-		'stExit',
-		'stFormatBogus',
-		'stStop',
 		'stData',
-		'dataGroup',
-		'justAListNewOfExpression',
-		'impElementNew',
-		'nonEmptyList',
-		'ifElseIfClause'
+		'stDeclaration',
+		'stExit',
+		'stExpressionAssign',
+		'stExternal',
+		'stFormatBogus',
+		'stFunction',
+		'stIfLogical',
+		'stPrint',
+		'stStop',
+		'stWrite',
+		'statement',
+		'tkChar',
+		'tkComma',
+		'tkIdentifier',
+		'tkNothing',
+		'tkNumber',
+		'tkString',
+		'typeSpec',
+		'unaryOp',
+		'valInteger',
+		'valLogical',
+		'valStar',
+		'value'
 	],
 	#category : #'FortranSrc-Parser'
 }
@@ -101,13 +101,11 @@ PP2FortranSrcGrammar class >> ignoredNames [
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> aList: aRule [
 
+	self flag: #TODO. " old <<Must be deleted, For Debug only>> #aList: aRule
+
 	^ (self prelude: 'AList')
 	, (self haskellList: aRule)
-]
-
-{ #category : #'grammar-helper' }
-PP2FortranSrcGrammar >> aListNew: aRule [
-
+	"
 	^ (self token: 'AList')
 	, (self token: '{')
 	, (self prefixed: emptyTuple by:  'alistAnno =') , tkComma
@@ -323,7 +321,7 @@ PP2FortranSrcGrammar >> commonGroup [
 	, (self prefixed: emptyTuple by:  'commonGroupAnno = ') , tkComma
 	, (self prefixed: srcSpan by:  'commonGroupSpan = ') , tkComma
 	, (self prefixed: (self maybeNoParens: expression) by: 'commonGroupName = ') , tkComma
-	, (self prefixed: (self aListNew: declarator) by: 'commonGroupVars = ')
+	, (self prefixed: (self aList: declarator) by: 'commonGroupVars = ')
 	, (self token: '}')
 ]
 
@@ -346,8 +344,8 @@ PP2FortranSrcGrammar >> dataGroup [
 	, (self token: '{')
 	, (self prefixed: emptyTuple by:  'dataGroupAnno =') , tkComma
 	, (self prefixed: srcSpan by:  'dataGroupSpan =') , tkComma
-	, (self prefixed: (self aListNew: expression) by:  'dataGroupNames =') , tkComma
-	, (self prefixed: (self aListNew: expression) by:  'dataGroupInitializers =')
+	, (self prefixed: (self aList: expression) by:  'dataGroupNames =') , tkComma
+	, (self prefixed: (self aList: expression) by:  'dataGroupInitializers =')
 	, (self token: '}')
 ]
 
@@ -369,16 +367,22 @@ PP2FortranSrcGrammar >> declarator [
 PP2FortranSrcGrammar >> declaratorType [
 
 	^ (self token: 'ScalarDecl')
-	  /
-	  (self parens: (self token: 'ArrayDecl') , (self parens: (self aList: dimensionDeclarator)))
+	  / (
+				(self token: 'ArrayDecl')
+			 , (self parens: (self aList: dimensionDeclarator))
+	    )
 ]
 
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> dimensionDeclarator [
 
-	^ (self prelude: 'DimensionDeclarator')
-	, (self maybe: expression)
-	, (self maybe: expression)
+	^ (self token: 'DimensionDeclarator')
+	, (self token: '{')
+	, (self prefixed: emptyTuple by:  'dimDeclAnno =') , tkComma
+	, (self prefixed: srcSpan by:  'dimDeclSpan =') , tkComma
+	, (self prefixed: (self maybeNoParens: expression) by:  'dimDeclLower =') , tkComma
+	, (self prefixed: (self maybeNoParens: expression) by:  'dimDeclUpper =')
+	, (self token: '}')
 ]
 
 { #category : #'grammar-block' }
@@ -421,7 +425,7 @@ PP2FortranSrcGrammar >> expFunctionCall [
 
 	^ (self prelude: 'ExpFunctionCall')
 	, (self parens: expression)
-	, (self parens: (self aListNew: argument))
+	, (self parens: (self aList: argument))
 ]
 
 { #category : #'grammar-expression' }
@@ -429,7 +433,7 @@ PP2FortranSrcGrammar >> expSubscript [
 
 	^ (self prelude: 'ExpSubscript')
 	, (self parens: expression)
-	, (self parens: (self aListNew: index))
+	, (self parens: (self aList: index))
 ]
 
 { #category : #'grammar-expression' }
@@ -486,7 +490,7 @@ PP2FortranSrcGrammar >> haskellListOfString [
 	self flag: #TODO. "has to be removed, debugging purpose only"
 	"rule to test method #haskellList:"
 
-	^ self aListNew: tkString
+	^ self aList: tkString
 ]
 
 { #category : #'grammar-block' }
@@ -506,8 +510,13 @@ PP2FortranSrcGrammar >> impCharacter [
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> impElement [
 
-	^ impCharacter
-	/ impRange
+	^ (self token: 'ImpElement')
+	, (self token: '{')
+	, (self prefixed: emptyTuple by:  'impElementAnno =') , tkComma
+	, (self prefixed: srcSpan by:  'impElementSpan =') , tkComma
+	, (self prefixed: tkChar by: 'impElementFrom ='), tkComma
+	, (self prefixed: (self maybeNoParens: tkChar) by: 'impElementTo =')
+	, (self token: '}')
 ]
 
 { #category : #'grammar-declaration' }
@@ -517,8 +526,8 @@ PP2FortranSrcGrammar >> impElementNew [
 	, (self token: '{')
 	, (self prefixed: emptyTuple by:  'impElementAnno =') , tkComma
 	, (self prefixed: srcSpan by:  'impElementSpan =') , tkComma
-	, (self prefixed: impCharacter by: 'impElementFrom ='), tkComma
-	, (self prefixed: (self maybeNoParens: impCharacter) by: 'impElementTo =')
+	, (self prefixed: tkChar by: 'impElementFrom ='), tkComma
+	, (self prefixed: (self maybeNoParens: tkChar) by: 'impElementTo =')
 	, (self token: '}')
 ]
 
@@ -530,7 +539,7 @@ PP2FortranSrcGrammar >> impList [
 	, (self prefixed: emptyTuple by:  'impListAnno =') , tkComma
 	, (self prefixed: srcSpan by:  'impListSpan =') , tkComma
 	, (self prefixed: typeSpec by: 'impListType ='), tkComma
-	, (self prefixed: (self aListNew: impElementNew) by: 'impListElements =')
+	, (self prefixed: (self aList: impElement) by: 'impListElements =')
 	, (self token: '}')
 ]
 
@@ -592,7 +601,7 @@ PP2FortranSrcGrammar >> justAList: aRule [
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> justAListNew: aRule [
 
-	^ self parens: (self token: 'Just') , (self aListNew: aRule)
+	^ self parens: (self token: 'Just') , (self aList: aRule)
 ]
 
 { #category : #'grammar-tests' }
@@ -739,7 +748,7 @@ PP2FortranSrcGrammar >> prelude: aString aList: aRule [
 PP2FortranSrcGrammar >> prelude: aString aListNew: aRule [
 
 	^ (self prelude: aString)
-	, (self parens: (self aListNew: aRule))
+	, (self parens: (self aList: aRule))
 ]
 
 { #category : #'grammar-helper' }
@@ -899,14 +908,14 @@ PP2FortranSrcGrammar >> stCall [
 
 	^ ((self prelude: 'StCall')
 	, (self parens: expression)
-	, (self parens: (self aListNew:  argument)))
+	, (self parens: (self aList:  argument)))
 ]
 
 { #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> stData [
 
 	^ (self prelude: 'StData')
-	, (self parens: (self aListNew: dataGroup))
+	, (self parens: (self aList: dataGroup))
 ]
 
 { #category : #'grammar-statement' }
@@ -914,8 +923,8 @@ PP2FortranSrcGrammar >> stDeclaration [
 
 	^ (self prelude: 'StDeclaration')
 	, (self parens: typeSpec)
-	, (self maybe: (self aListNew: attribute))
-	, (self parens: (self aListNew: declarator))
+	, (self maybe: (self aList: attribute))
+	, (self parens: (self aList: declarator))
 ]
 
 { #category : #'grammar-statement' }
@@ -937,7 +946,7 @@ PP2FortranSrcGrammar >> stExpressionAssign [
 PP2FortranSrcGrammar >> stExternal [
 
 	^ (self prelude: 'StExternal')
-	, (self parens: (self aListNew: expression))
+	, (self parens: (self aList: expression))
 ]
 
 { #category : #'grammar-statement' }
@@ -951,7 +960,7 @@ PP2FortranSrcGrammar >> stFunction [
 
 	^ (self prelude: 'StFunction')
 	, (self parens: expression)
-	, (self parens: (self aListNew: expression))
+	, (self parens: (self aList: expression))
 	, (self parens: expression)
 ]
 
@@ -980,8 +989,8 @@ PP2FortranSrcGrammar >> stStop [
 PP2FortranSrcGrammar >> stWrite [
 
 	^ (self prelude: 'StWrite')
-	, (self parens: (self aListNew: controlPair))
-	, (self maybe: (self aListNew: expression))
+	, (self parens: (self aList: controlPair))
+	, (self maybe: (self aList: expression))
 ]
 
 { #category : #accessing }
@@ -996,7 +1005,7 @@ PP2FortranSrcGrammar >> statement [
 	  / (self prelude: 'StAllocatable' aList: declarator)
 	  / (self prelude: 'StCommon' aListNew: commonGroup)
 	  / (self prelude: 'StEquivalence' aList: (self aList: expression))
-	  / (self prelude: 'StImplicit' maybe: (self aListNew: impList))
+	  / (self prelude: 'StImplicit' maybe: (self aList: impList))
 	  / stIfLogical / stExpressionAssign
 	  /
 	  ((self prelude: 'StGotoUnconditional') , (self parens: expression))
@@ -1022,10 +1031,24 @@ PP2FortranSrcGrammar >> surrounded: aRule by: aCollectionOfToken [
 	, (self token: aCollectionOfToken last)
 ]
 
+{ #category : #'grammar-declaration' }
+PP2FortranSrcGrammar >> tkChar [
+
+	^ $' asPParser
+	, #letter asPParser flatten
+	, $' asPParser
+]
+
 { #category : #token }
 PP2FortranSrcGrammar >> tkComma [
 
 	^ self token: ','
+]
+
+{ #category : #token }
+PP2FortranSrcGrammar >> tkEqual [
+	
+	^ self token: '='
 ]
 
 { #category : #token }
@@ -1048,9 +1071,12 @@ PP2FortranSrcGrammar >> tkNumber [
 { #category : #token }
 PP2FortranSrcGrammar >> tkString [
 
-	^ $" asPParser
-	, ('\"' asPParser / $" asPParser negate) star flatten
-	, $" asPParser
+	^ ($" asPParser
+			, ('\"' asPParser / $" asPParser negate) star flatten
+			, $" asPParser)
+	/ ($' asPParser
+			, #letter asPParser flatten
+			, $' asPParser)
 ]
 
 { #category : #token }
