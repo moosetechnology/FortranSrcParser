@@ -271,14 +271,18 @@ PP2FortranSrcGrammar >> blForAll [
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blIf [
 
-	self flag: #TODO. "#FIXME."
 	^ (self prelude: 'BlIf')
 	, (self maybe: expression)
 	, (self maybe: tkString)
 	, (self parens: 
 						(self parens:  expression, tkComma , (self haskellList: block))
 					 , (self token: ':|') ":| -> It is the constructor for a non-empty list"
-					 , (self haskellList: block)) "#FIXME:"
+					 , (self haskellList: 
+								(self parens:  expression
+							 , tkComma
+							 , (self haskellList: block))
+						)
+	  )
 	, (self maybe: (self haskellList: block))
 	, (self maybe: expression)
 ]
@@ -339,9 +343,13 @@ PP2FortranSrcGrammar >> controlPair [
 { #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> dataGroup [
 
-	^ (self prelude: 'DataGroup')
-	, (self parens: (self aList: expression))
-	, (self parens: (self aList: expression))
+	^ (self token: 'DataGroup')
+	, (self token: '{')
+	, (self prefixed: emptyTuple by:  'dataGroupAnno =') , tkComma
+	, (self prefixed: srcSpan by:  'dataGroupSpan =') , tkComma
+	, (self prefixed: (self aListNew: expression) by:  'dataGroupNames =') , tkComma
+	, (self prefixed: (self aListNew: expression) by:  'dataGroupInitializers =')
+	, (self token: '}')
 ]
 
 { #category : #'grammar-declaration' }
@@ -377,10 +385,14 @@ PP2FortranSrcGrammar >> dimensionDeclarator [
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> doSpecification [
 
-	^ (self prelude: 'DoSpecification')
-	, (self parens: statement)
-	, (self parens: expression)
-	, (self maybe: expression)
+	^ (self token: 'DoSpecification')
+	, (self token: '{')
+	, (self prefixed: emptyTuple by:  'doSpecAnno =') , tkComma
+	, (self prefixed: srcSpan by:  'doSpecSpan =') , tkComma
+	, (self prefixed: statement by:  'doSpecInitial =') , tkComma
+	, (self prefixed: expression by:  'doSpecLimit =') , tkComma
+	, (self prefixed: (self maybeNoParens: expression) by:  'doSpecIncrement =')
+	, (self token: '}')
 ]
 
 { #category : #token }
@@ -418,7 +430,7 @@ PP2FortranSrcGrammar >> expSubscript [
 
 	^ (self prelude: 'ExpSubscript')
 	, (self parens: expression)
-	, (self parens: (self aList: index))
+	, (self parens: (self aListNew: index))
 ]
 
 { #category : #'grammar-expression' }
@@ -687,9 +699,7 @@ PP2FortranSrcGrammar >> parens: aRule [
 { #category : #grammar }
 PP2FortranSrcGrammar >> position [
 
-	^ self parens: tkNumber
-	, (self token: ':')
-	, tkNumber
+	^ self parens: (tkNumber , (self token: ':') , tkNumber)
 ]
 
 { #category : #'grammar-programUnit' }
@@ -891,7 +901,7 @@ PP2FortranSrcGrammar >> stCall [
 PP2FortranSrcGrammar >> stData [
 
 	^ (self prelude: 'StData')
-	, (self parens: (self aList: dataGroup))
+	, (self parens: (self aListNew: dataGroup))
 ]
 
 { #category : #'grammar-statement' }
@@ -936,7 +946,7 @@ PP2FortranSrcGrammar >> stFunction [
 
 	^ (self prelude: 'StFunction')
 	, (self parens: expression)
-	, (self parens: (self aList: expression))
+	, (self parens: (self aListNew: expression))
 	, (self parens: expression)
 ]
 
@@ -1092,9 +1102,9 @@ PP2FortranSrcGrammar >> valInteger [
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> valLogical [
 
-	
 	^ (self token: 'ValLogical')
-	  , ((self token: 'False') / (self token: 'True')) , tkNothing
+	, ((self token: 'False') / (self token: 'True'))
+	, tkNothing
 ]
 
 { #category : #'grammar-expression' }
