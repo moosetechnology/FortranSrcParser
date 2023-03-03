@@ -10,7 +10,7 @@ Class {
 { #category : #accessing }
 IASTSubroutine >> parameters [
 
-	^ parameters
+	^ parameters ifNil: [ parameters := #() ]
 ]
 
 { #category : #accessing }

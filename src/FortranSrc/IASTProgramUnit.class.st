@@ -2,8 +2,8 @@ Class {
 	#name : #IASTProgramUnit,
 	#superclass : #IASTAbstractEntity,
 	#instVars : [
-		'name',
-		'body'
+		'body',
+		'entityName'
 	],
 	#category : #'FortranSrc-intrermediateAST'
 }
@@ -21,13 +21,13 @@ IASTProgramUnit >> body: anObject [
 ]
 
 { #category : #accessing }
-IASTProgramUnit >> name [
+IASTProgramUnit >> entityName [
 
-	^ name
+	^ entityName
 ]
 
 { #category : #accessing }
-IASTProgramUnit >> name: anObject [
+IASTProgramUnit >> entityName: anObject [
 
-	name := anObject
+	entityName := anObject
 ]

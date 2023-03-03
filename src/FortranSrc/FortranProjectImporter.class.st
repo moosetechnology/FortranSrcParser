@@ -148,12 +148,10 @@ FortranProjectImporter >> parseAnnotatedFortranSources [
 		error := (self buildDirectory / ('' join: { 
 				           input basename.
 				           '.err' })) pathString.
-		LibC runCommand: (' ' join: { 
+		LibC runCommand: ('{1} "{2}" >"{3}" 2>"{4}"' format: { 
 					 self parser.
 					 input pathString.
-					 ' >'.
 					 output.
-					 ' 2>'.
 					 error }).
 		"			self parser , ' ' , input pathString , ' >' , output , ' 2>' , error"
 		output asFileReference writeStream.

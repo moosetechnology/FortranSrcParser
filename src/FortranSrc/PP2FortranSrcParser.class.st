@@ -77,8 +77,7 @@ PP2FortranSrcParser >> argumentExpression [
 	"((self token: 'ArgExpr'), (self parens: expression))
 	/ ((self prelude: 'ArgExprVar') , tkString)"
 	
-	^ super argumentExpression ==> [ :nodes | 1halt. ]
-
+	^ super argumentExpression ==> [ :nodes | nodes second. ]
 	
 ]
 
@@ -204,14 +203,12 @@ PP2FortranSrcParser >> expFunctionCall [
 	"(self prelude: 'ExpFunctionCall') , (self parens: expression)
 	  , (self maybe: (self aList: argument))"
 
-	^ super expFunctionCall ==> [ :nodes | 
-	  | candidate | 1halt.
-	  candidate := self
-		               ensureFunction: nodes second third
-		               intrinsic: nodes second second = 'ValIntrinsic'.
-	  "self createParameters: nodes third second to: candidate."
-	  self createInvocation: nodes first second to: candidate.
-	candidate
+	^ super expFunctionCall ==> [ :nodes |
+	IASTInvocation new 
+		sourceAnchor: nodes first second;
+		entityName: nodes second entityName;
+		arguments: nodes third;
+		yourself.
 	 ]
 ]
 
@@ -236,7 +233,7 @@ PP2FortranSrcParser >> expValue [
 	^ super expValue ==> [ :nodes |
 		IASTVarAccess new
 			sourceAnchor: nodes first second ;
-			entityName: nodes second first ;
+			entityName: nodes second second ;
 			yourself
 	]
 ]
@@ -301,8 +298,10 @@ PP2FortranSrcParser >> maybe: aRule [
 { #category : #'grammar-metaInfo' }
 PP2FortranSrcParser >> metaInfo [
 
-	"self parens: (self token: 'MetaInfo') , (self token: '{') , (miParameters delimitedBy: tkComma) , (self token: '}')
-	  "
+	" (self token: 'MetaInfo')
+	, (self token: '{')
+	, (miParameters delimitedBy: tkComma)
+	, (self token: '}')"
 
 	^ super metaInfo
 	  ==> [ :nodes | 
@@ -398,17 +397,19 @@ PP2FortranSrcParser >> prelude: aString [
 { #category : #'grammar-programUnit' }
 PP2FortranSrcParser >> programFile [
 
-	"(self token: 'ProgramFile') , metaInfo , (self haskellList: programUnit)"
+	" (self token: 'ProgramFile {programFileMeta =')
+	, metaInfo
+	, (self token: tkComma)
+	, (self token: 'programFileProgramUnits = ')
+	, (self haskellList: programUnit)
+	, (self token: '}')"
 
-	^ super programFile ==> [ :nodes | 
-	| progFile |
-
-	progFile := IASTProgramFile new.
-	progFile
-		filename: (nodes second at: 'miFilename' ifPresent: [ :node | node ] ifAbsent: [ '' ]) ;
+	^ super programFile ==> [ :nodes | 1halt.
+	IASTProgramFile new
+		filename: (nodes second at: 'miFilename' ifAbsent: [ '' ]) ;
 		version: (nodes second at: 'miVersion' ifAbsent: [ '' ]);
-		progUnits: nodes third.
-	progFile ]
+		progUnits: nodes fifth ;
+		yourself ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -418,11 +419,14 @@ PP2FortranSrcParser >> puBlockData [
 	, (self maybe: tkString)
 	, (self haskellList: block)"
 
-	^ super puBlockData ==> [ :nodes | 
-	  | aBlockdata |
-		aBlockdata := self ensureBlockdata: nodes second.
-		aBlockdata.
-	   ]
+	^ super puBlockData ==> [ :nodes |
+		IASTBlockData new
+			sourceAnchor: nodes first second ;
+			entityName: (nodes second = 'Nothing'
+				ifTrue: [ '**No Name**' ]
+				ifFalse: [ nodes second ]) ;
+			body: nodes third ; 
+			yourself ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -450,18 +454,16 @@ PP2FortranSrcParser >> puFunction [
 	, (self haskellList: block)
 	, (self maybe: programUnit)"
 
-	^ super puFunction ==> [ :nodes | 
-	| aFunction |
-	aFunction := IASTFunction new.
-	aFunction
-		name: nodes fourth ;
-		sourceAnchor: nodes first second ;
-		parameters: (nodes fifth = 'Nothing'
-			ifTrue: [ #() ]
-			ifFalse: [ nodes fifth second ]) ;
-		returnType: nodes second ";
-		body: nodes seventh".
-	 aFunction ]
+	^ super puFunction ==> [ :nodes | 1halt.
+	  IASTFunction new
+		  sourceAnchor: nodes first second;
+		  returnType: nodes second;
+		  entityName: nodes fourth;
+		  parameters: (nodes fifth = 'Nothing'
+				   ifTrue: [ #(  ) ]
+				   ifFalse: [ nodes fifth second ]);
+		  body: nodes seventh;
+		  yourself ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -471,15 +473,12 @@ PP2FortranSrcParser >> puMain [
 	  , (self haskellList: block) , (self maybe: programUnit)"
 
 	^ super puMain ==> [ :nodes | 
-	| program |
-
-	program := IASTMainProgram new.
-	program 
-		name: (nodes second = 'Nothing'
-			ifTrue: [ '** No name given **' ]
-			ifFalse: [ nodes second ]);
-		body: nodes third.
-	program ]
+		IASTMainProgram new
+			entityName: (nodes second = 'Nothing'
+				ifTrue: [ '** No name given **' ]
+				ifFalse: [ nodes second ]) ;
+			body: nodes third ;
+			yourself ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -492,28 +491,15 @@ PP2FortranSrcParser >> puSubroutine [
 	, (self haskellList: block)
 	, (self maybe: programUnit)"
 
-	^ super puSubroutine ==> [ :nodes | 
-	  | subroutine | 
-	  subroutine := self ensureSubroutine: nodes third.
-	  subroutine sourceAnchor: nodes first second.
-	  nodes fourth = 'Nothing' ifFalse: [ 
-		  nodes fourth second do: [ :node |
-			  subroutine addParameter:
-				  ((self newEntity: FamixFortranParameter)
-					   sourceAnchor: node first;
-					   name: node third value;
-					   yourself) ] ].
-	  nodes fifth do: [ :aBlockNode | 
-		  aBlockNode isArray
-			  ifFalse: [ 
-				  aBlockNode setOwner: subroutine
-				  "aBlockNode isInvocation ifTrue: [ 1 halt ]" ]
-			  ifTrue: [ 
-				  (aBlockNode flattened select: [ :entity | 
-					   entity class = FamixFortranInvocation or: [ 
-						   entity class = FamixFortranComment ] ]) do: [ :anEntity | 
-					  anEntity setOwner: subroutine ] ] ].
-	  subroutine ]
+	^ super puSubroutine ==> [ :nodes |
+		IASTSubroutine new
+			sourceAnchor: nodes first second ;
+			entityName: nodes third ;
+			parameters: (nodes fourth = 'Nothing'
+				ifTrue: [ #() ]
+				ifFalse: [ nodes fourth second]) ;
+			body: nodes fifth ;
+			yourself ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -561,14 +547,13 @@ PP2FortranSrcParser >> stCall [
 	"(self prelude: 'StCall') , (self parens: expression)
 	  , (self maybe: (self aList: argument))"
 
-	^ super stCall ==> [ :nodes | 
-	  | candidate |
-	  candidate := self ensureSubroutine: nodes second third.
-	  (self newEntity: FamixFortranInvocation)
-		  addCandidate: candidate;
-		  signature: (self getSignature: nodes first second);
-		sourceAnchor: nodes first second;
-		  yourself ]
+	^ super stCall ==> [ :nodes |
+		IASTInvocation new
+			sourceAnchor: nodes first second;
+			entityName: nodes second entityName;
+			arguments: (nodes third = 'Nothing' ifTrue: [ #() ] ifFalse: [ nodes third second ] );
+			yourself
+		]
 ]
 
 { #category : #'grammar-statement' }

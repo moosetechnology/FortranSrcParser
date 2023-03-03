@@ -10,7 +10,7 @@ Class {
 { #category : #accessing }
 IASTVarAccess >> isAssigned [
 
-	^ isAssigned
+	^ isAssigned ifNil: [ isAssigned := false ]
 ]
 
 { #category : #accessing }

@@ -98,7 +98,7 @@ PP2FortranSrcParserFromASTTest >> testExpUnary [
 
 	self assert: ast first equals: 'ExpUnary'.
 	self assert: ast third equals: 'Minus'.
-	self assert: ast fourth second equals: 'ValInteger'.
+	self assert: ast fourth entityName equals: 'ValInteger'.
 	self assert: ast fourth third  equals: 8
 ]
 
