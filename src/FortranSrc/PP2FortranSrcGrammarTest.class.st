@@ -13506,10 +13506,16 @@ PP2FortranSrcGrammarTest >> testProgramFilePUSubRoutine [
 
 	self
 		parse: 'ProgramFile {
-	programFileMeta = MetaInfo {
-		miVersion = Fortran77,
-        miFilename = "./fortran77.f"},
-	programFileProgramUnits = []}
+		programFileMeta = 
+			MetaInfo {miVersion = Fortran77,
+                   miFilename = "./fortran77.f"},
+      programFileProgramUnits = [PUSubroutine ()
+         (1:7)-(2:9)
+         (Nothing, Nothing)
+         "hello"
+         Nothing
+         []
+         Nothing]}
 '
 		rule: #programFile
 ]

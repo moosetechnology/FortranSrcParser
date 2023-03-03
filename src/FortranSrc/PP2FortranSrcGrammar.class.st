@@ -99,9 +99,9 @@ PP2FortranSrcGrammar >> aList: aRule [
 
 	^ (self token: 'AList')
 	, (self token: '{')
-	, (self prefixed: emptyTuple by:  'alistAnno') , tkComma
-	, (self prefixed: srcSpan by:  'alistSpan'), tkComma
-	, (self prefixed: (self haskellList: aRule) by: 'alistList')
+	, (self overturedBy: 'alist')
+	, (self prefix: 'alistList')
+	, (self haskellList: aRule)
 	, (self token: '}')
 ]
 
@@ -117,10 +117,12 @@ PP2FortranSrcGrammar >> argument [
 
 	^ (self token: 'Argument')
 	, (self token: '{')
-	, (self prefixed: emptyTuple by:  'argumentAnno') , tkComma
-	, (self prefixed: srcSpan by:  'argumentSpan') , tkComma
-	, (self prefixed: (self maybe: tkString) by: 'argumentName') , tkComma
-	, (self prefixed: argumentExpression by: 'argumentExpr')
+	, (self overturedBy: 'argument')
+	, (self prefix: 'argumentName')
+	, (self maybe: tkString)
+	, tkComma
+	, (self prefix: 'argumentExpr')
+	, argumentExpression
 	, (self token: '}')
 ]
 
@@ -309,10 +311,12 @@ PP2FortranSrcGrammar >> commonGroup [
 
 	^ (self token: 'CommonGroup')
 	, (self token: '{')
-	, (self prefixed: emptyTuple by:  'commonGroupAnno') , tkComma
-	, (self prefixed: srcSpan by:  'commonGroupSpan') , tkComma
-	, (self prefixed: (self maybeNoParens: expression) by: 'commonGroupName') , tkComma
-	, (self prefixed: (self aList: declarator) by: 'commonGroupVars')
+	, (self overturedBy: 'commonGroup')
+	, (self prefix: 'commonGroupName')
+	, (self maybeNoParens: expression)
+	, tkComma
+	, (self prefix: 'commonGroupVars')
+	, (self aList: declarator)
 	, (self token: '}')
 ]
 
@@ -321,10 +325,12 @@ PP2FortranSrcGrammar >> controlPair [
 
 	^ (self token: 'ControlPair')
 	, (self token: '{')
-	, (self prefixed: emptyTuple by:  'controlPairAnno') , tkComma
-	, (self prefixed: srcSpan by:  'controlPairSpan') , tkComma
-	, (self prefixed: (self maybe: tkString) by: 'controlPairName') , tkComma
-	, (self prefixed: (expression) by: 'controlPairExpr')
+	, (self overturedBy: 'controlPair')
+	, (self prefix: 'controlPairName')
+	, (self maybe: tkString)
+	, tkComma
+	, (self prefix: 'controlPairExpr')
+	, expression
 	, (self token: '}')
 ]
 
@@ -333,10 +339,12 @@ PP2FortranSrcGrammar >> dataGroup [
 
 	^ (self token: 'DataGroup')
 	, (self token: '{')
-	, (self prefixed: emptyTuple by:  'dataGroupAnno') , tkComma
-	, (self prefixed: srcSpan by:  'dataGroupSpan') , tkComma
-	, (self prefixed: (self aList: expression) by:  'dataGroupNames') , tkComma
-	, (self prefixed: (self aList: expression) by:  'dataGroupInitializers')
+	, (self overturedBy: 'dataGroup')
+	, (self prefix: 'dataGroupNames')
+	, (self aList: expression)
+	, tkComma
+	, (self prefix: 'dataGroupInitializers')
+	, (self aList: expression)
 	, (self token: '}')
 ]
 
@@ -345,12 +353,18 @@ PP2FortranSrcGrammar >> declarator [
 
 	^ (self token: 'Declarator')
 	, (self token: '{')
-	, (self prefixed: emptyTuple by:  'declaratorAnno') , tkComma
-	, (self prefixed: srcSpan by:  'declaratorSpan') , tkComma
-	, (self prefixed: expression by: 'declaratorVariable') , tkComma
-	, (self prefixed: declaratorType by: 'declaratorType') , tkComma
-	, (self prefixed: (self maybeNoParens: expression) by: 'declaratorLength') , tkComma
-	, (self prefixed: (self maybeNoParens: expression) by: 'declaratorInitial')
+	, (self overturedBy: 'declarator')
+	, (self prefix: 'declaratorVariable')
+	, expression
+	, tkComma
+	, (self prefix: 'declaratorType')
+	, declaratorType
+	, tkComma
+	, (self prefix: 'declaratorLength')
+	, (self maybeNoParens: expression)
+	, tkComma
+	, (self prefix: 'declaratorInitial')
+	, (self maybeNoParens: expression)
 	, (self token: '}')
 ]
 
@@ -369,10 +383,12 @@ PP2FortranSrcGrammar >> dimensionDeclarator [
 
 	^ (self token: 'DimensionDeclarator')
 	, (self token: '{')
-	, (self prefixed: emptyTuple by:  'dimDeclAnno') , tkComma
-	, (self prefixed: srcSpan by:  'dimDeclSpan') , tkComma
-	, (self prefixed: (self maybeNoParens: expression) by:  'dimDeclLower') , tkComma
-	, (self prefixed: (self maybeNoParens: expression) by:  'dimDeclUpper')
+	, (self overturedBy: 'dimDecl')
+	, (self prefix: 'dimDeclLower')
+	, (self maybeNoParens: expression)
+	, tkComma
+	, (self prefix: 'dimDeclUpper')
+	, (self maybeNoParens: expression)
 	, (self token: '}')
 ]
 
@@ -381,11 +397,15 @@ PP2FortranSrcGrammar >> doSpecification [
 
 	^ (self token: 'DoSpecification')
 	, (self token: '{')
-	, (self prefixed: emptyTuple by:  'doSpecAnno') , tkComma
-	, (self prefixed: srcSpan by:  'doSpecSpan') , tkComma
-	, (self prefixed: statement by:  'doSpecInitial') , tkComma
-	, (self prefixed: expression by:  'doSpecLimit') , tkComma
-	, (self prefixed: (self maybeNoParens: expression) by:  'doSpecIncrement')
+	, (self overturedBy: 'doSpec')
+	, (self prefix: 'doSpecInitial')
+	, statement
+	, tkComma
+	, (self prefix: 'doSpecLimit')
+	, expression
+	, tkComma
+	, (self prefix: 'doSpecIncrement')
+	, (self maybeNoParens: expression)
 	, (self token: '}')
 ]
 
@@ -480,10 +500,12 @@ PP2FortranSrcGrammar >> impElement [
 
 	^ (self token: 'ImpElement')
 	, (self token: '{')
-	, (self prefixed: emptyTuple by:  'impElementAnno') , tkComma
-	, (self prefixed: srcSpan by:  'impElementSpan') , tkComma
-	, (self prefixed: tkChar by: 'impElementFrom'), tkComma
-	, (self prefixed: (self maybeNoParens: tkChar) by: 'impElementTo')
+	, (self overturedBy: 'impElement')
+	, (self prefix: 'impElementFrom')
+	, tkChar
+	, tkComma
+	, (self prefix: 'impElementTo')
+	, (self maybeNoParens: tkChar)
 	, (self token: '}')
 ]
 
@@ -492,10 +514,12 @@ PP2FortranSrcGrammar >> impList [
 
 	^ (self token: 'ImpList')
 	, (self token: '{')
-	, (self prefixed: emptyTuple by:  'impListAnno') , tkComma
-	, (self prefixed: srcSpan by:  'impListSpan') , tkComma
-	, (self prefixed: typeSpec by: 'impListType'), tkComma
-	, (self prefixed: (self aList: impElement) by: 'impListElements')
+	, (self overturedBy: 'impList')
+	, (self prefix: 'impListType')
+	, typeSpec
+	, tkComma
+	, (self prefix: 'impListElements')
+	, (self aList: impElement)
 	, (self token: '}')
 ]
 
@@ -629,6 +653,17 @@ PP2FortranSrcGrammar >> miVersion [
 ]
 
 { #category : #'grammar-helper' }
+PP2FortranSrcGrammar >> overturedBy: aPrefix [
+
+	^ (self prefix: aPrefix , 'Anno')
+	, emptyTuple
+	, tkComma
+	, (self prefix: aPrefix , 'Span')
+	, srcSpan
+	, tkComma
+]
+
+{ #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> parens: aRule [
 
 	^ (self token: '(')
@@ -640,6 +675,13 @@ PP2FortranSrcGrammar >> parens: aRule [
 PP2FortranSrcGrammar >> position [
 
 	^ self parens: (tkNumber , (self token: ':') , tkNumber)
+]
+
+{ #category : #'grammar-programUnit' }
+PP2FortranSrcGrammar >> prefix: aPrefix [
+
+	^ (self token: aPrefix uncapitalized)
+	, tkEqual
 ]
 
 { #category : #'grammar-programUnit' }
@@ -683,8 +725,11 @@ PP2FortranSrcGrammar >> programFile [
 
 	^ (self token: 'ProgramFile')
 	, (self token: '{')
-	, (self prefixed: metaInfo by: 'programFileMeta') , tkComma
-	, (self prefixed: (self haskellList: programUnit) by:  'programFileProgramUnits')
+	, (self prefix: 'programFileMeta')
+	, metaInfo
+	, tkComma
+	, (self prefix: 'programFileProgramUnits')
+	, (self haskellList: programUnit)
 	, (self token: '}')
 ]
 
@@ -761,10 +806,12 @@ PP2FortranSrcGrammar >> selector [
 
 	^ (self token: 'Selector')
 	, (self token: '{')
-	, (self prefixed: emptyTuple by:  'selectorAnno') , tkComma
-	, (self prefixed: srcSpan by:  'selectorSpan') , tkComma
-	, (self prefixed: (self maybeNoParens: expression) by: 'selectorLength') , tkComma
-	, (self prefixed: (self maybeNoParens: expression) by: 'selectorKind')
+	, (self overturedBy: 'selector')
+	, (self prefix: 'selectorLength')
+	, (self maybeNoParens: expression)
+	, tkComma
+	, (self prefix: 'selectorKind')
+	, (self maybeNoParens: expression)
 	, (self token: '}')
 ]
 
@@ -948,12 +995,9 @@ PP2FortranSrcGrammar >> tkNumber [
 { #category : #token }
 PP2FortranSrcGrammar >> tkString [
 
-	^ ($" asPParser
-			, ('\"' asPParser / $" asPParser negate) star flatten
-			, $" asPParser)
-	/ ($' asPParser
-			, #letter asPParser flatten
-			, $' asPParser)
+	^ $" asPParser
+	, ('\"' asPParser / $" asPParser negate) star flatten
+	, $" asPParser
 ]
 
 { #category : #'grammar-helper' }
@@ -967,10 +1011,12 @@ PP2FortranSrcGrammar >> typeSpec [
 
 	^ (self token: 'TypeSpec')
 	, (self token: '{')
-	, (self prefixed: emptyTuple by:  'typeSpecAnno') , tkComma
-	, (self prefixed: srcSpan by:  'typeSpecSpan') , tkComma
-	, (self prefixed: baseType by: 'typeSpecBaseType') , tkComma
-	, (self prefixed: (self maybeNoParens: selector) by: 'typeSpecSelector')
+	, (self overturedBy: 'typeSpec')
+	, (self prefix: 'typeSpecBaseType')
+	, baseType
+	, tkComma
+	, (self prefix: 'typeSpecSelector')
+	, (self maybeNoParens: selector)
 	, (self token: '}')
 ]
 
