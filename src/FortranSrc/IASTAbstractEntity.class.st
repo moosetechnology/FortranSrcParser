@@ -10,6 +10,8 @@ Class {
 { #category : #accessing }
 IASTAbstractEntity >> sourceAnchor [
 
+	<FMProperty: #tokenPosition type: #Object>
+	<FMComment: 'represente the position(startLine, startColumn, endLine, endColumn) of each node of IRAST'>
 	^ sourceAnchor
 ]
 

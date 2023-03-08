@@ -14109,6 +14109,36 @@ PP2FortranSrcGrammarTest >> testStImplicit [
 		rule: #statement
 ]
 
+{ #category : #'tests-expression' }
+PP2FortranSrcGrammarTest >> testStRead [
+
+	self
+		parse: 'StRead ()
+  (8:7)-(8:21)
+  (AList
+  {alistAnno = (),
+  alistSpan = (8:11)-(8:15),
+  alistList = [ControlPair {controlPairAnno = (),
+    controlPairSpan = (8:12)-(8:12),
+    controlPairName = Nothing,
+    controlPairExpr = ExpValue ()
+      (8:12)-(8:12)
+      ValStar},
+    ControlPair {controlPairAnno = (),
+    controlPairSpan = (8:14)-(8:14),
+    controlPairName = Nothing,
+    controlPairExpr = ExpValue ()
+      (8:14)-(8:14)
+      ValStar}]})
+  (Just AList {alistAnno = (),
+    alistSpan = (8:17)-(8:21),
+    alistList = [ExpValue ()
+      (8:17)-(8:21)
+      (ValVariable "fname")]})'
+		rule: #stRead.
+
+]
+
 { #category : #'tests-statement' }
 PP2FortranSrcGrammarTest >> testStReturn [
 

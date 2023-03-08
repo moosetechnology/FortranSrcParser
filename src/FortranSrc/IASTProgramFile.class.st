@@ -10,6 +10,12 @@ Class {
 }
 
 { #category : #accessing }
+IASTProgramFile >> addProgramUnit: anObject [
+
+	^ self progUnits add: anObject
+]
+
+{ #category : #accessing }
 IASTProgramFile >> filename [
 
 	^ filename
@@ -19,6 +25,17 @@ IASTProgramFile >> filename [
 IASTProgramFile >> filename: anObject [
 
 	filename := anObject
+]
+
+{ #category : #accessing }
+IASTProgramFile >> initialize [
+
+	super initialize.
+
+	"Default value initialization"
+	version := 'Fortran77'.
+	progUnits := OrderedCollection new.
+
 ]
 
 { #category : #accessing }

@@ -3,7 +3,8 @@ Class {
 	#superclass : #IASTAbstractEntity,
 	#instVars : [
 		'body',
-		'entityName'
+		'entityName',
+		'comments'
 	],
 	#category : #'FortranSrc-intrermediateAST'
 }
@@ -18,6 +19,18 @@ IASTProgramUnit >> body [
 IASTProgramUnit >> body: anObject [
 
 	body := anObject
+]
+
+{ #category : #accessing }
+IASTProgramUnit >> comments [
+
+	^ comments
+]
+
+{ #category : #accessing }
+IASTProgramUnit >> comments: anObject [
+
+	comments := anObject
 ]
 
 { #category : #accessing }

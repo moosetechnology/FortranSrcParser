@@ -83,7 +83,8 @@ Class {
 		'valInteger',
 		'valLogical',
 		'valStar',
-		'value'
+		'value',
+		'stRead'
 	],
 	#category : #'FortranSrc-Parser'
 }
@@ -690,14 +691,6 @@ PP2FortranSrcGrammar >> prefixSuffix [
 	^ self parens: tkNothing , tkComma , tkNothing
 ]
 
-{ #category : #'grammar-programUnit' }
-PP2FortranSrcGrammar >> prefixed: aRule by: aPrefix [
-
-	^ (self token: aPrefix uncapitalized)
-	, tkEqual
-	, aRule
-]
-
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> prelude: aString [
 
@@ -909,6 +902,14 @@ PP2FortranSrcGrammar >> stPrint [
 ]
 
 { #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stRead [
+
+	^ (self prelude: 'StRead')
+	, (self parens: (self aList: controlPair))
+	, (self maybe: (self aList: expression))
+]
+
+{ #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> stStop [
 
 	^ (self prelude: 'StStop')
@@ -942,7 +943,7 @@ PP2FortranSrcGrammar >> statement [
 	  ((self prelude: 'StGotoUnconditional') , (self parens: expression))
 	  / stCall / (self prelude: 'StReturn' maybe: expression)
 	  / (self prelude: 'StContinue') / stFunction / stPrint / stExternal / stWrite / stExit 
-	  / stFormatBogus / stStop / stData
+	  / stFormatBogus / stStop / stData / stRead
 	"/ stStructure / stIntent / stOptional / stPublic / stPrivate / stProtected / stSave"
 	"/ stAsynchronous / stPointer / stTarget / stValue / stVolatile / stAutomatic / ststatic / stNamelist / stParameter  / stIntrinsic"
 	"/ stFormat"
@@ -951,7 +952,7 @@ PP2FortranSrcGrammar >> statement [
 	" / stIfArithmetic / stSelectCase / stCase / stEndcase"
 	" / stPointerAssign / stLabelAssign"
 	" / stGotoAssigned / stGotoComputed"
-	" / stPause / stRead / stRead2 / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum "
+	" / stPause / stRead2 / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum "
 ]
 
 { #category : #'grammar-declaration' }

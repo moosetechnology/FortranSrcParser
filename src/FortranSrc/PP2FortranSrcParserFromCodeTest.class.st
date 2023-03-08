@@ -17,6 +17,7 @@ PP2FortranSrcParserFromCodeTest >> parse: sourceCode rule: aRule [
 
 { #category : #running }
 PP2FortranSrcParserFromCodeTest >> parserClass [
+
 	^ PP2FortranSrcParser 
 ]
 
@@ -38,7 +39,7 @@ PP2FortranSrcParserFromCodeTest >> testBlockData [
 
 	self assert: node class equals: IASTBlockData.
 	self assert: node entityName equals: 'myblck'.
-	self assert: node body size equals: 0.
+	self assert: node body size equals: 3.
 ]
 
 { #category : #'tests - allnodes' }
@@ -78,16 +79,89 @@ c --- end ---
 '
 		        rule: #start.
 
-	self assert: iast progUnits size equals: 1.
+	self assert: iast progUnits size equals: 2.
 
 	node := iast progUnits first.
 
 	self assert: node class equals: IASTFunction.
 	self assert: node entityName equals: 'ifunc'.
-	self assert: node body size equals: 1.
+	self assert: node body size equals: 2.
 	self assert: node parameters size equals: 2.
-	self assert: node parameters first entityName equals: #k.
-	self assert: node parameters second entityName equals: #l
+	self assert: node parameters first entityName equals: 'k'.
+	self assert: node parameters second entityName equals: 'l'.
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserFromCodeTest >> testFunctionOracle1 [
+
+	| iast node |
+	iast := self
+		        parse: '      FUNCTION F ( X ) 
+      INTEGER F, X 
+      F = X + 1 
+      RETURN 
+      END
+'
+		        rule: #start.
+
+	self assert: iast progUnits size equals: 1.
+
+	node := iast progUnits first.
+
+	self assert: node class equals: IASTFunction.
+	self assert: node entityName equals: 'f'.
+	self assert: node body size equals: 2.
+	self assert: node parameters size equals: 1.
+	self assert: node parameters first entityName equals: 'x'.
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserFromCodeTest >> testFunctionOracle2 [
+
+	| iast node |
+	iast := self
+		        parse: '      INTEGER FUNCTION F ( X ) 
+      INTEGER X 
+      F = X + 1 
+      RETURN 
+      END
+'
+		        rule: #start.
+
+	self assert: iast progUnits size equals: 1.
+
+	node := iast progUnits first.
+
+	self assert: node class equals: IASTFunction.
+	self assert: node entityName equals: 'f'.
+	self assert: node body size equals: 2.
+	self assert: node parameters size equals: 1.
+	self assert: node parameters first entityName equals: 'x'.
+	self assert: node returnType entityName equals: 'TypeInteger'
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserFromCodeTest >> testFunctionOracle3 [
+
+	| iast node |
+	iast := self
+		        parse: '      FUNCTION NXT ( X ) 
+      INTEGER X 
+      NXT = X + 1 
+      RETURN 
+      END
+'
+		        rule: #start.
+
+	self assert: iast progUnits size equals: 1.
+
+	node := iast progUnits first.
+
+	self assert: node class equals: IASTFunction.
+	self assert: node entityName equals: 'nxt'.
+	self assert: node body size equals: 2.
+	self assert: node parameters size equals: 1.
+	self assert: node parameters first entityName equals: 'x'.
 ]
 
 { #category : #'tests - allnodes' }
@@ -109,9 +183,9 @@ PP2FortranSrcParserFromCodeTest >> testFunctionWithAccesses [
 	self assert: node parameters first entityName equals: 'k'.
 	self assert: node parameters second entityName equals: 'l'.
 	
-	self assert: node body flattened equals: 'ifunc'.
-	self assert: node body second equals: 'k'.
-	self assert: node body third equals: 'l'.
+	self assert: node body first entityName equals: 'ifunc'.
+	self assert: node body second entityName equals: 'k'.
+	self assert: node body third entityName equals: 'l'.
 ]
 
 { #category : #'tests - allnodes' }
@@ -136,7 +210,7 @@ PP2FortranSrcParserFromCodeTest >> testFunctionWithInvocation [
 
 	self assert: main class equals: IASTMainProgram.
 	self assert: main entityName equals: 'myprog'.
-	self assert: main body size equals: 1.
+	self assert: main body size equals: 2.
 
 	self assert: function class equals: IASTFunction.
 	self assert: function parameters size equals: 2.
@@ -160,9 +234,27 @@ PP2FortranSrcParserFromCodeTest >> testImplicit [
 	
 	node := iast progUnits first.
 
-	self assert: node class equals: IASTBlockData.
-	self assert: node entityName equals: 'myblck'.
+	self assert: node class equals: IASTMainProgram.
+	self assert: node entityName equals: 'main'.
 	self assert: node body size equals: 0.
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserFromCodeTest >> testMainAndSubroutineHelloName [
+
+	self
+		        parse: '      subroutine hello( name )
+      character*(*) name
+      write(*,*) ''hello '', name
+      end
+      program main
+      character*20 fname
+      write(*,*) ''type your name: ''
+      read(*,*) fname
+      call hello(fname)
+      end
+'
+		        rule: #start.
 ]
 
 { #category : #'tests-programUnit' }
@@ -189,7 +281,7 @@ C----------------------------------------------------------------------^
 	node := iast progUnits second.
 	self assert: node class equals: IASTMainProgram.
 	self assert: node entityName equals: 'myprog'.
-	self assert: node body size equals: 1.
+	self assert: node body size equals: 0.
 
 	node := iast progUnits third.
 	self assert: node class equals: IASTComment.
@@ -222,7 +314,7 @@ PP2FortranSrcParserFromCodeTest >> testProgramWithMultipleProgUnitsWithInvocatio
 	node := iast progUnits first.
 	self assert: node class equals: IASTMainProgram.
 	self assert: node entityName equals: 'myprog'.
-	self assert: node body size equals: 2.
+	self assert: node body size equals: 3.
 	
 	node := iast progUnits second.
 	self assert: node class equals: IASTFunction.
@@ -250,7 +342,7 @@ PP2FortranSrcParserFromCodeTest >> testProgramWithMultipleProgUnitsWithInvocatio
 '
 		       rule: #start.
 
-	self assert: iast progUnits size equals: 3.
+	self assert: iast progUnits size equals: 2.
 	
 	node := iast progUnits first.
 	self assert: node class equals: IASTMainProgram.
@@ -259,20 +351,44 @@ PP2FortranSrcParserFromCodeTest >> testProgramWithMultipleProgUnitsWithInvocatio
 	
 	node := iast progUnits second.
 	self assert: node class equals: IASTFunction.
-	self assert: node parameters size equals: 2.
-	self assert: node parameters first entityName equals: #k.
-	self assert: node parameters second entityName equals: #l.
-
-	node := iast progUnits third.
-	self assert: node class equals: IASTSubroutine.
 	self assert: node parameters size equals: 1.
-	self assert: node parameters first entityName equals: 'msg'.
+	self assert: node parameters first entityName equals: 'k'.
+	self assert: node body size equals: 0.
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserFromCodeTest >> testRelbkWithDeclarationOnly [
+
+	" :| "
+	| iast |
+	iast := self
+		        parse: 'C234567890----
+      subroutine relbk(lib,name,title)
+      integer brcnt
+      integer urcnt
+      integer ubbcnt
+      character *(*) name
+      character *(*) title
+      external mypnt
+      integer mypnt
+      external findbk 
+      integer findbk
+      external findur
+      integer findur
+      integer ir
+      integer ibk
+      end
+
+'
+		        rule: #start.
+	parser model  halt.
+	iast halt.
 ]
 
 { #category : #'tests-programUnit' }
 PP2FortranSrcParserFromCodeTest >> testSubroutine [
 
-	| iast node |
+	| iast node accesses invocations |
 	iast := self
 		       parse: '      subroutine hello( name )
         write(*,*) name
@@ -287,6 +403,126 @@ PP2FortranSrcParserFromCodeTest >> testSubroutine [
 	self assert: node class equals: IASTSubroutine.
 	self assert: node parameters size equals: 1.
 	self assert: node parameters first entityName equals: 'name'.
+
+	accesses := node body select: [ :entity | 
+		            entity class = IASTVarAccess ].
+	invocations := node body select: [ :entity | 
+		               entity class = IASTInvocation ].
+
+	self assert: accesses size equals: 1.
+	self
+		assertCollection:
+		(accesses collect: [ :entity | entity entityName ])
+		hasSameElements: #( 'name' ).
+		
+	self assert: invocations size equals: 0
+]
+
+{ #category : #'tests-programUnit' }
+PP2FortranSrcParserFromCodeTest >> testSubroutine2 [
+
+	| iast node accesses invocations |
+	iast := self
+		        parse: '      subroutine hello( fname, lname )
+        write(*,*) fname, lname
+      end
+'
+		        rule: #start.
+
+	self assert: iast progUnits size equals: 1.
+
+	node := iast progUnits first.
+
+	self assert: node class equals: IASTSubroutine.
+	self assert: node parameters size equals: 2.
+	self assert: node parameters first entityName equals: 'fname'.
+	self assert: node parameters second entityName equals: 'lname'.
+	self assert: node body size equals: 2.
+
+	accesses := node body select: [ :entity | 
+		            entity class = IASTVarAccess ].
+	invocations := node body select: [ :entity | 
+		               entity class = IASTInvocation ].
+
+	self assert: accesses size equals: 2.
+	self
+		assertCollection:
+		(accesses collect: [ :entity | entity entityName ])
+		hasSameElements: #( 'fname' 'lname' ).
+
+	self assert: invocations size equals: 0
+]
+
+{ #category : #'tests-programUnit' }
+PP2FortranSrcParserFromCodeTest >> testSubroutine3 [
+
+	| iast node |
+	iast := self
+		       parse: '      subroutine hello( fn, ln )
+        character*20 n
+        integer*4i
+        n = fn // ln
+        write(*,*) i, ''first='', fn, '', last='', ln, '' and name='', n
+      end
+'
+		       rule: #start.
+
+	self assert: iast class equals: IASTProgramFile.
+	self assert: iast progUnits size equals: 1.
+	
+	parser model halt.
+
+	node := iast progUnits first.
+
+	self assert: node class equals: IASTSubroutine.
+	self assert: node parameters size equals: 2.
+	self assert: node parameters first entityName equals: 'fn'.
+	self assert: node parameters second entityName equals: 'ln'.
+	self assert: node body size equals: 9.
+]
+
+{ #category : #'tests-programUnit' }
+PP2FortranSrcParserFromCodeTest >> testSubroutine4BugWithDeclarationAndInitialization [
+
+	| iast node |
+	iast := self
+		       parse: '      subroutine hello( fn, ln )
+        character*20 n
+        integer i = 20
+        n = fn // ln
+        write(*,*) i, ''first='', fn, '', last='', ln, '' and name='', n
+      end
+'
+		       rule: #start.
+
+	self assert: iast progUnits size equals: 1.
+
+	node := iast progUnits first.
+
+	self assert: node class equals: IASTSubroutine.
+	self assert: node parameters size equals: 2.
+	self assert: node parameters first entityName equals: 'fn'.
+	self assert: node parameters second entityName equals: 'ln'.
+]
+
+{ #category : #'tests - temp' }
+PP2FortranSrcParserFromCodeTest >> testSubroutineEmpty [
+
+	| iast node |
+	iast := self
+		       parse: '      subroutine hello
+      end
+'
+		       rule: #start.
+
+	self assert: iast progUnits size equals: 1.
+
+	node := iast progUnits first.
+
+	self assert: node class equals: IASTSubroutine.
+	self assert: node entityName equals: 'hello'.
+	self assert: node parameters size equals: 0.
+	self assert: node body size equals: 0.
 ]
 
 { #category : #'tests-programUnit' }
@@ -306,15 +542,22 @@ c subroutine comment
 	node := iast progUnits first.
 
 	self assert: node class equals: IASTSubroutine.
+	self assert: node entityName equals: 'hello'.
 	self assert: node parameters size equals: 1.
 	self assert: node parameters first entityName equals: 'name'.
+	self assert: node body size equals: 1.
+
+	self assert: node comments size equals: 1.
+	self assert: node comments anyOne text equals: ' subroutine comment'.
+	
 ]
 
 { #category : #'tests - allnodes' }
 PP2FortranSrcParserFromCodeTest >> testTemp [
 
 	" :| "
-	self
+	| iast |
+	iast := self
 		        parse: '      subroutine relbk(lib,name,title)
       implicit none
 c2345678901234567890123456789012345678901234567890123456789012
@@ -431,6 +674,7 @@ c        ur.ubb(jr) == ur.ubb(jr + 1) -> erreur parsing normal
 
 '
 		        rule: #start.
+		iast halt.
 ]
 
 { #category : #'tests - allnodes' }
