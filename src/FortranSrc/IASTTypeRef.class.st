@@ -12,14 +12,12 @@ Class {
 IASTTypeRef >> addSelector: selector [
 
 	self length: (selector first = 'Nothing'
-			 ifTrue: [ selector first ]
 			 ifFalse: [ 
 				 (selector first class = IASTVarAccess and: [ 
 					  selector first isAssigned ])
 					 ifTrue: [ selector first entityName asNumber ]
-					 ifFalse: [ 'ValStar' ] ]).
+					 ifFalse: [ 0 ] ]).
 	self kind: (selector second = 'Nothing'
-			 ifTrue: [ selector second ]
 			 ifFalse: [ 
 				 selector second isAssigned ifTrue: [ 
 					 selector second entityName asNumber ] ])
