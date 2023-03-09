@@ -765,12 +765,8 @@ PP2FortranSrcParser >> typeSpec [
 		              sourceAnchor: nodes third sixth;
 		              entityName: nodes fifth;
 		              yourself.
-	  nodes eighth = 'Nothing'
-		  ifTrue: [ 
-			  anEntity
-				  length: nodes eighth;
-				  kind: nodes eighth ]
-		  ifFalse: [ anEntity addSelector: nodes eighth second ].
+	  nodes eighth = 'Nothing' ifFalse: [ 
+		  anEntity addSelector: nodes eighth second ].
 
 	  anEntity ]
 ]
