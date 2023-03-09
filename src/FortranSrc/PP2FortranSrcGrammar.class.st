@@ -68,6 +68,7 @@ Class {
 		'stFunction',
 		'stIfLogical',
 		'stPrint',
+		'stRead',
 		'stStop',
 		'stWrite',
 		'statement',
@@ -83,8 +84,7 @@ Class {
 		'valInteger',
 		'valLogical',
 		'valStar',
-		'value',
-		'stRead'
+		'value'
 	],
 	#category : #'FortranSrc-Parser'
 }
@@ -860,9 +860,9 @@ PP2FortranSrcGrammar >> stExit [
 { #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> stExpressionAssign [
 
-	^ ((self prelude: 'StExpressionAssign')
+	^ (self prelude: 'StExpressionAssign')
 	, (self parens: expression)
-	, (self parens: expression))
+	, (self parens: expression)
 ]
 
 { #category : #'grammar-statement' }
