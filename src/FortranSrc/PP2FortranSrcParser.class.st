@@ -501,9 +501,7 @@ PP2FortranSrcParser >> puBlockData [
 			entityName: (nodes second = 'Nothing'
 				ifTrue: [ '**No Name**' ]
 				ifFalse: [ nodes second ]) ;
-			body: (nodes third flattened select: [ :node | 
-					   node class = IASTInvocation or: [ 
-							   node class = IASTVarAccess and: [ node isAssigned not ] ] ]) ; 
+			body: nodes third ; 
 			yourself ]
 ]
 
@@ -541,9 +539,7 @@ PP2FortranSrcParser >> puFunction [
 		  parameters: (nodes fifth = 'Nothing'
 				   ifTrue: [ #(  ) ]
 				   ifFalse: [ nodes fifth ]);
-		  body: (nodes seventh flattened select: [ :node | 
-					   node class = IASTInvocation or: [ 
-							   node class = IASTVarAccess and: [ node isAssigned not ] ] ]);
+		  body: nodes seventh ;
 		  yourself ]
 ]
 
@@ -559,9 +555,7 @@ PP2FortranSrcParser >> puMain [
 			entityName: (nodes second = 'Nothing'
 				ifTrue: [ '** No name given **' ]
 				ifFalse: [ nodes second ]) ;
-			body: (nodes third flattened select: [ :node | 
-					   node class = IASTInvocation or: [ 
-							   node class = IASTVarAccess and: [ node isAssigned not ] ] ]) ;
+			body: nodes third ;
 			yourself ]
 ]
 
@@ -582,9 +576,7 @@ PP2FortranSrcParser >> puSubroutine [
 			parameters: (nodes fourth = 'Nothing'
 				ifTrue: [ #() ]
 				ifFalse: [ nodes fourth ]) ;
-			body: (nodes fifth flattened select: [ :node | 
-					   node class = IASTInvocation or: [ 
-							   node class = IASTVarAccess and: [ node isAssigned not ] ] ]) ;
+			body: nodes fifth ;
 			comments: (nodes fifth select: [ :node | node class = IASTComment ]) ;
 			yourself ]
 ]
