@@ -10,6 +10,15 @@ Class {
 }
 
 { #category : #accessing }
+IASTProgramUnit >> accesses [
+
+	^ body
+		  ifNil: [ #(  ) ]
+		  ifNotNil: [ 
+		  body flattened select: [ :entity | entity class = IASTVarAccess ] ]
+]
+
+{ #category : #accessing }
 IASTProgramUnit >> body [
 
 	^ body
@@ -43,4 +52,22 @@ IASTProgramUnit >> entityName [
 IASTProgramUnit >> entityName: anObject [
 
 	entityName := anObject
+]
+
+{ #category : #accessing }
+IASTProgramUnit >> invocations [
+
+	^ body
+		  ifNil: [ #(  ) ]
+		  ifNotNil: [ 
+		  body flattened select: [ :entity | entity class = IASTInvocation ] ]
+]
+
+{ #category : #accessing }
+IASTProgramUnit >> localVariables [
+
+	^ body
+		  ifNil: [ #(  ) ]
+		  ifNotNil: [ 
+		  body flattened select: [ :entity | entity class = IASTVariable ] ]
 ]
