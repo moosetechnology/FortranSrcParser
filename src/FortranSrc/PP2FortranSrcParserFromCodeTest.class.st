@@ -85,10 +85,13 @@ c --- end ---
 
 	self assert: node class equals: IASTFunction.
 	self assert: node entityName equals: 'ifunc'.
-	self assert: node body size equals: 2.
+	self assert: node body size equals: 1.
 	self assert: node parameters size equals: 2.
 	self assert: node parameters first entityName equals: 'k'.
 	self assert: node parameters second entityName equals: 'l'.
+	self assert: node invocations size equals: 0.
+	self assert: node localVariables size equals: 0.
+	self assert: node accesses size equals: 2
 ]
 
 { #category : #'tests - allnodes' }
