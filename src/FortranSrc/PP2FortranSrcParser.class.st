@@ -352,10 +352,8 @@ PP2FortranSrcParser >> maybe: aRule [
 	" tkNothing
 	/ (self parens: (self token: 'Just') , aRule)"
 
-	^ (super maybe: aRule) ==> [ :nodes |
-	  nodes = 'Nothing'
-		  ifTrue: [ nodes ]
-		  ifFalse: [ nodes second ] ]
+	^ (super maybe: aRule) ==> [ :nodes | 
+	  nodes ifNotNil: [ nodes second ] ]
 ]
 
 { #category : #'grammar-metaInfo' }
@@ -498,9 +496,9 @@ PP2FortranSrcParser >> puBlockData [
 	^ super puBlockData ==> [ :nodes | 1halt.
 		IASTBlockData new
 			sourceAnchor: nodes first second ;
-			entityName: (nodes second = 'Nothing'
-				ifTrue: [ '**No Name**' ]
-				ifFalse: [ nodes second ]) ;
+			entityName: (nodes second
+				ifNil: [ '**No Name**' ]
+				ifNotNil: [ nodes second ]) ;
 			body: nodes third ; 
 			yourself ]
 ]
@@ -536,10 +534,8 @@ PP2FortranSrcParser >> puFunction [
 		  sourceAnchor: nodes first second;
 		  returnType: nodes second;
 		  entityName: nodes fourth;
-		  parameters: (nodes fifth = 'Nothing'
-				   ifTrue: [ #(  ) ]
-				   ifFalse: [ nodes fifth ]);
-		  body: nodes seventh ;
+		  parameters: nodes fifth;
+		  body: nodes seventh;
 		  yourself ]
 ]
 
@@ -549,14 +545,15 @@ PP2FortranSrcParser >> puMain [
 	"(self prelude: 'PUMain') , (self maybe: tkString)
 	  , (self haskellList: block) , (self maybe: programUnit)"
 
-	^ super puMain ==> [ :nodes | 1halt.
-		IASTMainProgram new
-			sourceAnchor: nodes first second ;
-			entityName: (nodes second = 'Nothing'
-				ifTrue: [ '** No name given **' ]
-				ifFalse: [ nodes second ]) ;
-			body: nodes third ;
-			yourself ]
+	^ super puMain ==> [ :nodes | 
+	  1 halt.
+	  IASTMainProgram new
+		  sourceAnchor: nodes first second;
+		  entityName: (nodes second
+				   ifNil: [ '** No name given **' ]
+				   ifNotNil: [ nodes second ]);
+		  body: nodes third;
+		  yourself ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -573,9 +570,7 @@ PP2FortranSrcParser >> puSubroutine [
 		IASTSubroutine new
 			sourceAnchor: nodes first second ;
 			entityName: nodes third ;
-			parameters: (nodes fourth = 'Nothing'
-				ifTrue: [ #() ]
-				ifFalse: [ nodes fourth ]) ;
+			parameters: nodes fourth ;
 			body: nodes fifth ;
 			comments: (nodes fifth select: [ :node | node class = IASTComment ]) ;
 			yourself ]
@@ -636,16 +631,13 @@ PP2FortranSrcParser >> stCall [
 	"(self prelude: 'StCall') , (self parens: expression)
 	  , (self maybe: (self aList: argument))"
 
-	^ super stCall ==> [ :nodes | 
+	^ super stCall ==> [ :nodes |
 	  1 halt.
 	  self flag: #TODO. "manage arguments by overriding argument method and extracting needed infos"
 	  IASTInvocation new
 		  sourceAnchor: nodes first second;
 		  entityName: nodes second entityName;
-		  arguments: (nodes third = 'Nothing'
-				   ifTrue: [ #(  ) ]
-				   ifFalse: [ 
-					   nodes third flattened select: [ :node | node class = IASTVarAccess ] ]);
+		  arguments: nodes third;
 		  yourself ]
 ]
 
@@ -727,6 +719,25 @@ PP2FortranSrcParser >> stPrint [
 PP2FortranSrcParser >> stack [
 
 	^ stack
+]
+
+{ #category : #'grammar-programUnit' }
+PP2FortranSrcParser >> tkChar [
+
+	" $' asPParser
+	, #letter asPParser flatten
+	, $' asPParser"
+
+	^ super tkChar ==> [ :nodes | nodes second anyOne ]
+]
+
+{ #category : #token }
+PP2FortranSrcParser >> tkNothing [
+
+	" self token: 'Nothing'"
+
+	self flag: #FIXME. "transform 'Nothing' to nil or something similar"
+	^ super tkNothing ==> [ :nodes | nil ]
 ]
 
 { #category : #'grammar-programUnit' }
