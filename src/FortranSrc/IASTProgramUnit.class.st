@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'body',
 		'entityName',
-		'comments'
+		'comments',
+		'implicits'
 	],
 	#category : #'FortranSrc-intrermediateAST'
 }
@@ -52,6 +53,18 @@ IASTProgramUnit >> entityName [
 IASTProgramUnit >> entityName: anObject [
 
 	entityName := anObject
+]
+
+{ #category : #accessing }
+IASTProgramUnit >> implicits [
+
+	^ implicits
+]
+
+{ #category : #accessing }
+IASTProgramUnit >> implicits: anObject [
+
+	implicits := anObject
 ]
 
 { #category : #accessing }

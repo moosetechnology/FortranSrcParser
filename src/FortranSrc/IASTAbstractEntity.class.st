@@ -8,6 +8,12 @@ Class {
 }
 
 { #category : #accessing }
+IASTAbstractEntity >> accept: aVisitor [
+
+	self subclassResponsibility
+]
+
+{ #category : #accessing }
 IASTAbstractEntity >> sourceAnchor [
 
 	<FMProperty: #tokenPosition type: #Object>

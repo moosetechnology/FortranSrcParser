@@ -10,6 +10,12 @@ Class {
 }
 
 { #category : #accessing }
+IASTVariable >> accept: aVisitor [
+
+	^ aVisitor visitIASTVariable: self.
+]
+
+{ #category : #accessing }
 IASTVariable >> dimension [
 
 	^ dimension

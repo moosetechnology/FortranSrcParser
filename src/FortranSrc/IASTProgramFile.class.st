@@ -10,6 +10,12 @@ Class {
 }
 
 { #category : #accessing }
+IASTProgramFile >> accept: aVisitor [
+
+	^ aVisitor visitIASTProgramFile: self.
+]
+
+{ #category : #accessing }
 IASTProgramFile >> addProgramUnit: anObject [
 
 	^ self progUnits add: anObject

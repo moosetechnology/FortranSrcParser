@@ -8,6 +8,12 @@ Class {
 }
 
 { #category : #accessing }
+IASTComment >> accept: aVisitor [
+
+	^ aVisitor visitIASTComment: self.
+]
+
+{ #category : #accessing }
 IASTComment >> text [
 
 	^ text

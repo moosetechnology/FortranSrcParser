@@ -8,6 +8,12 @@ Class {
 }
 
 { #category : #accessing }
+IASTVarAccess >> accept: aVisitor [
+
+	^ aVisitor visitIASTVarAccess: self.
+]
+
+{ #category : #accessing }
 IASTVarAccess >> isAssigned [
 
 	^ isAssigned ifNil: [ isAssigned := false ]

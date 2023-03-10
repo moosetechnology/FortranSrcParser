@@ -9,6 +9,12 @@ Class {
 }
 
 { #category : #accessing }
+IASTInvocation >> accept: aVisitor [
+
+	^ aVisitor visitIASTInvocation: self.
+]
+
+{ #category : #accessing }
 IASTInvocation >> addArgument: anObject [
 
 	^ self arguments add: anObject
@@ -21,9 +27,17 @@ IASTInvocation >> arguments [
 ]
 
 { #category : #accessing }
-IASTInvocation >> arguments: aCollection [
+IASTInvocation >> arguments: aNodes [
 
-	self arguments addAll: aCollection
+	arguments := aNodes ifNil: [ #(  ) ] ifNotNil: [ 
+		             aNodes flattened
+			             select: [ :node | node class = IASTVarAccess ]
+			             thenCollect: [ :node | 
+				             IASTArgument new
+					             sourceAnchor: node sourceAnchor;
+					             entityName: node entityName;
+					             isConstant: node isAssigned;
+					             yourself ] ]
 ]
 
 { #category : #accessing }
