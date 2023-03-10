@@ -116,7 +116,7 @@ PP2FortranSrcParser >> blStatement [
 	"(self prelude: 'BlStatement') , (self maybe: expression)
 	  , (self parens: statement)"
 
-	^ super blStatement ==> [ :nodes | nodes third ]
+	^ super blStatement ==> [ :nodes | 1halt. nodes third ]
 ]
 
 { #category : #'grammar-expression' }
@@ -248,10 +248,10 @@ PP2FortranSrcParser >> expFunctionCall [
 
 	^ super expFunctionCall ==> [ :nodes | 1halt.
 	IASTInvocation new 
-		sourceAnchor: nodes first second;
-		entityName: nodes second entityName;
-		arguments: (nodes third flattened select: [ :node | node class = IASTVarAccess ]) ;
-		yourself.
+		sourceAnchor: nodes first second ;
+		entityName: nodes second entityName ;
+		arguments: nodes third ;
+		yourself
 	 ]
 ]
 
@@ -510,7 +510,6 @@ PP2FortranSrcParser >> programFile [
 
 	^ super programFile ==> [ :nodes | 
 	  | compilationUnit |
-	  1 halt.
 	  compilationUnit := IASTProgramFile new
 		                     filename:
 			                     (nodes fourth
@@ -549,7 +548,7 @@ PP2FortranSrcParser >> puComment [
 
 	"(self prelude: 'PUComment') , comment"
 
-	^ super puComment ==> [ :nodes | 1halt.
+	^ super puComment ==> [ :nodes |
 		IASTComment new
 			sourceAnchor: nodes first second ;
 			text: nodes second second ;
@@ -691,6 +690,12 @@ PP2FortranSrcParser >> stDeclaration [
 	, (self parens: (self aList: declarator))"
 
 	^ super stDeclaration ==> [ :nodes | 
+	  "{ 
+		  nodes second entityName.
+		  nodes second length.
+		  nodes second kind.
+		  nodes fourth first second entityName } traceCr.
+	  1 halt."
 	  nodes fourth collect: [ :node | 
 		  IASTVariable new
 			  sourceAnchor: node first;
@@ -704,10 +709,11 @@ PP2FortranSrcParser >> stDeclaration [
 { #category : #'grammar-statement' }
 PP2FortranSrcParser >> stExpressionAssign [
 
-	"((self prelude: 'StExpressionAssign') , (self parens: expression) , (self parens: expression))"
+	" (self prelude: 'StExpressionAssign')
+	, (self parens: expression)
+	, (self parens: expression)"
 
-	self flag: #FIXME. "StExpressionAssign peut cacher des invocation qui empêche de les traiter plus haut. voir message à moi-même discord."
-	^ super stExpressionAssign ==> [ :nodes |
+	^ super stExpressionAssign ==> [ :nodes | 1halt.
 	  { nodes first second . nodes second . nodes third } ]
 ]
 
