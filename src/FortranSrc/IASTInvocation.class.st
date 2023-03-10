@@ -15,12 +15,6 @@ IASTInvocation >> accept: aVisitor [
 ]
 
 { #category : #accessing }
-IASTInvocation >> addArgument: anObject [
-
-	^ self arguments add: anObject
-]
-
-{ #category : #accessing }
 IASTInvocation >> arguments [
 
 	^ arguments ifNil: [ arguments := OrderedCollection new ]
