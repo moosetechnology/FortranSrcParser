@@ -319,6 +319,47 @@ PP2FortranSrcParser >> haskellList: aRule [
 			  nodes second at: i ] ] ]
 ]
 
+{ #category : #'grammar-declaration' }
+PP2FortranSrcParser >> impElement [
+
+	" (self token: 'ImpElement')
+	, (self token: '{')
+	, (self overturedBy: 'impElement')
+	, (self prefix: 'impElementFrom')
+	, tkChar
+	, tkComma
+	, (self prefix: 'impElementTo')
+	, (self maybeNoParens: tkChar)
+	, (self token: '}')"
+
+	^ super impElement ==> [ :nodes |
+	  self flag: #FIXME. "nodes third sixth ."
+	  nodes eighth
+		  ifNil: [ { nodes fifth } ]
+		  ifNotNil: [ nodes fifth to: nodes eighth ] ]
+]
+
+{ #category : #'private - utility' }
+PP2FortranSrcParser >> impList [
+
+	" (self token: 'ImpList')
+	, (self token: '{')
+	, (self overturedBy: 'impList')
+	, (self prefix: 'impListType')
+	, typeSpec
+	, tkComma
+	, (self prefix: 'impListElements')
+	, (self aList: impElement)
+	, (self token: '}')"
+
+	^ super impList ==> [ :nodes |
+	  IASTImplicit new
+		  sourceAnchor: nodes third sixth;
+		  forType: nodes fifth entityName;
+		  range: nodes eighth flattened ;
+		  yourself ]
+]
+
 { #category : #initialization }
 PP2FortranSrcParser >> initialize [
 
@@ -707,6 +748,17 @@ PP2FortranSrcParser >> stIfLogical [
 ]
 
 { #category : #'grammar-statement' }
+PP2FortranSrcParser >> stImplicit [
+
+	"(self prelude: 'StImplicit' maybe: (self aList: impList))"
+
+	^ (self prelude: 'StImplicit' maybe: (self aList: impList))
+	  ==> [ :nodes | 
+		  1 halt.
+		  nodes ]
+]
+
+{ #category : #'grammar-statement' }
 PP2FortranSrcParser >> stPrint [
 	" (self prelude: 'StPrint')
 	, (self parens: expression)
@@ -719,6 +771,24 @@ PP2FortranSrcParser >> stPrint [
 PP2FortranSrcParser >> stack [
 
 	^ stack
+]
+
+{ #category : #'grammar-statement' }
+PP2FortranSrcParser >> statement [
+
+	" stDeclaration / (self prelude: 'StDimension' aList: declarator)
+	  / (self prelude: 'StAllocatable' aList: declarator)
+	  / (self prelude: 'StCommon' aList: commonGroup)
+	  / (self prelude: 'StEquivalence' aList: (self aList: expression))
+	  / (self prelude: 'StImplicit' maybe: (self aList: impList))
+	  / stIfLogical / stExpressionAssign
+	  /
+	  ((self prelude: 'StGotoUnconditional') , (self parens: expression))
+	  / stCall / (self prelude: 'StReturn' maybe: expression)
+	  / (self prelude: 'StContinue') / stFunction / stPrint / stExternal / stWrite / stExit 
+	  / stFormatBogus / stStop / stData / stRead"
+
+	^ super statement ==> [ :nodes | 1 halt. nodes  ]
 ]
 
 { #category : #'grammar-programUnit' }

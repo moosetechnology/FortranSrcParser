@@ -43,6 +43,143 @@ PP2FortranSrcParserFromCodeTest >> testBlockData [
 ]
 
 { #category : #'tests - allnodes' }
+PP2FortranSrcParserFromCodeTest >> testFortran77DotF [
+
+	| iast node |
+	iast := self
+		        parse: 'C234567
+      subroutine hello(name)
+      character*(*) name
+      write(*,*) ''hello '', name
+      end
+      program main
+      character*20 fname
+      write(*,*)''Enter your name:''
+      read(*,*) fname
+      call hello(fname)
+      end
+'
+		        rule: #start.
+
+	self assert: iast progUnits size equals: 3.
+	
+	node := iast progUnits first.
+	self assert: node class equals: IASTComment.
+	self assert: node text equals: '234567'.
+
+	node := iast progUnits second.
+	self assert: node class equals: IASTSubroutine.
+	self assert: node entityName equals: 'hello'.
+	self assert: node body size equals: 2.
+	self assert: node parameters size equals: 1.
+	self assert: node parameters first entityName equals: 'name'.
+	
+	node := iast progUnits third.
+	self assert: node class equals: IASTMainProgram.
+	self assert: node entityName equals: 'main'.
+	self assert: node body size equals: 4.
+	self assert: node localVariables size equals: 1.
+	self assert: node accesses size equals: 1.
+	self assert: node invocations size equals: 1.
+	
+	parser model halt.
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserFromCodeTest >> testFortran77DotFWithImplicitNone [
+
+	| iast node |
+	iast := self
+		        parse: 'C234567
+      subroutine hello(cname)
+      implicit none
+      character*(*) cname
+      write(*,*) ''hello '', cname
+      end
+      program main
+      implicit none
+      character*20 sname
+      write(*,*)''Enter your name:''
+      read(*,*) sname
+      call hello(sname)
+      end
+'
+		        rule: #start.
+
+	self assert: iast progUnits size equals: 3.
+	
+	node := iast progUnits first.
+	self assert: node class equals: IASTComment.
+	self assert: node text equals: '234567'.
+
+	node := iast progUnits second.
+	self assert: node class equals: IASTSubroutine.
+	self assert: node entityName equals: 'hello'.
+	self assert: node body size equals: 2.
+	self assert: node parameters size equals: 1.
+	self assert: node parameters first entityName equals: 'cname'.
+	self assert: node accesses size equals: 1.
+	self assert: node invocations size equals: 0.
+	self assert: node localVariables size equals: 1.
+	
+	node := iast progUnits third.
+	self assert: node class equals: IASTMainProgram.
+	self assert: node entityName equals: 'main'.
+	self assert: node body size equals: 4.
+	self assert: node localVariables size equals: 1.
+	self assert: node accesses size equals: 1.
+	self assert: node invocations size equals: 1.
+	
+	parser model halt.
+]
+
+{ #category : #'tests - allnodes' }
+PP2FortranSrcParserFromCodeTest >> testFortran77DotFWithImplicitType [
+
+	| iast node |
+	iast := self
+		        parse: 'C234567
+      subroutine hello(cname)
+      implicit character*(*)(c, s)
+      write(*,*) ''hello '', cname
+      end
+      program main
+      implicit character*20 (c, s)
+      write(*,*)''Enter your name:''
+      read(*,*) sname
+      call hello(sname)
+      end
+'
+		        rule: #start.
+
+	self assert: iast progUnits size equals: 3.
+	
+	node := iast progUnits first.
+	self assert: node class equals: IASTComment.
+	self assert: node text equals: '234567'.
+
+	node := iast progUnits second.
+	self assert: node class equals: IASTSubroutine.
+	self assert: node entityName equals: 'hello'.
+	self assert: node body size equals: 2.
+	self assert: node parameters size equals: 1.
+	self assert: node parameters first entityName equals: 'cname'.
+	self assert: node accesses size equals: 1.
+	self assert: node invocations size equals: 0.
+	self assert: node localVariables size equals: 1.
+	
+	node := iast progUnits third.
+	self assert: node class equals: IASTMainProgram.
+	self assert: node entityName equals: 'main'.
+	self assert: node body size equals: 4.
+	self assert: node localVariables size equals: 1.
+	self assert: node accesses size equals: 1.
+	self assert: node invocations size equals: 1.
+	
+	parser model halt.
+]
+
+{ #category : #'tests - allnodes' }
 PP2FortranSrcParserFromCodeTest >> testFullASTTemp [
 
 	self
