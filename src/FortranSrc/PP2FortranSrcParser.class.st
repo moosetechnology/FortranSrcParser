@@ -2,9 +2,9 @@ Class {
 	#name : #PP2FortranSrcParser,
 	#superclass : #PP2FortranSrcGrammar,
 	#instVars : [
-		'stack',
 		'model',
-		'f77sourcefile'
+		'f77sourcefile',
+		'f77parser'
 	],
 	#category : #'FortranSrc-Parser'
 }
@@ -96,18 +96,31 @@ PP2FortranSrcParser >> argumentExpression [
 	
 ]
 
+{ #category : #'private - utility' }
+PP2FortranSrcParser >> astHaskell: sourceCode [
+
+	self f77Filename asFileReference writeStreamDo: [ :stream | 
+		stream truncate.
+		stream
+		<< (sourceCode copy replaceAll: Character cr with: Character lf) ].
+
+	LibC runCommand: ('{1} {2} "{3}" >"{3}.ast" 2>"{3}.err"' format: { 
+				 self f77parser.
+				 self f77ParserOption.
+				 self f77Filename })
+]
+
 { #category : #'grammar-block' }
 PP2FortranSrcParser >> blComment [
-	
+
 	" (self prelude: 'BlComment')
 	, comment"
 
-	^ super blComment ==> [ :nodes |
-		IASTComment new
-			text: nodes second second ;
-			sourceAnchor: nodes first second ;
-			yourself
-	]
+	^ super blComment ==> [ :nodes | 
+	  IASTComment new
+		  text: nodes second second;
+		  sourceAnchor: nodes first second;
+		  yourself ]
 ]
 
 { #category : #'grammar-block' }
@@ -116,7 +129,9 @@ PP2FortranSrcParser >> blStatement [
 	"(self prelude: 'BlStatement') , (self maybe: expression)
 	  , (self parens: statement)"
 
-	^ super blStatement ==> [ :nodes | 1halt. nodes third ]
+	^ super blStatement ==> [ :nodes | 
+	  self flag: #TODO. "delete after debug"
+	  nodes third ]
 ]
 
 { #category : #'grammar-expression' }
@@ -246,13 +261,21 @@ PP2FortranSrcParser >> expFunctionCall [
 	"(self prelude: 'ExpFunctionCall') , (self parens: expression)
 	  , (self maybe: (self aList: argument))"
 
-	^ super expFunctionCall ==> [ :nodes | 1halt.
-	IASTInvocation new 
-		sourceAnchor: nodes first second ;
-		entityName: nodes second entityName ;
-		arguments: nodes third ;
-		yourself
-	 ]
+	^ super expFunctionCall ==> [ :nodes | 
+	  self flag: #TODO. "delete after debug"
+	  nodes second isEsope
+		  ifTrue: [ 
+			  (self getClass: nodes second entityName) new
+				  sourceAnchor: nodes first second;
+				  entityName: nodes second entityName;
+				  entities: nodes third;
+				  yourself ]
+		  ifFalse: [ 
+			  IASTInvocation new
+				  sourceAnchor: nodes first second;
+				  entityName: nodes second entityName;
+				  arguments: nodes third;
+				  yourself ] ]
 ]
 
 { #category : #'grammar-expression' }
@@ -274,15 +297,46 @@ PP2FortranSrcParser >> expValue [
 	" (self prelude: 'ExpValue')
 	, ((self parens: value) / valStar)"
 
-	^ super expValue ==> [ :nodes |
-	  (nodes second = 'ValStar' or: [ nodes second first = 'ValString' ])
+	^ super expValue ==> [ :nodes | 
+	  (nodes second = 'ValStar' or: [ 
+		   { #ValString. #ValLogical } includes: nodes second first ])
 		  ifTrue: [ nodes ]
 		  ifFalse: [ 
-			 IASTVarAccess new
-				  sourceAnchor: nodes first second ;
-				  isAssigned: (nodes second second isNumber) ; 
-				  entityName: nodes second second asString ;
+			  IASTVarAccess new
+				  sourceAnchor: nodes first second;
+				  isAssigned: nodes second second isNumber;
+				  entityName: nodes second second asString;
 				  yourself ] ]
+]
+
+{ #category : #'settings-default' }
+PP2FortranSrcParser >> f77AstFilename [
+
+	^ self f77Filename , '.ast'
+]
+
+{ #category : #'settings-default' }
+PP2FortranSrcParser >> f77Filename [
+
+	^ './fortran77.f'
+]
+
+{ #category : #'settings-default' }
+PP2FortranSrcParser >> f77ParserOption [
+
+	^ '-v77l'
+]
+
+{ #category : #accessing }
+PP2FortranSrcParser >> f77parser [
+
+	^ f77parser ifNil: [ f77parser := 'fortran-src' ]
+]
+
+{ #category : #accessing }
+PP2FortranSrcParser >> f77parser: aF77Parser [
+
+	f77parser := aF77Parser
 ]
 
 { #category : #accessing }
@@ -295,6 +349,15 @@ PP2FortranSrcParser >> f77sourcefile [
 PP2FortranSrcParser >> f77sourcefile: filename [
 
 	f77sourcefile := filename
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcParser >> getClass: aName [
+
+	^ { 
+		  (#esoar -> IASTVarEsoAr).
+		  (#esoat -> IASTVarEsoAt).
+		  (#esosl -> IASTVarEsoSl) } asDictionary at: aName
 ]
 
 { #category : #'private-helper' }
@@ -364,9 +427,8 @@ PP2FortranSrcParser >> impList [
 PP2FortranSrcParser >> initialize [
 
 	super initialize.
-
-	"stack := Stack new."
 	model := OrderedCollection new.
+	f77parser := 'fortran-src'.
 	f77sourcefile := ''
 ]
 
@@ -479,6 +541,15 @@ PP2FortranSrcParser >> parens: aRule [
 	^ (super parens: aRule) ==> [ :nodes | nodes second ]
 ]
 
+{ #category : #accessing }
+PP2FortranSrcParser >> parse: sourceCode [
+
+	self astHaskell: sourceCode.
+	^ super parse: (self f77AstFilename asFileReference readStream contents
+			   replaceAll: Character lf
+			   with: Character cr)
+]
+
 { #category : #grammar }
 PP2FortranSrcParser >> position [
 
@@ -548,12 +619,13 @@ PP2FortranSrcParser >> puComment [
 
 	"(self prelude: 'PUComment') , comment"
 
-	^ super puComment ==> [ :nodes |
-		IASTComment new
-			sourceAnchor: nodes first second ;
-			text: nodes second second ;
-			yourself
-	]
+	^ super puComment ==> [ :nodes | 
+	  self flag: #TODO. "I do this to distinguish between a normal comment and a ""global comment"", in order to visit these two differently."
+	  IASTComment new
+		  sourceAnchor: nodes first second;
+		  text: nodes second second;
+		  isProgUnit: true;
+		  yourself ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -569,7 +641,7 @@ PP2FortranSrcParser >> puFunction [
 	, (self maybe: programUnit)"
 
 	^ super puFunction ==> [ :nodes | 
-	  1 halt.
+	  self flag: #TODO. "delete after debug"
 	  IASTFunction new
 		  sourceAnchor: nodes first second;
 		  returnType: nodes second;
@@ -586,7 +658,6 @@ PP2FortranSrcParser >> puMain [
 	  , (self haskellList: block) , (self maybe: programUnit)"
 
 	^ super puMain ==> [ :nodes | 
-	  1 halt.
 	  IASTMainProgram new
 		  sourceAnchor: nodes first second;
 		  entityName: (nodes second
@@ -606,14 +677,13 @@ PP2FortranSrcParser >> puSubroutine [
 	, (self haskellList: block)
 	, (self maybe: programUnit)"
 
-	^ super puSubroutine ==> [ :nodes | 1halt.
-		IASTSubroutine new
-			sourceAnchor: nodes first second ;
-			entityName: nodes third ;
-			parameters: nodes fourth ;
-			body: nodes fifth ;
-			comments: (nodes fifth select: [ :node | node class = IASTComment ]) ;
-			yourself ]
+	^ super puSubroutine ==> [ :nodes | 
+	  IASTSubroutine new
+		  sourceAnchor: nodes first second;
+		  entityName: nodes third;
+		  parameters: nodes fourth;
+		  body: nodes fifth;
+		  yourself ]
 ]
 
 { #category : #'grammar-declaration' }
@@ -672,7 +742,6 @@ PP2FortranSrcParser >> stCall [
 	  , (self maybe: (self aList: argument))"
 
 	^ super stCall ==> [ :nodes |
-	  1 halt.
 	  self flag: #TODO. "manage arguments by overriding argument method and extracting needed infos"
 	  IASTInvocation new
 		  sourceAnchor: nodes first second;
@@ -713,8 +782,14 @@ PP2FortranSrcParser >> stExpressionAssign [
 	, (self parens: expression)
 	, (self parens: expression)"
 
-	^ super stExpressionAssign ==> [ :nodes | 1halt.
-	  { nodes first second . nodes second . nodes third } ]
+	^ super stExpressionAssign ==> [ :nodes | 
+	  self flag: #TODO. "delete after debug"
+	  nodes second class = IASTVarAccess ifTrue: [ 
+		  nodes second isWrite: true ].
+	  { 
+		  nodes first second.
+		  nodes second.
+		  nodes third } ]
 ]
 
 { #category : #'grammar-metaInfo' }
@@ -734,13 +809,26 @@ PP2FortranSrcParser >> stFunction [
 	  , (self parens: expression)"
 
 	^ super stFunction ==> [ :nodes | 
-	  | candidate | 1halt.
-	 " candidate := self ensureFunction: nodes second third.
-	  (self newEntity: FamixFortranInvocation)
-		  addCandidate: candidate;
-		  signature: (self getSignature: nodes first second);
-		  sourceAnchor: nodes first second;
-		  yourself" nodes ]
+	  nodes second isEsope
+		  ifTrue: [ 
+			  (self getClass: nodes second entityName) new
+				  sourceAnchor: nodes first second;
+				  entityName: nodes second entityName;
+				  addRefsEntities: nodes third;
+				  addEntities: nodes fourth;
+				  yourself ]
+		  ifFalse: [ "statement function, not an invocation"
+			  self flag: #TODO. "returnType: ;"
+			  IASTFunction new
+				  sourceAnchor: nodes first second;
+				  entityName: nodes second entityName;
+				  parameters: nodes third;
+				  body: nodes fourth;
+				  "sourceAnchor: nodes first second;
+				  entityName: nodes second entityName;
+				  arguments: nodes third;
+				  yourself"
+					  yourself ] ]
 ]
 
 { #category : #'grammar-statement' }
@@ -773,12 +861,6 @@ PP2FortranSrcParser >> stPrint [
 	^ super stPrint ==> [ :nodes | 1halt. nodes ]
 ]
 
-{ #category : #'accessing - tests' }
-PP2FortranSrcParser >> stack [
-
-	^ stack
-]
-
 { #category : #'grammar-statement' }
 PP2FortranSrcParser >> statement [
 
@@ -794,7 +876,9 @@ PP2FortranSrcParser >> statement [
 	  / (self prelude: 'StContinue') / stFunction / stPrint / stExternal / stWrite / stExit 
 	  / stFormatBogus / stStop / stData / stRead"
 
-	^ super statement ==> [ :nodes | 1 halt. nodes  ]
+	^ super statement ==> [ :nodes | 
+	  self flag: #TODO. "delete after debug"
+	  nodes ]
 ]
 
 { #category : #'grammar-programUnit' }
@@ -852,8 +936,7 @@ PP2FortranSrcParser >> typeSpec [
 		              sourceAnchor: nodes third sixth;
 		              entityName: nodes fifth;
 		              yourself.
-	  nodes eighth = 'Nothing' ifFalse: [ 
-		  anEntity addSelector: nodes eighth second ].
+	  nodes eighth ifNotNil: [ anEntity addSelector: nodes eighth second ].
 
 	  anEntity ]
 ]
