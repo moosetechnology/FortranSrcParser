@@ -4,8 +4,8 @@ Class {
 	#instVars : [
 		'body',
 		'entityName',
-		'comments',
-		'implicits'
+		'implicits',
+		'annotations'
 	],
 	#category : #'FortranSrc-intrermediateAST'
 }
@@ -17,6 +17,18 @@ IASTProgramUnit >> accesses [
 		  ifNil: [ #(  ) ]
 		  ifNotNil: [ 
 		  body flattened select: [ :entity | entity class = IASTVarAccess ] ]
+]
+
+{ #category : #accessing }
+IASTProgramUnit >> annotations [
+
+	^ annotations
+]
+
+{ #category : #accessing }
+IASTProgramUnit >> annotations: anObject [
+
+	annotations := anObject
 ]
 
 { #category : #accessing }
@@ -34,13 +46,7 @@ IASTProgramUnit >> body: anObject [
 { #category : #accessing }
 IASTProgramUnit >> comments [
 
-	^ comments
-]
-
-{ #category : #accessing }
-IASTProgramUnit >> comments: anObject [
-
-	comments := anObject
+	^ self localComments 
 ]
 
 { #category : #accessing }
@@ -74,6 +80,15 @@ IASTProgramUnit >> invocations [
 		  ifNil: [ #(  ) ]
 		  ifNotNil: [ 
 		  body flattened select: [ :entity | entity class = IASTInvocation ] ]
+]
+
+{ #category : #accessing }
+IASTProgramUnit >> localComments [
+
+	^ body
+		  ifNil: [ #(  ) ]
+		  ifNotNil: [ 
+		  body flattened select: [ :entity | entity class = IASTComment ] ]
 ]
 
 { #category : #accessing }

@@ -3,21 +3,21 @@ Class {
 	#superclass : #IASTAbstractEntity,
 	#instVars : [
 		'entityName',
-		'comments'
+		'annotations'
 	],
 	#category : #'FortranSrc-intrermediateAST'
 }
 
 { #category : #accessing }
-IASTEntityRef >> comments [
+IASTEntityRef >> annotations [
 
-	^ comments
+	^ annotations
 ]
 
 { #category : #accessing }
-IASTEntityRef >> comments: anObject [
+IASTEntityRef >> annotations: anObject [
 
-	comments := anObject
+	annotations := anObject
 ]
 
 { #category : #accessing }

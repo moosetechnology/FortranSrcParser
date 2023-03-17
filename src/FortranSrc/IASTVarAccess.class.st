@@ -2,7 +2,8 @@ Class {
 	#name : #IASTVarAccess,
 	#superclass : #IASTEntityRef,
 	#instVars : [
-		'isAssigned'
+		'isAssigned',
+		'isWrite'
 	],
 	#category : #'FortranSrc-intrermediateAST'
 }
@@ -23,4 +24,24 @@ IASTVarAccess >> isAssigned [
 IASTVarAccess >> isAssigned: anObject [
 
 	isAssigned := anObject
+]
+
+{ #category : #accessing }
+IASTVarAccess >> isEsope [
+
+	^ self entityName
+		  ifNotNil: [ { #esoar. #esoat. #esosl } includes: self entityName ]
+		  ifNil: [ false ]
+]
+
+{ #category : #accessing }
+IASTVarAccess >> isWrite [
+
+	^ isWrite ifNil: [ isWrite := false ]
+]
+
+{ #category : #accessing }
+IASTVarAccess >> isWrite: anObject [
+
+	isWrite := anObject
 ]
