@@ -24,7 +24,7 @@ PP2FortranSrcParser class >> getLines: filename [
 { #category : #accessing }
 PP2FortranSrcParser class >> ignoredNames [
 
-	^ super ignoredNames , #( stack model #f77sourcefile )
+	^ super ignoredNames , #( f77parser f77sourcefile model )
 ]
 
 { #category : #debugging }
