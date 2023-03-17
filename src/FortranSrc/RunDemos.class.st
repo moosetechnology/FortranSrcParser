@@ -1,3 +1,32 @@
+"
+## Demo 
+
+You can run any line to create a FAMIX model from the ESOPE source code or pure Fortran77 code.
+
+```st
+RunDemos runPureF77.
+
+RunDemos runPlainExample.
+
+RunDemos runBorbk.
+
+RunDemos runFindbk.
+
+RunDemos runFindur.
+
+RunDemos runLibpnt.
+
+RunDemos runMain.
+
+RunDemos runNewbook.
+
+RunDemos runNewlib.
+
+RunDemos runNewuser.
+
+RunDemos runRelbk.
+```
+"
 Class {
 	#name : #RunDemos,
 	#superclass : #Object,
