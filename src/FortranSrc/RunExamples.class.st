@@ -83,6 +83,13 @@ RunExamples class >> runPlainExample [
 ]
 
 { #category : #example }
+RunExamples class >> runPureF77 [
+
+	<script>
+	self runner: EsopeCodeExample pureF77
+]
+
+{ #category : #example }
 RunExamples class >> runRelbk [
 
 	<script>

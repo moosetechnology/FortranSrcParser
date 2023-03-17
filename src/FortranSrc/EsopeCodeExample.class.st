@@ -904,6 +904,23 @@ EsopeCodeExample class >> plainExample [
 ]
 
 { #category : #'filesytem-inmemory' }
+EsopeCodeExample class >> pureF77 [
+
+	^ 'C234567
+      subroutine hello(name)
+      character*(*) name
+      write(*,*) ''hello '', name
+      end
+      program main
+      character*20 fname
+      write(*,*)''Enter your name:''
+      read(*,*) fname
+      call hello(fname)
+      end
+'
+]
+
+{ #category : #'filesytem-inmemory' }
 EsopeCodeExample class >> relbk [
 
 	^ '      subroutine relbk(lib,name,title)
