@@ -1,11 +1,11 @@
 Class {
-	#name : #EsopeCodeExample,
+	#name : #DemosCodes,
 	#superclass : #Object,
-	#category : #'FortranSrc-esodeCodeExamples'
+	#category : #'FortranSrc-demos'
 }
 
 { #category : #'filesytem-inmemory' }
-EsopeCodeExample class >> borbk [
+DemosCodes class >> borbk [
 
 	^ '      subroutine borbk(lib,name,title)
       implicit none
@@ -125,7 +125,7 @@ c desactivate structure
 ]
 
 { #category : #'filesytem-inmemory' }
-EsopeCodeExample class >> findbk [
+DemosCodes class >> findbk [
 
 	^ '      integer function findbk(lib,title)
       implicit none
@@ -234,7 +234,7 @@ c       write(*,*) ''book title'', bk.btitle
 ]
 
 { #category : #'filesytem-inmemory' }
-EsopeCodeExample class >> findur [
+DemosCodes class >> findur [
 
 	^ '      integer function findur(lib,name) 
       implicit none
@@ -344,7 +344,7 @@ c       write(*,*) "user name", ur.uname
 ]
 
 { #category : #'filesytem-inmemory' }
-EsopeCodeExample class >> libpnt [
+DemosCodes class >> libpnt [
 
 	^ '      subroutine libprt(lib)
       implicit none
@@ -472,7 +472,7 @@ c desactivate structure
 ]
 
 { #category : #'filesytem-inmemory' }
-EsopeCodeExample class >> main [
+DemosCodes class >> main [
 
 	^ '      program main
       implicit none
@@ -562,7 +562,7 @@ c lib structure pstr
 ]
 
 { #category : #'filesytem-inmemory' }
-EsopeCodeExample class >> newbook [
+DemosCodes class >> newbook [
 
 	^ '      subroutine newbook(lib,title,pages,udc)
       implicit none
@@ -669,7 +669,7 @@ c desactivate struct
 ]
 
 { #category : #'filesytem-inmemory' }
-EsopeCodeExample class >> newlib [
+DemosCodes class >> newlib [
 
 	^ '      subroutine newlib(lib)
       implicit none
@@ -763,7 +763,7 @@ c desactivate struct
 ]
 
 { #category : #'filesytem-inmemory' }
-EsopeCodeExample class >> newuser [
+DemosCodes class >> newuser [
 
 	^ '      subroutine newuser(lib,name)
       implicit none
@@ -871,7 +871,7 @@ c desactivate struct
 ]
 
 { #category : #'filesytem-inmemory' }
-EsopeCodeExample class >> plainExample [
+DemosCodes class >> plainExample [
 
 	^ 'C234567
       program main
@@ -904,7 +904,7 @@ EsopeCodeExample class >> plainExample [
 ]
 
 { #category : #'filesytem-inmemory' }
-EsopeCodeExample class >> pureF77 [
+DemosCodes class >> pureF77 [
 
 	^ 'C234567
       subroutine hello(name)
@@ -921,7 +921,7 @@ EsopeCodeExample class >> pureF77 [
 ]
 
 { #category : #'filesytem-inmemory' }
-EsopeCodeExample class >> relbk [
+DemosCodes class >> relbk [
 
 	^ '      subroutine relbk(lib,name,title)
       implicit none

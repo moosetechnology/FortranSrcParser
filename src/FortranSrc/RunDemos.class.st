@@ -1,103 +1,103 @@
 Class {
-	#name : #RunExamples,
+	#name : #RunDemos,
 	#superclass : #Object,
 	#classVars : [
 		'Counter'
 	],
-	#category : #'FortranSrc-runExamples'
+	#category : #'FortranSrc-demos'
 }
 
 { #category : #'class initialization' }
-RunExamples class >> counter [
+RunDemos class >> counter [
 
 	Counter := Counter + 10
 ]
 
 { #category : #'class initialization' }
-RunExamples class >> initialize [
+RunDemos class >> initialize [
 
 	Counter := 1000
 ]
 
 { #category : #example }
-RunExamples class >> runBorbk [
+RunDemos class >> runBorbk [
 
 	<script>
-	self runner: EsopeCodeExample borbk
+	self runner: DemosCodes borbk
 ]
 
 { #category : #example }
-RunExamples class >> runFindbk [
+RunDemos class >> runFindbk [
 
 	<script>
-	self runner: EsopeCodeExample findbk
+	self runner: DemosCodes findbk
 ]
 
 { #category : #example }
-RunExamples class >> runFindur [
+RunDemos class >> runFindur [
 
 	<script>
-	self runner: EsopeCodeExample findur
+	self runner: DemosCodes findur
 ]
 
 { #category : #example }
-RunExamples class >> runLibpnt [
+RunDemos class >> runLibpnt [
 
 	<script>
-	self runner: EsopeCodeExample libpnt
+	self runner: DemosCodes libpnt
 ]
 
 { #category : #example }
-RunExamples class >> runMain [
+RunDemos class >> runMain [
 
 	<script>
-	self runner: EsopeCodeExample main
+	self runner: DemosCodes main
 ]
 
 { #category : #example }
-RunExamples class >> runNewbook [
+RunDemos class >> runNewbook [
 
 	<script>
-	self runner: EsopeCodeExample newbook
+	self runner: DemosCodes newbook
 ]
 
 { #category : #example }
-RunExamples class >> runNewlib [
+RunDemos class >> runNewlib [
 
 	<script>
-	self runner: EsopeCodeExample newlib
+	self runner: DemosCodes newlib
 ]
 
 { #category : #example }
-RunExamples class >> runNewuser [
+RunDemos class >> runNewuser [
 
 	<script>
-	self runner: EsopeCodeExample newuser
+	self runner: DemosCodes newuser
 ]
 
 { #category : #example }
-RunExamples class >> runPlainExample [
+RunDemos class >> runPlainExample [
 
 	<script>
-	self runner: EsopeCodeExample plainExample
+	self runner: DemosCodes plainExample
 ]
 
 { #category : #example }
-RunExamples class >> runPureF77 [
+RunDemos class >> runPureF77 [
 
 	<script>
-	self runner: EsopeCodeExample pureF77
+	self runner: DemosCodes pureF77
 ]
 
 { #category : #example }
-RunExamples class >> runRelbk [
+RunDemos class >> runRelbk [
 
 	<script>
-	self runner: EsopeCodeExample relbk
+	self runner: DemosCodes relbk
 ]
 
 { #category : #example }
-RunExamples class >> runner: anEsopeSourceCode [
+RunDemos class >> runner: anEsopeSourceCode [
 
 	<script>
 	| rewriter parser ir irModel visitorForIr famixModel |
