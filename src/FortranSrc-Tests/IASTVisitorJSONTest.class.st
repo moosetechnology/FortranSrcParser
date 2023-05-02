@@ -280,6 +280,33 @@ IASTVisitorJSONTest >> testIntegerVariableDeclaration [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testMultipleStatements [
+	| iast stmt |
+	iast := self visitCode: '      subroutine hello
+      integer someVar
+      someVar = 3 * someVar
+      end
+'.
+
+	self assert: iast first body size equals: 3.
+
+	stmt := iast first body first.
+	self assert: stmt class equals: IASTVariable.
+	self assert: stmt entityName equals: 'somevar'.
+
+	stmt := iast first body second.
+	self assert: stmt class equals: IASTVarAccess.
+	self assert: stmt isWrite.
+	self assert: stmt entityName equals: 'somevar'.
+
+	stmt := iast first body third.
+	self assert: stmt class equals: IASTVarAccess.
+	self deny: stmt isWrite.
+	self assert: stmt entityName equals: 'somevar'.
+
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testStringVariableDeclaration [
 	| iast stmt |
 	iast := self visitCode: '      subroutine hello
