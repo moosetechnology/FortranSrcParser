@@ -29,7 +29,7 @@ IASTVariable >> dimension: anObject [
 
 { #category : #accessing }
 IASTVariable >> initialValue [
-
+	self flag: 'to remove'.
 	^ initialValue
 ]
 
