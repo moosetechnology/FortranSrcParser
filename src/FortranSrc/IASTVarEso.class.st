@@ -34,6 +34,12 @@ IASTVarEso >> addRefsEntities: aCollection [
 ]
 
 { #category : #accessing }
+IASTVarEso >> arguments: aCollection [
+
+	self entities: aCollection
+]
+
+{ #category : #accessing }
 IASTVarEso >> entities [
 
 	^ entities

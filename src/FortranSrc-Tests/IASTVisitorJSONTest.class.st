@@ -88,6 +88,27 @@ IASTVisitorJSONTest >> testAssignementStatementWithComplexRHS [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testAssignementStatementWithEsoAt [
+	| iast stmt |
+	iast := self visitCode: '      subroutine hello
+      someVar = esoat(var,1)
+      end
+'.
+
+	self assert: iast first body size equals: 2.
+
+	stmt := iast first body first.
+	self assert: stmt class equals: IASTVarAccess.
+	self assert: stmt entityName equals: 'somevar'.
+
+	stmt := iast first body second.
+	self assert: stmt class equals: IASTVarEsoAt.
+	self deny: stmt isWrite.
+	self assert: stmt entities size equals: 1
+
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testEmptySubroutine [
 	| iast sub |
 	iast := self visitCode: '      subroutine hello

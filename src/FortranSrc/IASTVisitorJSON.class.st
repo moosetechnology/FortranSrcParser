@@ -77,24 +77,41 @@ IASTVisitorJSON >> visitBlocks: aJSONArray [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitFunction: aFunctionNode [
-	| astLhsNode arguments astRhsNode |
-	(self isESOPEFunction: (aFunctionNode at: 'name')) ifFalse: [ ^nil ].
+IASTVisitorJSON >> visitExpr: anExprNode [
+	^self accept: (anExprNode at: 'contents')
+]
 
+{ #category : #visiting }
+IASTVisitorJSON >> visitFunction: aFunctionNode [
+	| astRhsNode astLhsNode arguments |
+	(self isESOPEFunction: (aFunctionNode at: 'name')) ifFalse: [ ^nil ].
 	astLhsNode := IASTVarEso newFrom: (self valueNodeContent: (aFunctionNode at: 'name')).
 	astLhsNode isWrite: true.
+
 	arguments := (aFunctionNode at: 'arguments') at: 'list'.
 	astLhsNode entities: (arguments collect: [:arg | self accept: arg] thenReject: [:arg | arg isNil]).
-	
+
 	astRhsNode := self accept: (aFunctionNode at: 'body').
 
 	^astRhsNode ifNil: [ { astLhsNode } ] ifNotNil: [ { astLhsNode . astRhsNode } ]
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitFunction_call: aNode [
-		self flag: #TODO.
-		self shouldBeImplemented
+IASTVisitorJSON >> visitFunction_call: aFunctionCallNode [
+	| astNode arguments |
+	
+	astNode := (self isESOPEFunction: (aFunctionCallNode at: 'function'))
+		ifTrue:  [ IASTVarEso newFrom: (self valueNodeContent: (aFunctionCallNode at: 'function')) ]
+		ifFalse: [ IASTInvocation new
+			entityName: (aFunctionCallNode at: 'name') ;
+			yourself.
+		].
+
+	astNode sourceAnchor: (self visitSpan: (aFunctionCallNode at: 'span')).
+	arguments := (aFunctionCallNode at: 'arguments') at: 'list'.
+	astNode arguments: (arguments collect: [:arg | self accept: (arg at: 'expr')] thenReject: [:arg | arg isNil]).
+	^astNode
+
 ]
 
 { #category : #visiting }
