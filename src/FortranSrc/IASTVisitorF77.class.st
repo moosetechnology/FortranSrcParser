@@ -187,12 +187,6 @@ IASTVisitorF77 >> visit: anIASTModel [
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTArgument: anArgument [
-
-	self flag: #TODO.
-]
-
-{ #category : #visiting }
 IASTVisitorF77 >> visitIASTBlockData: aBlockData [
 
 	self flag: #TODO.
