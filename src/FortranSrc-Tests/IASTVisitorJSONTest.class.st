@@ -263,6 +263,43 @@ IASTVisitorJSONTest >> testEsoAtTwoArgsReceivesVar [
 	self deny: stmt isWrite.
 ]
 
+{ #category : #tests }
+IASTVisitorJSONTest >> testIntegerVariableDeclaration [
+	| iast stmt |
+	iast := self visitCode: '      subroutine hello
+      integer i
+      end
+'.
+
+	self assert: iast first body size equals: 1.
+	stmt := iast first body first.
+
+	self assert: stmt class equals: IASTVariable.
+	self assert: stmt entityName equals: 'i'.
+	self assert: stmt typeSpec equals: 'integer'.
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testTwoIntegerVariableDeclarations [
+	| iast stmt |
+	iast := self visitCode: '      subroutine hello
+      integer i,j
+      end
+'.
+
+	self assert: iast first body size equals: 2.
+
+	stmt := iast first body first.
+	self assert: stmt class equals: IASTVariable.
+	self assert: stmt entityName equals: 'i'.
+	self assert: stmt typeSpec equals: 'integer'.
+
+	stmt := iast first body second.
+	self assert: stmt class equals: IASTVariable.
+	self assert: stmt entityName equals: 'j'.
+	self assert: stmt typeSpec equals: 'integer'.
+]
+
 { #category : #parsing }
 IASTVisitorJSONTest >> visitCode: aString [
 	self astJSON: aString.

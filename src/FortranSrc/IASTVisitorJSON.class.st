@@ -18,8 +18,8 @@ IASTVisitorJSON >> accept: aNode [
 IASTVisitorJSON >> doesNotUnderstand: message [
 	(message selector beginsWith: 'visit') ifTrue:  [ |code|
 		code := message selector asString , ' aNode
-		self flag: #TODO.
-		self shouldBeImplemented'.
+	self flag: #TODO.
+	self shouldBeImplemented'.
 		IASTVisitorJSON compile: code  classified: 'visiting'
 	]. 
 ]
@@ -35,7 +35,7 @@ IASTVisitorJSON >> isESOPEFunction: aNode [
 IASTVisitorJSON >> makeProcedureNode: aIASTClass with: aProcedureNode [
 	^aIASTClass new
 		entityName: (aProcedureNode at: 'name') ;
-		sourceAnchor: (self visitSpan: (aProcedureNode at: 'span')) ;
+		sourceAnchor: (self visitSpanOf: aProcedureNode) ;
 		parameters: (self visitArguments: (aProcedureNode at: 'arguments')) ;
 		body: (self visitBlocks: (aProcedureNode at: 'blocks')) ;
 		yourself
@@ -95,6 +95,22 @@ IASTVisitorJSON >> visitBlocks: aJSONArray [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitDeclaration: aDeclarationNode [
+	| typeSpec |
+
+	typeSpec := self visitBase_type: (aDeclarationNode at: 'type').
+
+	^((aDeclarationNode at: 'declarators') at: 'list') collect: [ :declarator |
+		IASTVariable new
+			entityName: (self valueNodeContent: (declarator at: 'variable')) ;
+			sourceAnchor: (self visitSpanOf: declarator) ;
+			typeSpec: typeSpec ;
+			yourself
+	].
+	
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitExpr: anExprNode [
 	^self accept: (anExprNode at: 'contents')
 ]
@@ -141,7 +157,7 @@ IASTVisitorJSON >> visitFunction_call: aFunctionCallNode [
 			yourself.
 		].
 
-	astNode sourceAnchor: (self visitSpan: (aFunctionCallNode at: 'span')).
+	astNode sourceAnchor: (self visitSpanOf: aFunctionCallNode).
 	arguments := (aFunctionCallNode at: 'arguments') at: 'list'.
 	astNode arguments: (arguments collect: [:arg | self accept: (arg at: 'expr')] thenReject: [:arg | arg isNil]).
 	^astNode
@@ -198,8 +214,10 @@ IASTVisitorJSON >> visitProgram_units: aNode [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitSpan: aSpanString [
-	| one two three four colon dash |
+IASTVisitorJSON >> visitSpanOf: aNode [
+	| one two three four colon dash aSpanString |
+	aSpanString := aNode at: 'span'.
+
 	colon := aSpanString indexOf: $:.
 	one := aSpanString copyFrom: 2 to: colon-1.
 	
@@ -237,6 +255,6 @@ IASTVisitorJSON >> visitValue: aValueNode [
 		ifTrue: [ IASTVarAccess new
 			isWrite: false ;
 			entityName: (self valueNodeContent: aValueNode) ;
-			sourceAnchor: (self visitSpan: (aValueNode at: 'span')) ]
+			sourceAnchor: (self visitSpanOf: aValueNode) ]
 		ifFalse: [ nil ]
 ]
