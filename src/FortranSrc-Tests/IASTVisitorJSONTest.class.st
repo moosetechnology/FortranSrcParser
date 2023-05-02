@@ -280,6 +280,23 @@ IASTVisitorJSONTest >> testIntegerVariableDeclaration [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testStringVariableDeclaration [
+	| iast stmt |
+	iast := self visitCode: '      subroutine hello
+      character*8 str
+      end
+'.
+
+	self assert: iast first body size equals: 1.
+
+	stmt := iast first body first.
+	self assert: stmt class equals: IASTVariable.
+	self assert: stmt entityName equals: 'str'.
+	self assert: stmt typeSpec equals: 'character'.
+
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testTwoIntegerVariableDeclarations [
 	| iast stmt |
 	iast := self visitCode: '      subroutine hello
