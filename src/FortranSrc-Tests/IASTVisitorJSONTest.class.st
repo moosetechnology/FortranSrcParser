@@ -109,6 +109,23 @@ IASTVisitorJSONTest >> testAssignementStatementWithEsoAt [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testEmptyFunction [
+	| iast sub |
+	iast := self visitCode: '      integer function hello()
+      end
+'.
+
+	self assert: iast isCollection.
+	self assert: iast size equals: 1.
+	self assert: iast first class equals: IASTFunction.
+	sub := iast first.
+	self assert: sub entityName equals: 'hello'.
+	self assert: sub parameters isEmpty.
+	self assert: sub returnType equals: 'integer'.
+	self assert: sub body isEmpty.
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testEmptySubroutine [
 	| iast sub |
 	iast := self visitCode: '      subroutine hello

@@ -26,7 +26,20 @@ IASTVisitorJSON >> doesNotUnderstand: message [
 
 { #category : #testing }
 IASTVisitorJSON >> isESOPEFunction: aNode [
+	aNode isString ifTrue: [ ^false ].
+	
 	^#(esoat esoar esosl) includes: (self valueNodeContent: aNode)
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> makeProcedureNode: aIASTClass with: aProcedureNode [
+	^aIASTClass new
+		entityName: (aProcedureNode at: 'name') ;
+		sourceAnchor: (self visitSpan: (aProcedureNode at: 'span')) ;
+		parameters: (self visitArguments: (aProcedureNode at: 'arguments')) ;
+		body: (self visitBlocks: (aProcedureNode at: 'blocks')) ;
+		yourself
+
 ]
 
 { #category : #'as yet unclassified' }
@@ -65,6 +78,11 @@ IASTVisitorJSON >> visitAssign_expression: anAssignExpressionNode [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitBase_type: aTypeNode [
+	^aTypeNode at: 'base_type'
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitBinary: aBinaryExpressionNode [
 		^{ self accept: (aBinaryExpressionNode at: 'left') .
 		   self accept: (aBinaryExpressionNode at: 'right') }
@@ -83,8 +101,16 @@ IASTVisitorJSON >> visitExpr: anExprNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitFunction: aFunctionNode [
+	^(self isESOPEFunction: (aFunctionNode at: 'name'))
+		ifTrue:  [ self visitFunctionESOPE: aFunctionNode ]
+		ifFalse: [ self visitFunctionFortran: aFunctionNode ].
+
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitFunctionESOPE: aFunctionNode [
 	| astRhsNode astLhsNode arguments |
-	(self isESOPEFunction: (aFunctionNode at: 'name')) ifFalse: [ ^nil ].
+
 	astLhsNode := IASTVarEso newFrom: (self valueNodeContent: (aFunctionNode at: 'name')).
 	astLhsNode isWrite: true.
 
@@ -94,6 +120,14 @@ IASTVisitorJSON >> visitFunction: aFunctionNode [
 	astRhsNode := self accept: (aFunctionNode at: 'body').
 
 	^astRhsNode ifNil: [ { astLhsNode } ] ifNotNil: [ { astLhsNode . astRhsNode } ]
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitFunctionFortran: aFunctionNode [
+
+	^(self makeProcedureNode: IASTFunction with: aFunctionNode)
+		returnType: (self visitBase_type: (aFunctionNode at: 'type')) ;
+		yourself
 ]
 
 { #category : #visiting }
@@ -193,12 +227,8 @@ IASTVisitorJSON >> visitStatement: aStatementNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitSubroutine: aSubroutineNode [
-	^IASTSubroutine new
-		entityName: (aSubroutineNode at: 'name') ;
-		sourceAnchor: (self visitSpan: (aSubroutineNode at: 'span')) ;
-		parameters: (self visitArguments: (aSubroutineNode at: 'arguments')) ;
-		body: (self visitBlocks: (aSubroutineNode at: 'blocks')) ;
-		yourself
+	^self makeProcedureNode: IASTSubroutine with: aSubroutineNode
+
 ]
 
 { #category : #visiting }
