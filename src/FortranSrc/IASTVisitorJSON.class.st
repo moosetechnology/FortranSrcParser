@@ -91,7 +91,7 @@ IASTVisitorJSON >> visitBinary: aBinaryExpressionNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitBlocks: aJSONArray [
-		^(self visitJSONArray: aJSONArray) flatten 
+		^(self visitJSONArray: aJSONArray) flattened
 ]
 
 { #category : #visiting }
