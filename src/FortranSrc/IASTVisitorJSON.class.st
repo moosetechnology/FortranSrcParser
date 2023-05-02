@@ -18,9 +18,15 @@ IASTVisitorJSON >> accept: aNode [
 IASTVisitorJSON >> doesNotUnderstand: message [
 	(message selector beginsWith: 'visit') ifTrue:  [ |code|
 		code := message selector asString , ' aNode
+		self flag: #TODO.
 		self shouldBeImplemented'.
 		IASTVisitorJSON compile: code  classified: 'visiting'
 	]. 
+]
+
+{ #category : #testing }
+IASTVisitorJSON >> isESOPEFunction: aNode [
+	^#(esoat esoar esosl) includes: (self valueNodeContent: aNode)
 ]
 
 { #category : #'as yet unclassified' }
@@ -28,7 +34,7 @@ IASTVisitorJSON >> valueNodeContent: aValueNode [
 	^((aValueNode at: 'value') at: 'contents')
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #testing }
 IASTVisitorJSON >> valueNodeIsVariable: aValueNode [
 	^((aValueNode at: 'value') at: 'tag') = 'variable'
 ]
@@ -47,6 +53,20 @@ IASTVisitorJSON >> visitArguments: anArgumentsNode [
 { #category : #visiting }
 IASTVisitorJSON >> visitBlocks: aJSONArray [
 		^self visitJSONArray: aJSONArray 
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitFunction: aFunctionNode [
+	| astNode arguments |
+	(self isESOPEFunction: (aFunctionNode at: 'name')) ifFalse: [ ^nil ].
+
+	astNode := IASTVarEso newFrom: (self valueNodeContent: (aFunctionNode at: 'name')).
+	astNode isWrite: true.
+	arguments := (aFunctionNode at: 'arguments') at: 'list'.
+	^astNode 
+		entities: (arguments collect: [:arg | self accept: arg]) ;
+		yourself
+
 ]
 
 { #category : #visiting }
@@ -122,9 +142,8 @@ IASTVisitorJSON >> visitSpan: aSpanString [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitStatement: aNode [
-		self flag: #TODO.
-		^nil
+IASTVisitorJSON >> visitStatement: aStatementNode [
+	^self accept: (aStatementNode at: 'statement')
 ]
 
 { #category : #visiting }
@@ -141,6 +160,7 @@ IASTVisitorJSON >> visitSubroutine: aSubroutineNode [
 IASTVisitorJSON >> visitValue: aValueNode [
 	^(self valueNodeIsVariable: aValueNode)
 		ifTrue: [ IASTVarAccess new
+			isWrite: false ;
 			entityName: (self valueNodeContent: aValueNode) ;
 			sourceAnchor: (self visitSpan: (aValueNode at: 'span')) ]
 		ifFalse: [ nil ]

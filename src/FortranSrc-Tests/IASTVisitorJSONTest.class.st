@@ -91,13 +91,21 @@ IASTVisitorJSONTest >> testEmptySubroutineTwoParams [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testEsoAtTwoArgs [
-	| iast sub |
+	| iast stmt |
 	iast := self visitCode: '      subroutine hello( name )
         esoat(baz,bar) = 5
       end
 '.
 
-	sub := iast first.
+	stmt := iast first body first.
+	self assert: stmt class equals: IASTVarEsoAt.
+	self assert: stmt isWrite.
+	self assert: stmt entities size equals: 2.
+	stmt entities do: [ :ent |
+		self assert: ent class equals: IASTVarAccess.
+		self assert: (#(baz bar) includes: ent entityName asSymbol).
+		self deny: ent isWrite.
+	]
 ]
 
 { #category : #parsing }
