@@ -324,6 +324,49 @@ IASTVisitorJSONTest >> testStringVariableDeclaration [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testSubroutineInvocation [
+	| iast stmt |
+	iast := self visitCode: '      subroutine hello
+      call someSubRoutine
+      end
+'.
+
+	self assert: iast first body size equals: 1.
+
+	stmt := iast first body first.
+	self assert: stmt class equals: IASTInvocation.
+	self assert: stmt entityName equals: 'somesubroutine'.
+	self assert: stmt arguments size equals: 0
+
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testSubroutineInvocationWithArguments [
+	| iast stmt arg |
+	iast := self visitCode: '      subroutine hello
+      call someSubRoutine(bar,5,baz)
+      end
+'.
+
+	self assert: iast first body size equals: 1.
+
+	stmt := iast first body first.
+	self assert: stmt class equals: IASTInvocation.
+	self assert: stmt entityName equals: 'somesubroutine'.
+	self assert: stmt arguments size equals: 2.
+
+	arg := stmt arguments first.
+	self assert: arg class equals: IASTVarAccess.
+	self assert: arg entityName equals: 'bar'.
+	self deny: arg isWrite.
+
+	arg := stmt arguments second.
+	self assert: arg class equals: IASTVarAccess.
+	self assert: arg entityName equals: 'baz'.
+	self deny: arg isWrite.
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testTwoIntegerVariableDeclarations [
 	| iast stmt |
 	iast := self visitCode: '      subroutine hello

@@ -95,6 +95,26 @@ IASTVisitorJSON >> visitBlocks: aJSONArray [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitCall: aCallNode [
+	"used for call statements (and cannot be an ESOPE function),
+	 and Function_call statement (and can be an ESOPE function)"
+	| astNode arguments |
+	
+	astNode := (self isESOPEFunction: (aCallNode at: 'function'))
+		ifTrue:  [ IASTVarEso newFrom: (self valueNodeContent: (aCallNode at: 'function')) ]
+		ifFalse: [ IASTInvocation new
+			entityName:  (self valueNodeContent: (aCallNode at: 'function')) ;
+			yourself.
+		].
+
+	astNode sourceAnchor: (self visitSpanOf: aCallNode).
+	arguments := (aCallNode at: 'arguments') at: 'list'.
+	astNode arguments: (arguments collect: [:arg | self accept: (arg at: 'expr')] thenReject: [:arg | arg isNil]).
+	^{ astNode }
+
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitDeclaration: aDeclarationNode [
 	| typeSpec |
 
@@ -148,20 +168,7 @@ IASTVisitorJSON >> visitFunctionFortran: aFunctionNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitFunction_call: aFunctionCallNode [
-	| astNode arguments |
-	
-	astNode := (self isESOPEFunction: (aFunctionCallNode at: 'function'))
-		ifTrue:  [ IASTVarEso newFrom: (self valueNodeContent: (aFunctionCallNode at: 'function')) ]
-		ifFalse: [ IASTInvocation new
-			entityName: (aFunctionCallNode at: 'name') ;
-			yourself.
-		].
-
-	astNode sourceAnchor: (self visitSpanOf: aFunctionCallNode).
-	arguments := (aFunctionCallNode at: 'arguments') at: 'list'.
-	astNode arguments: (arguments collect: [:arg | self accept: (arg at: 'expr')] thenReject: [:arg | arg isNil]).
-	^astNode
-
+	^(self visitCall: aFunctionCallNode) anyOne
 ]
 
 { #category : #visiting }
