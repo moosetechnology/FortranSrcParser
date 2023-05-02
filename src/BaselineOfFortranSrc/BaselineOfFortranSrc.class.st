@@ -19,15 +19,15 @@ BaselineOfFortranSrc >> baseline: spec [
 BaselineOfFortranSrc >> defineDependencies: spec [
 	spec
 		baseline: 'PetitParser2' with: [ spec repository: 'github://kursjan/petitparser2' ] ;
-		baseline: 'Famix-Fortran77-Entities' with: [ spec repository: 'github://uNouss/FortranMetamodelGenerator' ] ;
+		baseline: 'FamixFortran77' with: [ spec repository: 'github://uNouss/FortranMetamodelGenerator' ] ;
 		baseline: 'Neo-JSON' with: [ spec repository: 'github://svenvc/NeoJSON' ]
 ]
 
 { #category : #'as yet unclassified' }
 BaselineOfFortranSrc >> definePackages: spec [
 	spec
-		repository: 'https://github.com/badetitou/Carrefour';
-		package: 'FortranSrc' with: [ spec requires: #(PetitParser2 'Famix-Fortran77-Entities' 'Neo-JSON') ];
+		repository: 'https://github.com/uNouss/FortranSrcParser';
+		package: 'FortranSrc' with: [ spec requires: #(PetitParser2 'FamixFortran77' 'Neo-JSON') ];
 		package: 'FortranSrc-Tests'
 
 ]
