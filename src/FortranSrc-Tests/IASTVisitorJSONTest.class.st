@@ -22,7 +22,7 @@ IASTVisitorJSONTest >> astJSON: sourceCode [
 		stream
 		<< (sourceCode copy replaceAll: Character cr with: Character lf) ].
 
-	LibC runCommand: ('{1} {2} "{3}" >"{3}.ast" 2>"{3}.err"' format: { 
+	LibC runCommand: ('{1} {2} "{3}" > "{3}.ast" 2> "{3}.err"' format: { 
 				 self fortranSrcPath.
 				 option.
 				 filename. })

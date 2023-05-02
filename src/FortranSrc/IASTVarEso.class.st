@@ -1,16 +1,25 @@
 Class {
 	#name : #IASTVarEso,
-	#superclass : #IASTEntityRef,
+	#superclass : #IASTVarAccess,
 	#instVars : [
 		'entities'
 	],
 	#category : #'FortranSrc-intrermediateAST'
 }
 
+{ #category : #'instance creation' }
+IASTVarEso class >> newFrom: aString [
+	self subclassesDo: [ :subclass |
+		(subclass name asLowercase endsWith: aString asLowercase)
+		ifTrue: [ ^subclass new ]
+	].
+	NotYetImplemented signalFor: 'IASTVarEso subclass for: ' , aString
+]
+
 { #category : #accessing }
 IASTVarEso >> addEntities: aCollection [
 
-	aCollection asCollection do: [ :element | 1halt.
+	aCollection asCollection do: [ :element |
 		(element class = IASTVarAccess and: [ element isAssigned not ]) ifTrue: [ 
 			self entities add: element ] ]
 ]
@@ -18,7 +27,7 @@ IASTVarEso >> addEntities: aCollection [
 { #category : #accessing }
 IASTVarEso >> addRefsEntities: aCollection [
 
-	aCollection do: [ :element | 1halt.
+	aCollection do: [ :element |
 		(element class = IASTVarAccess or: [ 
 			 element class inheritsFrom: IASTVarEso ]) ifTrue: [ 
 			self entities add: element ] ]
