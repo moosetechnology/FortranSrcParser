@@ -64,6 +64,30 @@ IASTVisitorJSONTest >> testAssignementStatement [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testAssignementStatementWithComplexRHS [
+	| iast stmt |
+	iast := self visitCode: '      subroutine hello
+      someVar = otherVar + thirdVar
+      end
+'.
+
+	self assert: iast first body size equals: 3.
+
+	stmt := iast first body first.
+	self assert: stmt class equals: IASTVarAccess.
+	self assert: stmt entityName equals: 'somevar'.
+
+	stmt := iast first body second.
+	self assert: stmt class equals: IASTVarAccess.
+	self assert: stmt entityName equals: 'othervar'.
+
+	stmt := iast first body third.
+	self assert: stmt class equals: IASTVarAccess.
+	self assert: stmt entityName equals: 'thirdvar'.
+
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testEmptySubroutine [
 	| iast sub |
 	iast := self visitCode: '      subroutine hello

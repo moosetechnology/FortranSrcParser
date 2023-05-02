@@ -52,18 +52,23 @@ IASTVisitorJSON >> visitArguments: anArgumentsNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitAssign_expression: anAssignExpressionNode [
-	| lhsNode rhsNode |
+	| lhsNode rhsNodes |
 	lhsNode := self accept: (anAssignExpressionNode at: 'target').
 	lhsNode isWrite: true.
 	
-	rhsNode := self accept: (anAssignExpressionNode at: 'expression').
-	^{ lhsNode . rhsNode }
+	rhsNodes := self accept: (anAssignExpressionNode at: 'expression').
+	
+	^rhsNodes isCollection 
+	ifTrue:  [ { lhsNode } , rhsNodes ]
+	ifFalse: [ { lhsNode . rhsNodes } ]
+
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitBinary: aNode [
-		self flag: #TODO.
-		self shouldBeImplemented
+IASTVisitorJSON >> visitBinary: aBinaryExpressionNode [
+		^{ self accept: (aBinaryExpressionNode at: 'left') .
+		   self accept: (aBinaryExpressionNode at: 'right') }
+		reject: #isNil
 ]
 
 { #category : #visiting }
