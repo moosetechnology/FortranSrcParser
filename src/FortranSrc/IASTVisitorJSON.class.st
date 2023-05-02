@@ -51,6 +51,22 @@ IASTVisitorJSON >> visitArguments: anArgumentsNode [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitAssign_expression: anAssignExpressionNode [
+	| lhsNode rhsNode |
+	lhsNode := self accept: (anAssignExpressionNode at: 'target').
+	lhsNode isWrite: true.
+	
+	rhsNode := self accept: (anAssignExpressionNode at: 'expression').
+	^{ lhsNode . rhsNode }
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitBinary: aNode [
+		self flag: #TODO.
+		self shouldBeImplemented
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitBlocks: aJSONArray [
 		^(self visitJSONArray: aJSONArray) flatten 
 ]
@@ -63,11 +79,17 @@ IASTVisitorJSON >> visitFunction: aFunctionNode [
 	astLhsNode := IASTVarEso newFrom: (self valueNodeContent: (aFunctionNode at: 'name')).
 	astLhsNode isWrite: true.
 	arguments := (aFunctionNode at: 'arguments') at: 'list'.
-	astLhsNode entities: (arguments collect: [:arg | self accept: arg]).
+	astLhsNode entities: (arguments collect: [:arg | self accept: arg] thenReject: [:arg | arg isNil]).
 	
 	astRhsNode := self accept: (aFunctionNode at: 'body').
 
 	^astRhsNode ifNil: [ { astLhsNode } ] ifNotNil: [ { astLhsNode . astRhsNode } ]
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitFunction_call: aNode [
+		self flag: #TODO.
+		self shouldBeImplemented
 ]
 
 { #category : #visiting }

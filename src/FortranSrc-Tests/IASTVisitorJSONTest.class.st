@@ -42,6 +42,28 @@ IASTVisitorJSONTest >> setUp [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testAssignementStatement [
+	| iast stmt |
+	iast := self visitCode: '      subroutine hello
+      someVar = otherVar
+      end
+'.
+
+	self assert: iast first body size equals: 2.
+
+	stmt := iast first body first.
+	self assert: stmt class equals: IASTVarAccess.
+	self assert: stmt isWrite.
+	self assert: stmt entityName equals: 'somevar'.
+
+	stmt := iast first body second.
+	self assert: stmt class equals: IASTVarAccess.
+	self deny: stmt isWrite.
+	self assert: stmt entityName equals: 'othervar'.
+
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testEmptySubroutine [
 	| iast sub |
 	iast := self visitCode: '      subroutine hello
@@ -87,6 +109,61 @@ IASTVisitorJSONTest >> testEmptySubroutineTwoParams [
 	self assert: sub parameters second class equals: IASTParameter.
 	self assert: sub parameters second entityName equals: 'param2'.
 	self assert: sub body isEmpty.
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testEsoArTwoArgs [
+	| iast stmt |
+	iast := self visitCode: '      subroutine hello( name )
+        esoar(baz,bar) = 5
+      end
+'.
+
+	self assert: iast first body size equals: 1.
+	stmt := iast first body first.
+	self assert: stmt class equals: IASTVarEsoAr.
+	self assert: stmt isWrite.
+	self assert: stmt entities size equals: 2.
+
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testEsoArWithEsoAtArg [
+	| iast esoar esoat |
+	iast := self visitCode: '      subroutine hello( name )
+        esoar(esoat(baz,bar),2) = 5
+      end
+'.
+
+	self assert: iast first body size equals: 1.
+	esoar := iast first body first.
+
+	self assert: esoar class equals: IASTVarEsoAr.
+	self assert: esoar isWrite.
+	self assert: esoar entities size equals: 1.
+
+	esoat := esoar entities first.
+	self assert: esoat class equals: IASTVarEsoAt.
+	self deny: esoat isWrite.
+	self assert: esoat entities size equals: 2.
+
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testEsoAtOneArg [
+	| iast stmt |
+	iast := self visitCode: '      subroutine hello( name )
+        esoat(baz,2) = 5
+      end
+'.
+
+	self assert: iast first body size equals: 1.
+	stmt := iast first body first.
+	self assert: stmt class equals: IASTVarEsoAt.
+	self assert: stmt isWrite.
+	self assert: stmt entities size equals: 1.
+	self assert: stmt entities first class equals: IASTVarAccess.
+	self assert: stmt entities first entityName equals: 'baz'.
 ]
 
 { #category : #tests }
