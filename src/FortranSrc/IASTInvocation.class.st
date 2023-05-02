@@ -25,13 +25,7 @@ IASTInvocation >> arguments: aNodes [
 
 	arguments := aNodes ifNil: [ #(  ) ] ifNotNil: [ 
 		             aNodes flattened
-			             select: [ :node | node class = IASTVarAccess ]
-			             thenCollect: [ :node | 
-				             IASTArgument new
-					             sourceAnchor: node sourceAnchor;
-					             entityName: node entityName;
-					             isConstant: node isAssigned;
-					             yourself ] ]
+			             select: [ :node | node class = IASTVarAccess ] ]
 ]
 
 { #category : #accessing }
