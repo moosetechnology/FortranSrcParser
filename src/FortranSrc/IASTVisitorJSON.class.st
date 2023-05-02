@@ -52,21 +52,22 @@ IASTVisitorJSON >> visitArguments: anArgumentsNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitBlocks: aJSONArray [
-		^self visitJSONArray: aJSONArray 
+		^(self visitJSONArray: aJSONArray) flatten 
 ]
 
 { #category : #visiting }
 IASTVisitorJSON >> visitFunction: aFunctionNode [
-	| astNode arguments |
+	| astLhsNode arguments astRhsNode |
 	(self isESOPEFunction: (aFunctionNode at: 'name')) ifFalse: [ ^nil ].
 
-	astNode := IASTVarEso newFrom: (self valueNodeContent: (aFunctionNode at: 'name')).
-	astNode isWrite: true.
+	astLhsNode := IASTVarEso newFrom: (self valueNodeContent: (aFunctionNode at: 'name')).
+	astLhsNode isWrite: true.
 	arguments := (aFunctionNode at: 'arguments') at: 'list'.
-	^astNode 
-		entities: (arguments collect: [:arg | self accept: arg]) ;
-		yourself
+	astLhsNode entities: (arguments collect: [:arg | self accept: arg]).
+	
+	astRhsNode := self accept: (aFunctionNode at: 'body').
 
+	^astRhsNode ifNil: [ { astLhsNode } ] ifNotNil: [ { astLhsNode . astRhsNode } ]
 ]
 
 { #category : #visiting }

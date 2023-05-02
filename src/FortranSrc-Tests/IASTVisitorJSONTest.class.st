@@ -97,6 +97,7 @@ IASTVisitorJSONTest >> testEsoAtTwoArgs [
       end
 '.
 
+	self assert: iast first body size equals: 1.
 	stmt := iast first body first.
 	self assert: stmt class equals: IASTVarEsoAt.
 	self assert: stmt isWrite.
@@ -106,6 +107,21 @@ IASTVisitorJSONTest >> testEsoAtTwoArgs [
 		self assert: (#(baz bar) includes: ent entityName asSymbol).
 		self deny: ent isWrite.
 	]
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testEsoAtTwoArgsReceivesVar [
+	| iast stmt |
+	iast := self visitCode: '      subroutine hello( name )
+        esoat(baz,bar) = otherVar
+      end
+'.
+
+	self assert: iast first body size equals: 2.
+	stmt := iast first body second.
+	self assert: stmt class equals: IASTVarAccess.
+	self assert: stmt entityName equals: 'othervar'.
+	self deny: stmt isWrite.
 ]
 
 { #category : #parsing }
