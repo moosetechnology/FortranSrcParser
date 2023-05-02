@@ -109,6 +109,26 @@ IASTVisitorJSONTest >> testAssignementStatementWithEsoAt [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testComment [
+	| iast stmt |
+	iast := self visitCode: 'c     blah'.
+
+	self assert: iast size equals: 1.
+	stmt := iast first.
+	self assert: stmt class equals: IASTComment.
+	self assert: stmt text equals: '     blah'.
+
+	self assert: stmt sourceAnchor notNil.
+	self assert: stmt sourceAnchor class equals: FamixFortran77IndexedFileAnchor.
+	self assert: stmt sourceAnchor fileName equals: './fortran77.f'.
+	self assert: stmt sourceAnchor startLine equals: 1.
+	self assert: stmt sourceAnchor startColumn equals: 1.
+	self assert: stmt sourceAnchor endLine equals: 1.
+	self assert: stmt sourceAnchor endColumn equals: 11.
+
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testCommentInside [
 	| iast stmt |
 	iast := self visitCode: '      integer function hello()
