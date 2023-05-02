@@ -115,6 +115,14 @@ IASTVisitorJSON >> visitCall: aCallNode [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitComment: aCommentNode [
+	^IASTComment new
+		text: (aCommentNode at: 'comment') ;
+		sourceAnchor: (self visitSpanOf: aCommentNode) ;
+		yourself
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitDeclaration: aDeclarationNode [
 	| typeSpec |
 

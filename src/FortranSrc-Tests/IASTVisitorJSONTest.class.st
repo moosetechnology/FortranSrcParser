@@ -109,6 +109,37 @@ IASTVisitorJSONTest >> testAssignementStatementWithEsoAt [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testCommentInside [
+	| iast stmt |
+	iast := self visitCode: '      integer function hello()
+c     blah
+      end
+'.
+
+	self assert: iast first body size equals: 1.
+	stmt := iast first body first.
+
+	self assert: stmt class equals: IASTComment.
+	self assert: stmt text equals: '     blah'.
+
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testCommentOutside [
+	| iast stmt |
+	iast := self visitCode: 'c     blah
+      integer function hello()
+      end
+'.
+
+	self assert: iast size equals: 2.
+	stmt := iast first.
+	self assert: stmt class equals: IASTComment.
+	self assert: stmt text equals: '     blah'.
+
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testEmptyFunction [
 	| iast sub |
 	iast := self visitCode: '      integer function hello()
