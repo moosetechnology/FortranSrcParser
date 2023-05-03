@@ -28,13 +28,11 @@ IASTVisitorJSON >> doesNotUnderstand: message [
 
 { #category : #accessing }
 IASTVisitorJSON >> f77sourcefile [
-
-	^ f77sourcefile
+	^f77sourcefile
 ]
 
 { #category : #initialization }
 IASTVisitorJSON >> initialize [
-
 	super initialize.
 	model := OrderedCollection new.
 ]
@@ -42,7 +40,7 @@ IASTVisitorJSON >> initialize [
 { #category : #testing }
 IASTVisitorJSON >> isESOPEFunction: aNode [
 	aNode isString ifTrue: [ ^false ].
-	
+
 	^#(esoat esoar esosl) includes: (self valueNodeContent: aNode)
 ]
 
@@ -58,14 +56,12 @@ IASTVisitorJSON >> makeProgramUnitNode: aIASTClass with: aProgramUnitNode [
 
 { #category : #accessing }
 IASTVisitorJSON >> model [
-
 	^ model
 ]
 
 { #category : #accessing }
-IASTVisitorJSON >> model: anObject [
-
-	model := anObject
+IASTVisitorJSON >> model: aCollection [
+	model := aCollection
 ]
 
 { #category : #'as yet unclassified' }
@@ -81,12 +77,12 @@ IASTVisitorJSON >> valueNodeIsVariable: aValueNode [
 { #category : #visiting }
 IASTVisitorJSON >> visitArguments: anArgumentsNode [
 	anArgumentsNode ifNil: [ ^#() ].
-		^(self visitJSONArray: (anArgumentsNode at: 'list')) collect: [ :varAcces |
-				IASTParameter new
-					entityName: varAcces entityName ;
-					sourceAnchor: varAcces sourceAnchor ;
-					yourself
-		]
+	^(self visitJSONArray: (anArgumentsNode at: 'list')) collect: [ :varAcces |
+		IASTParameter new
+			entityName: varAcces entityName ;
+			sourceAnchor: varAcces sourceAnchor ;
+			yourself
+	]
 ]
 
 { #category : #visiting }
@@ -111,9 +107,10 @@ IASTVisitorJSON >> visitBase_type: aTypeNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitBinary: aBinaryExpressionNode [
-		^{ self accept: (aBinaryExpressionNode at: 'left') .
-		   self accept: (aBinaryExpressionNode at: 'right') }
-		reject: #isNil
+	^{ 
+		self accept: (aBinaryExpressionNode at: 'left') .
+		self accept: (aBinaryExpressionNode at: 'right') 
+	 } reject: #isNil
 ]
 
 { #category : #visiting }
@@ -123,7 +120,7 @@ IASTVisitorJSON >> visitBlock_data: aBlockDataNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitBlocks: aJSONArray [
-		^(self visitJSONArray: aJSONArray) flattened
+	^(self visitJSONArray: aJSONArray) flattened
 ]
 
 { #category : #visiting }
@@ -184,11 +181,12 @@ IASTVisitorJSON >> visitDeclaration: aDeclarationNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitDo: aDoNode [
-	^{ self accept: ((aDoNode at: 'do_spec') at: 'initial' ).
-			self accept: ((aDoNode at: 'do_spec') at: 'limit' ).
-			self accept: ((aDoNode at: 'do_spec') at: 'increment' ).
-		   self accept: (aDoNode at: 'body') }
-		reject: #isNil.
+	^{ 
+		self accept: ((aDoNode at: 'do_spec') at: 'initial' ).
+		self accept: ((aDoNode at: 'do_spec') at: 'limit' ).
+		self accept: ((aDoNode at: 'do_spec') at: 'increment' ).
+		self accept: (aDoNode at: 'body')
+	 } reject: #isNil.
 ]
 
 { #category : #visiting }
@@ -271,7 +269,7 @@ IASTVisitorJSON >> visitMain: aMainProgramNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitMeta: aNode [
-		self visitJSONDictionary: aNode
+	self visitJSONDictionary: aNode
 ]
 
 { #category : #visiting }
@@ -299,7 +297,7 @@ IASTVisitorJSON >> visitProgramFile: aProgramFileNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitProgram_units: aNode [
-		^self visitJSONArray: aNode
+	^self visitJSONArray: aNode
 ]
 
 { #category : #visiting }
