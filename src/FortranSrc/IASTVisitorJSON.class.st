@@ -16,14 +16,15 @@ IASTVisitorJSON >> accept: aNode [
 	aNode isArray  ifTrue: [ ^self visitJSONArray: aNode ].
 ]
 
-{ #category : #visiting }
+{ #category : #'reflective operations' }
 IASTVisitorJSON >> doesNotUnderstand: message [
-	(message selector beginsWith: 'visit') ifTrue:  [ |code|
-		code := message selector asString , ' aNode
+
+	| code |
+	(message selector beginsWith: 'visit') ifFalse: [ ^ self ].
+	code := message selector asString , ' aNode
 	self flag: #TODO.
 	self shouldBeImplemented'.
-		IASTVisitorJSON compile: code  classified: 'visiting'
-	]. 
+	self class compile: code classified: 'visiting'
 ]
 
 { #category : #accessing }
