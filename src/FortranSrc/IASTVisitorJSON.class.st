@@ -186,10 +186,11 @@ IASTVisitorJSON >> visitFunctionESOPE: aFunctionNode [
 	| astRhsNode astLhsNode arguments |
 
 	astLhsNode := IASTVarEso newFrom: (self valueNodeContent: (aFunctionNode at: 'name')).
+	astLhsNode sourceAnchor: (self visitSpanOf: aFunctionNode).
 	astLhsNode isWrite: true.
 
 	arguments := (aFunctionNode at: 'arguments') at: 'list'.
-	astLhsNode entities: (arguments collect: [:arg | self accept: arg] thenReject: [:arg | arg isNil]).
+	astLhsNode entities: (arguments collect: [:arg | self accept: arg] thenReject: #isNil).
 
 	astRhsNode := self accept: (aFunctionNode at: 'body').
 
@@ -198,9 +199,9 @@ IASTVisitorJSON >> visitFunctionESOPE: aFunctionNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitFunctionFortran: aFunctionNode [
-
-	^(self makeProcedureNode: IASTFunction with: aFunctionNode)
+	^(self makeProgramUnitNode: IASTFunction with: aFunctionNode)
 		returnType: (self visitBase_type: (aFunctionNode at: 'type')) ;
+		parameters: (self visitArguments: (aFunctionNode at: 'arguments')) ;
 		yourself
 ]
 
@@ -244,7 +245,7 @@ IASTVisitorJSON >> visitMeta: aNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitMiFilename: aString [
-		f77sourcefile := aString
+	f77sourcefile := aString
 ]
 
 { #category : #visiting }
@@ -302,7 +303,9 @@ IASTVisitorJSON >> visitStatement: aStatementNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitSubroutine: aSubroutineNode [
-	^self makeProcedureNode: IASTSubroutine with: aSubroutineNode
+	^(self makeProgramUnitNode: IASTSubroutine with: aSubroutineNode)
+		parameters: (self visitArguments: (aSubroutineNode at: 'arguments')) ;
+		yourself
 
 ]
 
