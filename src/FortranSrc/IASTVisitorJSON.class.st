@@ -115,6 +115,11 @@ IASTVisitorJSON >> visitBinary: aBinaryExpressionNode [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitBlock_data: aBlockDataNode [
+	^self makeProgramUnitNode: IASTBlockData with: aBlockDataNode
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitBlocks: aJSONArray [
 		^(self visitJSONArray: aJSONArray) flattened
 ]
