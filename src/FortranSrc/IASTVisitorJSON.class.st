@@ -310,6 +310,11 @@ IASTVisitorJSON >> visitSubroutine: aSubroutineNode [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitUnary: aUnaryNode [
+	^{ self accept: (aUnaryNode at: 'expression') } reject: #isNil
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitValue: aValueNode [
 	^(self valueNodeIsVariable: aValueNode)
 		ifTrue: [ IASTVarAccess new
