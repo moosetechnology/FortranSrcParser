@@ -10,6 +10,7 @@ Class {
 
 { #category : #visiting }
 IASTVisitorJSON >> accept: aNode [
+	aNode ifNil: [ ^nil ].
 	aNode isAssociation ifTrue: [ ^self visitJSONNode: aNode key value: aNode value ].
 	aNode isDictionary  ifTrue: [ ^self visitJSONDictionary: aNode ].
 	aNode isArray  ifTrue: [ ^self visitJSONArray: aNode ].
