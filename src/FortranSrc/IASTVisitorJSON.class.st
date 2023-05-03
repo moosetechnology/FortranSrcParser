@@ -25,6 +25,19 @@ IASTVisitorJSON >> doesNotUnderstand: message [
 	]. 
 ]
 
+{ #category : #accessing }
+IASTVisitorJSON >> f77sourcefile [
+
+	^ f77sourcefile
+]
+
+{ #category : #initialization }
+IASTVisitorJSON >> initialize [
+
+	super initialize.
+	model := OrderedCollection new.
+]
+
 { #category : #testing }
 IASTVisitorJSON >> isESOPEFunction: aNode [
 	aNode isString ifTrue: [ ^false ].
@@ -40,6 +53,18 @@ IASTVisitorJSON >> makeProgramUnitNode: aIASTClass with: aProgramUnitNode [
 		body: (self visitBlocks: (aProgramUnitNode at: 'blocks')) ;
 		yourself
 
+]
+
+{ #category : #accessing }
+IASTVisitorJSON >> model [
+
+	^ model
+]
+
+{ #category : #accessing }
+IASTVisitorJSON >> model: anObject [
+
+	model := anObject
 ]
 
 { #category : #'as yet unclassified' }
