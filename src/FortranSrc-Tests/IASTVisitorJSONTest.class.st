@@ -109,6 +109,41 @@ IASTVisitorJSONTest >> testAssignementStatementWithEsoAt [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testBlockDataWithOneCommon [
+	| programFile blockdata |
+	programFile := self visitCode: '      block data hello
+      common /mycom/ i
+      end
+'.
+
+	self assert: programFile class equals: IASTProgramFile.
+	self assert: programFile progUnits size equals: 1.
+	self assert: programFile progUnits first class equals: IASTBlockData.
+	blockdata := programFile progUnits first.
+	self assert: blockdata entityName equals: 'hello'.
+	self assert: blockdata body size equals: 3.
+	self assert: blockdata comments isEmpty.
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testBlockDataWithOneCommonOneData [
+	| programFile blockdata |
+	programFile := self visitCode: '      block data hello
+      common /mycom/ i
+      data i /12345/
+      end
+'.
+
+	self assert: programFile class equals: IASTProgramFile.
+	self assert: programFile progUnits size equals: 1.
+	self assert: programFile progUnits first class equals: IASTBlockData.
+	blockdata := programFile progUnits first.
+	self assert: blockdata entityName equals: 'hello'.
+	self assert: blockdata body size equals: 3.
+	self assert: blockdata comments isEmpty.
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testComment [
 	| programFile stmt |
 	programFile := self visitCode: 'c     blah'.
