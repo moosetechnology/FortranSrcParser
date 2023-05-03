@@ -186,6 +186,31 @@ IASTVisitorJSONTest >> testEmptyFunction [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testEmptyProgram [
+	| programFile prog |
+	programFile := self visitCode: '      program hello
+      end
+'.
+
+	self assert: programFile class equals: IASTProgramFile.
+	self assert: programFile progUnits size equals: 1.
+	self assert: programFile progUnits first class equals: IASTMainProgram.
+	prog := programFile progUnits first.
+	self assert: prog entityName equals: 'hello'.
+	self assert: prog body isEmpty.
+	self assert: prog comments isEmpty.
+
+	self assert: prog sourceAnchor notNil.
+	self assert: prog sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: prog sourceAnchor fileName equals: './fortran77.f'.
+	self assert: prog sourceAnchor startLine equals: 1.
+	self assert: prog sourceAnchor startColumn equals: 7.
+	self assert: prog sourceAnchor endLine equals: 2.
+	self assert: prog sourceAnchor endColumn equals: 10.
+
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testEmptySubroutine [
 	| programFile sub |
 	programFile := self visitCode: '      subroutine hello
@@ -372,6 +397,23 @@ IASTVisitorJSONTest >> testMultipleStatements [
 	self deny: stmt isWrite.
 	self assert: stmt entityName equals: 'somevar'.
 
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testProgramWithOneStatement [
+	| programFile prog |
+	programFile := self visitCode: '      program hello
+      a = -b
+      end
+'.
+
+	self assert: programFile class equals: IASTProgramFile.
+	self assert: programFile progUnits size equals: 1.
+	self assert: programFile progUnits first class equals: IASTMainProgram.
+	prog := programFile progUnits first.
+	self assert: prog entityName equals: 'hello'.
+	self assert: prog body size equals: 2.
+	self assert: prog comments isEmpty.
 ]
 
 { #category : #tests }
