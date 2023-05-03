@@ -96,10 +96,11 @@ IASTVisitorJSON >> visitAssign_expression: anAssignExpressionNode [
 	lhsNode isWrite: true.
 	
 	rhsNodes := self accept: (anAssignExpressionNode at: 'expression').
-	
-	^rhsNodes isCollection 
-	ifTrue:  [ { lhsNode } , rhsNodes ]
-	ifFalse: [ { lhsNode . rhsNodes } ]
+
+	^(rhsNodes isCollection 
+		ifTrue:  [ { lhsNode } , rhsNodes ]
+		ifFalse: [ { lhsNode . rhsNodes } ]
+	 ) reject: #isNil
 
 ]
 
