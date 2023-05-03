@@ -253,9 +253,16 @@ IASTVisitorJSON >> visitMiVersion: aNode [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitProgramFile: aNode [
-		self visitMeta: (aNode at: 'meta').
-		^self visitProgram_units: (aNode at: 'program_units')
+IASTVisitorJSON >> visitProgramFile: aProgramFileNode [
+	| programFile |
+	self visitMeta: (aProgramFileNode at: 'meta').
+	programFile := IASTProgramFile new
+		filename: self f77sourcefile ;
+		progUnits: (self visitProgram_units: (aProgramFileNode at: 'program_units')) ;
+		yourself.
+	self model add: programFile.
+	^ programFile
+		
 ]
 
 { #category : #visiting }
