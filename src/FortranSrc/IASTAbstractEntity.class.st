@@ -1,0 +1,28 @@
+Class {
+	#name : #IASTAbstractEntity,
+	#superclass : #Object,
+	#instVars : [
+		'sourceAnchor'
+	],
+	#category : #'FortranSrc-intrermediateAST'
+}
+
+{ #category : #accessing }
+IASTAbstractEntity >> accept: aVisitor [
+
+	self subclassResponsibility
+]
+
+{ #category : #accessing }
+IASTAbstractEntity >> sourceAnchor [
+
+	<FMProperty: #tokenPosition type: #Object>
+	<FMComment: 'represente the position(startLine, startColumn, endLine, endColumn) of each node of IRAST'>
+	^ sourceAnchor
+]
+
+{ #category : #accessing }
+IASTAbstractEntity >> sourceAnchor: anObject [
+
+	sourceAnchor := anObject
+]

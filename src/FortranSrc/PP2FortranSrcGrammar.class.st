@@ -1,93 +1,109 @@
 Class {
 	#name : #PP2FortranSrcGrammar,
-	#superclass : #PPCompositeParser,
+	#superclass : #PP2CompositeNode,
 	#instVars : [
 		'any',
-		'programFile',
+		'argument',
+		'argumentExpression',
+		'attribute',
+		'baseType',
+		'binaryOp',
+		'blAssociate',
+		'blCase',
+		'blComment',
+		'blDo',
+		'blDoWhile',
+		'blForAll',
+		'blIf',
+		'blStatement',
+		'block',
+		'comment',
+		'commonGroup',
+		'controlPair',
+		'dataGroup',
+		'declarator',
+		'declaratorType',
+		'dimensionDeclarator',
+		'doSpecification',
+		'emptyTuple',
+		'expBinary',
+		'expFunctionCall',
+		'expSubscript',
+		'expUnary',
+		'expValue',
+		'expression',
+		'forallHeader',
+		'ifElseIfClause',
+		'impElement',
+		'impList',
+		'impRange',
+		'index',
+		'intent',
+		'ixRange',
+		'ixSingle',
+		'lastPos',
 		'metaInfo',
-		'miVersion',
 		'miFilename',
 		'miParameters',
+		'miVersion',
+		'position',
+		'prefixSuffix',
+		'programFile',
 		'programUnit',
+		'puBlockData',
+		'puComment',
+		'puFunction',
 		'puMain',
 		'puModule',
 		'puSubroutine',
-		'puFunction',
-		'puBlockData',
-		'puComment',
-		'srcSpan',
-		'prefixSuffix',
-		'position',
-		'tkNothing',
-		'tkString',
-		'tkNumber',
-		'tkIdentifier',
-		'tkComma',
-		'emptyTuple',
-		'expression',
-		'expValue',
-		'value',
-		'block',
-		'blComment',
-		'comment',
-		'blStatement',
-		'statement',
-		'impList',
-		'typeSpec',
-		'impElement',
-		'impCharacter',
-		'impRange',
-		'baseType',
 		'selector',
-		'stDeclaration',
-		'attribute',
-		'declarator',
-		'dimensionDeclarator',
-		'intent',
-		'declaratorType',
-		'commonGroup',
-		'valInteger',
-		'ixSingle',
-		'ixRange',
-		'expSubscript',
-		'index',
-		'expBinary',
-		'expUnary',
-		'unaryOp',
-		'binaryOp',
-		'stExpressionAssign',
+		'srcSpan',
 		'stCall',
-		'argument',
-		'argumentExpression',
-		'blDo',
-		'doSpecification',
-		'expFunctionCall',
-		'blIf',
-		'lastPos',
+		'stData',
+		'stDeclaration',
+		'stExit',
+		'stExpressionAssign',
+		'stExternal',
+		'stFormatBogus',
+		'stFunction',
 		'stIfLogical',
-		'forallHeader',
-		'blForAll',
-		'blCase',
-		'blDoWhile',
-		'blAssociate',
-		'haskellListOfString',
-		'maybeOfString',
+		'stPrint',
+		'stRead',
+		'stStop',
+		'stWrite',
+		'statement',
+		'tkChar',
+		'tkComma',
+		'tkEqual',
+		'tkIdentifier',
+		'tkNothing',
+		'tkNumber',
+		'tkString',
+		'typeSpec',
+		'unaryOp',
+		'valInteger',
 		'valLogical',
-		'stFunction'
+		'valStar',
+		'value'
 	],
 	#category : #'FortranSrc-Parser'
 }
 
 { #category : #accessing }
 PP2FortranSrcGrammar class >> ignoredNames [
+
 	^super ignoredNames , #(lastPos)
 ]
 
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> aList: aRule [
 
-	^ (self prelude: 'AList')
+	^ (self token: 'AList')
+	, (self token: '{')
+	, (self overturedBy: 'alist')
+	, (self prefix: 'alistList')
 	, (self haskellList: aRule)
+	, (self token: '}')
 ]
 
 { #category : #token }
@@ -98,14 +114,22 @@ PP2FortranSrcGrammar >> any [
 
 { #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> argument [
-	^ (self prelude: 'Argument')
+
+	^ (self token: 'Argument')
+	, (self token: '{')
+	, (self overturedBy: 'argument')
+	, (self prefix: 'argumentName')
 	, (self maybe: tkString)
-	, (self parens: argumentExpression)
+	, tkComma
+	, (self prefix: 'argumentExpr')
+	, argumentExpression
+	, (self token: '}')
 ]
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> argumentExpression [
-	^ ((self token: 'ArgExpr'), (self parens: expression))
+
+	^ ((self token: 'ArgExpr') , (self parens: expression))
 	/ ((self prelude: 'ArgExprVar') , tkString)
 ]
 
@@ -149,6 +173,7 @@ PP2FortranSrcGrammar >> baseType [
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> binaryOp [
+
 	^ (self token: 'Addition')
   	/ (self token: 'Subtraction')
   	/ (self token: 'Multiplication')
@@ -172,14 +197,18 @@ PP2FortranSrcGrammar >> binaryOp [
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blAssociate [
 
-	^ (self prelude: 'BlAssociate') , (self maybe: expression)
-	  , (self maybe: tkString) , (self maybe: expression)
-	  , (self justAList: (self justATuple: expression and: expression)) , (self haskellList: block)
-	  , (self maybe: expression)
+	^ (self prelude: 'BlAssociate')
+	, (self maybe: expression)
+	, (self maybe: tkString)
+	", (self maybe: expression)" "see -> https://github.com/camfort/fortran-src/blob/416ce763fd9cde24415b1eee2e5ee7966ae0045c/src/Language/Fortran/AST.hs#L375"
+	, (self justAList: (self justATuple: expression and: expression))
+	, (self haskellList: block)
+	, (self maybe: expression)
 ]
 
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blCase [
+
 	^ (self prelude: 'BlCase')
 	, (self maybe: expression)
 	, (self maybe: tkString)
@@ -198,6 +227,7 @@ PP2FortranSrcGrammar >> blComment [
 
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blDo [
+
 	^ (self prelude: 'BlDo')
 	, (self maybe: expression)
 	, (self maybe: tkString)
@@ -210,14 +240,18 @@ PP2FortranSrcGrammar >> blDo [
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blDoWhile [
 
-	^ (self prelude: 'BlDoWhile') , (self maybe: expression)
-	  , (self maybe: tkString) , (self maybe: expression)
-	  , (self parens: expression) , (self haskellList: block)
-	  , (self maybe: expression)
+	^ (self prelude: 'BlDoWhile')
+	, (self maybe: expression)
+	, (self maybe: tkString)
+	, (self maybe: expression)
+	, (self parens: expression)
+	, (self haskellList: block)
+	, (self maybe: expression)
 ]
 
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blForAll [
+
 	^ (self prelude: 'BlForall')
 	, (self maybe: expression)
 	, (self maybe: tkString)
@@ -228,11 +262,18 @@ PP2FortranSrcGrammar >> blForAll [
 
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> blIf [
+	
+	"https://github.com/camfort/fortran-src/blob/416ce763fd9cde24415b1eee2e5ee7966ae0045c/src/Language/Fortran/AST.hs#L342"
+
 	^ (self prelude: 'BlIf')
 	, (self maybe: expression)
 	, (self maybe: tkString)
-	, (self haskellList: (self maybeNoParens: expression))
-	, (self haskellList: (self haskellList: block))
+	, (self parens: 
+						ifElseIfClause
+					 , (self token: ':|') ":| -> It is the constructor for a non-empty list"
+					 , (self haskellList: ifElseIfClause)
+	  )
+	, (self maybe: (self haskellList: block))
 	, (self maybe: expression)
 ]
 
@@ -247,56 +288,125 @@ PP2FortranSrcGrammar >> blStatement [
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> block [
 
-	^ blStatement / blIf / blDo / blComment / blForAll
+	^ blStatement
+	/ blIf
+	/ blDo
+	/ blComment
+	/ blForAll
 	/ blCase
-	/ blDoWhile / blAssociate "/ blInterface"
+	/ blDoWhile
+	/ blAssociate
+	"/ blInterface"
 ]
 
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> comment [
 
-	^ self parens: (self token: 'Comment') , tkString
+	^ self parens: (self token: 'Comment')
+	, tkString
 ]
 
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> commonGroup [
-	^ (self prelude: 'CommonGroup')
-	, (self maybe: expression)
-	, (self parens: (self aList: declarator))
+
+	^ (self token: 'CommonGroup')
+	, (self token: '{')
+	, (self overturedBy: 'commonGroup')
+	, (self prefix: 'commonGroupName')
+	, (self maybeNoParens: expression)
+	, tkComma
+	, (self prefix: 'commonGroupVars')
+	, (self aList: declarator)
+	, (self token: '}')
+]
+
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> controlPair [
+
+	^ (self token: 'ControlPair')
+	, (self token: '{')
+	, (self overturedBy: 'controlPair')
+	, (self prefix: 'controlPairName')
+	, (self maybe: tkString)
+	, tkComma
+	, (self prefix: 'controlPairExpr')
+	, expression
+	, (self token: '}')
+]
+
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> dataGroup [
+
+	^ (self token: 'DataGroup')
+	, (self token: '{')
+	, (self overturedBy: 'dataGroup')
+	, (self prefix: 'dataGroupNames')
+	, (self aList: expression)
+	, tkComma
+	, (self prefix: 'dataGroupInitializers')
+	, (self aList: expression)
+	, (self token: '}')
 ]
 
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> declarator [
 
-	^ (self prelude: 'Declarator')
-	, (self parens: expression)
+	^ (self token: 'Declarator')
+	, (self token: '{')
+	, (self overturedBy: 'declarator')
+	, (self prefix: 'declaratorVariable')
+	, expression
+	, tkComma
+	, (self prefix: 'declaratorType')
 	, declaratorType
-	, (self maybe: expression)
-	, (self maybe: expression)
+	, tkComma
+	, (self prefix: 'declaratorLength')
+	, (self maybeNoParens: expression)
+	, tkComma
+	, (self prefix: 'declaratorInitial')
+	, (self maybeNoParens: expression)
+	, (self token: '}')
 ]
 
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> declaratorType [
 
 	^ (self token: 'ScalarDecl')
-	  /
-	  (self parens: (self token: 'ArrayDecl') , (self parens: (self aList: dimensionDeclarator)))
+	  / (
+				(self token: 'ArrayDecl')
+			 , (self parens: (self aList: dimensionDeclarator))
+	    )
 ]
 
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> dimensionDeclarator [
 
-	^ (self prelude: 'DimensionDeclarator')
-	, (self maybe: expression)
-	, (self maybe: expression)
+	^ (self token: 'DimensionDeclarator')
+	, (self token: '{')
+	, (self overturedBy: 'dimDecl')
+	, (self prefix: 'dimDeclLower')
+	, (self maybeNoParens: expression)
+	, tkComma
+	, (self prefix: 'dimDeclUpper')
+	, (self maybeNoParens: expression)
+	, (self token: '}')
 ]
 
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> doSpecification [
-	^ (self prelude: 'DoSpecification')
-	, (self parens: statement)
-	, (self parens: expression)
-	, (self maybe: expression)
+
+	^ (self token: 'DoSpecification')
+	, (self token: '{')
+	, (self overturedBy: 'doSpec')
+	, (self prefix: 'doSpecInitial')
+	, statement
+	, tkComma
+	, (self prefix: 'doSpecLimit')
+	, expression
+	, tkComma
+	, (self prefix: 'doSpecIncrement')
+	, (self maybeNoParens: expression)
+	, (self token: '}')
 ]
 
 { #category : #token }
@@ -307,6 +417,7 @@ PP2FortranSrcGrammar >> emptyTuple [
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expBinary [
+
 	^ (self prelude: 'ExpBinary')
 	, binaryOp
 	, (self parens: expression)
@@ -315,13 +426,15 @@ PP2FortranSrcGrammar >> expBinary [
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expFunctionCall [
+
 	^ (self prelude: 'ExpFunctionCall')
 	, (self parens: expression)
-	, (self maybe: (self aList: argument))
+	, (self parens: (self aList: argument))
 ]
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expSubscript [
+
 	^ (self prelude: 'ExpSubscript')
 	, (self parens: expression)
 	, (self parens: (self aList: index))
@@ -329,6 +442,7 @@ PP2FortranSrcGrammar >> expSubscript [
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expUnary [
+
 	^ (self prelude: 'ExpUnary')
 	, unaryOp
 	, (self parens: expression)
@@ -337,59 +451,76 @@ PP2FortranSrcGrammar >> expUnary [
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expValue [
 
-	^ (self prelude: 'ExpValue') , (self parens: value)
+	^ (self prelude: 'ExpValue')
+	, ((self parens: value) / valStar)
 ]
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> expression [
+
 	^ expValue
 	/ expBinary
 	/ expUnary
-	/ expSubscript "/ expDataRef"
+	/ expSubscript
 	/ expFunctionCall
-	"/ expImpliedDo / expInitialisation / expReturnSpec"
+	"/ expImpliedDo
+	/ expDataRef
+	/ expInitialisation
+	/ expReturnSpec"
 ]
 
 { #category : #'grammar-block' }
 PP2FortranSrcGrammar >> forallHeader [
 
 	^ (self haskellList:
-		   tkString , (self parens: expression) , (self parens: expression) , (self maybe: expression))
+		   tkString
+		 , (self parens: expression)
+		 , (self parens: expression)
+		 , (self maybe: expression)
+	  )
 	  , (self maybe: expression)
 ]
 
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> haskellList: aRule [
 
-	^ (self token: '[') , (aRule separatedBy: tkComma) optional
-	  , (self token: ']')
+	^ (self token: '[')
+	, (aRule separatedBy: tkComma) optional
+	, (self token: ']')
 ]
 
-{ #category : #'grammar-tests' }
-PP2FortranSrcGrammar >> haskellListOfString [
+{ #category : #'grammar-block' }
+PP2FortranSrcGrammar >> ifElseIfClause [
 
-	"rule to test method #haskellList:"
-
-	^ self haskellList: tkString
-]
-
-{ #category : #'grammar-declaration' }
-PP2FortranSrcGrammar >> impCharacter [
-
-	^ (self prelude: 'ImpCharacter') , tkString
+	^ (self parens:  expression, tkComma , (self haskellList: block))
 ]
 
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> impElement [
 
-	^ impCharacter / impRange
+	^ (self token: 'ImpElement')
+	, (self token: '{')
+	, (self overturedBy: 'impElement')
+	, (self prefix: 'impElementFrom')
+	, tkChar
+	, tkComma
+	, (self prefix: 'impElementTo')
+	, (self maybeNoParens: tkChar)
+	, (self token: '}')
 ]
 
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> impList [
 
-	^ (self prelude: 'ImpList') , (self parens: typeSpec)
-	       , (self parens: (self aList: impElement))
+	^ (self token: 'ImpList')
+	, (self token: '{')
+	, (self overturedBy: 'impList')
+	, (self prefix: 'impListType')
+	, typeSpec
+	, tkComma
+	, (self prefix: 'impListElements')
+	, (self aList: impElement)
+	, (self token: '}')
 ]
 
 { #category : #'grammar-declaration' }
@@ -401,11 +532,14 @@ PP2FortranSrcGrammar >> impRange [
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> index [
-	^ ixSingle / ixRange
+
+	^ ixSingle
+	/ ixRange
 ]
 
 { #category : #initialization }
 PP2FortranSrcGrammar >> initialize [
+
 	super initialize.
 	lastPos := {(0 @ 0) . (0 @ 0)}
 ]
@@ -413,61 +547,80 @@ PP2FortranSrcGrammar >> initialize [
 { #category : #grammar }
 PP2FortranSrcGrammar >> intent [
 
-	^ (self token: 'In') / (self token: 'Out') / (self token: 'InOut')
+	^ (self token: 'In')
+	/ (self token: 'Out')
+	/ (self token: 'InOut')
 ]
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> ixRange [
-	^ (self prelude: 'IxRange') , (self maybe: expression) , (self maybe: expression) , (self maybe: expression)
+
+	^ (self prelude: 'IxRange')
+	, (self maybe: expression)
+	, (self maybe: expression)
+	, (self maybe: expression)
 ]
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> ixSingle [
-	^ (self prelude: 'IxSingle') , (self maybe: tkString) , (self parens: expression)
+
+	^ (self prelude: 'IxSingle')
+	, (self maybe: tkString)
+	, (self parens: expression)
 ]
 
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> justAList: aRule [
-	^ self parens: (self token: 'Just') , (self aList: aRule)
+
+	^ self parens: (self token: 'Just')
+	, (self aList: aRule)
+]
+
+{ #category : #'grammar-tests' }
+PP2FortranSrcGrammar >> justAListNewOfExpression [
+
+	"rule to test method #haskellList:"
+
+	^ self justAList: expression
 ]
 
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> justATuple: aRule1 and: aRule2 [
 
-	^ self parens:
-		  (self token: 'Just') , (self aList: aRule1) , (self aList: aRule2)
+	^ self parens: (self token: 'Just')
+	, (self aList: aRule1)
+	, (self aList: aRule2)
 ]
 
 { #category : #accessing }
 PP2FortranSrcGrammar >> lastPos [
-	^lastPos 
+
+	^ lastPos 
 ]
 
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> maybe: aRule [
+
 	"Maybe  -> Nothing / (Just aRule)"
-	^ tkNothing / (self parens: (self token: 'Just') , aRule)
+
+	^ tkNothing
+	/ (self parens: (self token: 'Just') , aRule)
 ]
 
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> maybeNoParens: aRule [
+
 	"a special #maybe: that does not put parentheses around 'Just aRule'
 	notably when it is in a haskell list"
-	^ tkNothing / ((self token: 'Just') , aRule)
-]
 
-{ #category : #'grammar-tests' }
-PP2FortranSrcGrammar >> maybeOfString [
-
-	"rule to test method #maybe:"
-
-	^ self maybe: tkString
+	^ tkNothing
+	/ ((self token: 'Just') , aRule)
 ]
 
 { #category : #'grammar-metaInfo' }
 PP2FortranSrcGrammar >> metaInfo [
 
-	^ self parens: (self token: 'MetaInfo')
+	^ (self token: 'MetaInfo')
 	, (self token: '{')
 	, (miParameters delimitedBy: tkComma)
 	, (self token: '}')
@@ -477,30 +630,56 @@ PP2FortranSrcGrammar >> metaInfo [
 { #category : #'grammar-metaInfo' }
 PP2FortranSrcGrammar >> miFilename [
 
-	^ (self token: 'miFilename') , (self token: '=') , tkString
+	^ (self token: 'miFilename')
+	, tkEqual
+	, tkString
 ]
 
 { #category : #'grammar-metaInfo' }
 PP2FortranSrcGrammar >> miParameters [
-	^ miVersion / miFilename
+
+	^ miVersion
+	/ miFilename
 ]
 
 { #category : #'grammar-metaInfo' }
 PP2FortranSrcGrammar >> miVersion [
 
-	^ (self token: 'miVersion') , (self token: '=') , tkIdentifier
+	^ (self token: 'miVersion')
+	, tkEqual
+	, tkIdentifier
+]
+
+{ #category : #'grammar-helper' }
+PP2FortranSrcGrammar >> overturedBy: aPrefix [
+
+	^ (self prefix: aPrefix , 'Anno')
+	, emptyTuple
+	, tkComma
+	, (self prefix: aPrefix , 'Span')
+	, srcSpan
+	, tkComma
 ]
 
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> parens: aRule [
 
-	^ (self token: '(') , aRule , (self token: ')')
+	^ (self token: '(')
+	, aRule
+	, (self token: ')')
 ]
 
 { #category : #grammar }
 PP2FortranSrcGrammar >> position [
 
-	^ self parens: tkNumber , (self token: ':') , tkNumber
+	^ self parens: (tkNumber , (self token: ':') , tkNumber)
+]
+
+{ #category : #'grammar-programUnit' }
+PP2FortranSrcGrammar >> prefix: aPrefix [
+
+	^ (self token: aPrefix uncapitalized)
+	, tkEqual
 ]
 
 { #category : #'grammar-programUnit' }
@@ -518,28 +697,44 @@ PP2FortranSrcGrammar >> prelude: aString [
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> prelude: aString aList: aRule [
 
-	^ (self prelude: aString) , (self parens: (self aList: aRule))
+	^ (self prelude: aString)
+	, (self parens: (self aList: aRule))
 ]
 
 { #category : #'grammar-helper' }
 PP2FortranSrcGrammar >> prelude: aString maybe: aRule [
 
-	^ (self prelude: aString) , (self maybe: aRule)
+	^ (self prelude: aString)
+	, (self maybe: aRule)
 ]
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> programFile [
 
-	^ (self token: 'ProgramFile') , metaInfo , (self haskellList: programUnit)
+	^ (self token: 'ProgramFile')
+	, (self token: '{')
+	, (self prefix: 'programFileMeta')
+	, metaInfo
+	, tkComma
+	, (self prefix: 'programFileProgramUnits')
+	, (self haskellList: programUnit)
+	, (self token: '}')
 ]
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> programUnit [
-	^ puMain / puModule / puSubroutine / puFunction / puBlockData / puComment
+
+	^ puMain
+	/ puModule
+	/ puSubroutine
+	/ puFunction
+	/ puBlockData
+	/ puComment
 ]
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puBlockData [
+
 	^ (self prelude: 'PUBlockData')
 	, (self maybe: tkString)
 	, (self haskellList: block)
@@ -548,11 +743,13 @@ PP2FortranSrcGrammar >> puBlockData [
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puComment [
 
-	^ (self prelude: 'PUComment') ,  comment
+	^ (self prelude: 'PUComment')
+	,  comment
 ]
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puFunction [
+
 	^ (self prelude: 'PUFunction')
 	, (self maybe: typeSpec)
 	, prefixSuffix
@@ -565,6 +762,7 @@ PP2FortranSrcGrammar >> puFunction [
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puMain [
+
 	^ (self prelude: 'PUMain')
 	, (self maybe: tkString)
 	, (self haskellList: block)
@@ -573,6 +771,7 @@ PP2FortranSrcGrammar >> puMain [
 
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puModule [
+
 	^ (self prelude: 'PUModule')
 	, tkString
 	, (self haskellList: block)
@@ -582,43 +781,64 @@ PP2FortranSrcGrammar >> puModule [
 { #category : #'grammar-programUnit' }
 PP2FortranSrcGrammar >> puSubroutine [
 
-	^ (self prelude: 'PUSubroutine') , prefixSuffix , tkString
-	  , ((self token: 'Nothing') / (self justAList: expression))
-	  , (self haskellList: block) , (self maybe: programUnit)
+	^ (self prelude: 'PUSubroutine')
+	, prefixSuffix
+	, tkString
+	, ((self token: 'Nothing') / (self justAList: expression))
+	, (self haskellList: block)
+	, (self maybe: programUnit)
 ]
 
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> selector [
 
-	^ (self prelude: 'Selector')
-	, (self maybe: expression)
-	, (self maybe: expression)
+	^ (self token: 'Selector')
+	, (self token: '{')
+	, (self overturedBy: 'selector')
+	, (self prefix: 'selectorLength')
+	, (self maybeNoParens: expression)
+	, tkComma
+	, (self prefix: 'selectorKind')
+	, (self maybeNoParens: expression)
+	, (self token: '}')
 ]
 
 { #category : #grammar }
 PP2FortranSrcGrammar >> srcSpan [
 
-	^ position , (self token: '-') , position
-		==> [ :nodes || line col|
-			line := nodes first second first asInteger.
-			col := nodes first second third asInteger.
-			(lastPos first x < line)
+	^ position
+	, (self token: '-')
+	, position
+	"The following production rule is for debugging purposes."
+	==> [ :nodes || line col|
+		line := nodes first second first asInteger.
+		col := nodes first second third asInteger.
+		(lastPos first x < line)
 			ifTrue: [ lastPos := { (line @ col) . nodes third second} ] 
 			ifFalse: [ ((lastPos first x = line) and: [lastPos first y < col])
 				ifTrue: [lastPos := { (line @ col) . nodes third second}] ].
-			nodes
-		]
+		nodes
+	]
 ]
 
 { #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> stCall [
+
 	^ ((self prelude: 'StCall')
 	, (self parens: expression)
-	, (self maybe: (self aList:  argument)))
+	, (self parens: (self aList:  argument)))
+]
+
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stData [
+
+	^ (self prelude: 'StData')
+	, (self parens: (self aList: dataGroup))
 ]
 
 { #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> stDeclaration [
+
 	^ (self prelude: 'StDeclaration')
 	, (self parens: typeSpec)
 	, (self maybe: (self aList: attribute))
@@ -626,17 +846,40 @@ PP2FortranSrcGrammar >> stDeclaration [
 ]
 
 { #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stExit [
+
+	^ (self prelude: 'StExit')
+	, (self maybe: expression)
+]
+
+{ #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> stExpressionAssign [
-	^ ((self prelude: 'StExpressionAssign')
+
+	^ (self prelude: 'StExpressionAssign')
 	, (self parens: expression)
-	, (self parens: expression))
+	, (self parens: expression)
+]
+
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stExternal [
+
+	^ (self prelude: 'StExternal')
+	, (self parens: (self aList: expression))
+]
+
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stFormatBogus [
+
+	^ (self prelude: 'StFormatBogus') , tkString
 ]
 
 { #category : #'grammar-statement' }
 PP2FortranSrcGrammar >> stFunction [
 
-	^ (self prelude: 'StFunction') , (self parens: expression)
-	  , (self parens: (self aList: expression)) , (self parens: expression)
+	^ (self prelude: 'StFunction')
+	, (self parens: expression)
+	, (self parens: (self aList: expression))
+	, (self parens: expression)
 ]
 
 { #category : #'grammar-statement' }
@@ -646,9 +889,40 @@ PP2FortranSrcGrammar >> stIfLogical [
 	, (self parens: statement)
 ]
 
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stPrint [
+	^ (self prelude: 'StPrint')
+	, (self parens: expression)
+	, (self maybe: (self justAList: expression))
+]
+
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stRead [
+
+	^ (self prelude: 'StRead')
+	, (self parens: (self aList: controlPair))
+	, (self maybe: (self aList: expression))
+]
+
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stStop [
+
+	^ (self prelude: 'StStop')
+	, (self maybe: expression)
+]
+
+{ #category : #'grammar-statement' }
+PP2FortranSrcGrammar >> stWrite [
+
+	^ (self prelude: 'StWrite')
+	, (self parens: (self aList: controlPair))
+	, (self maybe: (self aList: expression))
+]
+
 { #category : #accessing }
 PP2FortranSrcGrammar >> start [
-	^programFile
+
+	^ programFile
 ]
 
 { #category : #'grammar-statement' }
@@ -663,22 +937,37 @@ PP2FortranSrcGrammar >> statement [
 	  /
 	  ((self prelude: 'StGotoUnconditional') , (self parens: expression))
 	  / stCall / (self prelude: 'StReturn' maybe: expression)
-	  / (self prelude: 'StContinue') / stFunction 
+	  / (self prelude: 'StContinue') / stFunction / stPrint / stExternal / stWrite / stExit 
+	  / stFormatBogus / stStop / stData / stRead
 	"/ stStructure / stIntent / stOptional / stPublic / stPrivate / stProtected / stSave"
-	"/ stAsynchronous / stPointer / stTarget / stValue / stVolatile / stData / stAutomatic / ststatic / stNamelist / stParameter / stExternal / stIntrinsic"
+	"/ stAsynchronous / stPointer / stTarget / stValue / stVolatile / stAutomatic / ststatic / stNamelist / stParameter  / stIntrinsic"
 	"/ stFormat"
 
-	"/ stEntry / stInclude / stDo / stDoWhile / stEnddo / stCycle / stExit "
+	"/ stEntry / stInclude / stDo / stDoWhile / stEnddo / stCycle  "
 	" / stIfArithmetic / stSelectCase / stCase / stEndcase"
 	" / stPointerAssign / stLabelAssign"
 	" / stGotoAssigned / stGotoComputed"
-	"/ ststop / stPause / stRead / stRead2 / stWrite / stPrint / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum / stFormatBogus"
+	" / stPause / stRead2 / stTypePrint / stOpen / stClose / stFlush / stInquire / stRewind / stRewind2 / stBackspace / stBackspace2 / stEndfile / stEndfile2 / stAllocate / stNullify / stDeallocate / stWhere / stWhereConstruct / stElsewhere / stEndWhere / stUse / stModuleProcedure / stProcedure / stType / stEndType / stSequence / stForall / stForallstatement / stEndForall / stImport / stEnum / stEnumerator / stEndEnum "
+]
+
+{ #category : #'grammar-declaration' }
+PP2FortranSrcGrammar >> tkChar [
+
+	^ $' asPParser
+	, #letter asPParser flatten
+	, $' asPParser
 ]
 
 { #category : #token }
 PP2FortranSrcGrammar >> tkComma [
 
 	^ self token: ','
+]
+
+{ #category : #token }
+PP2FortranSrcGrammar >> tkEqual [
+	
+	^ self token: '='
 ]
 
 { #category : #token }
@@ -715,11 +1004,20 @@ PP2FortranSrcGrammar >> token: aString [
 { #category : #'grammar-declaration' }
 PP2FortranSrcGrammar >> typeSpec [
 
-	^ (self prelude: 'TypeSpec') , baseType , (self maybe: selector)
+	^ (self token: 'TypeSpec')
+	, (self token: '{')
+	, (self overturedBy: 'typeSpec')
+	, (self prefix: 'typeSpecBaseType')
+	, baseType
+	, tkComma
+	, (self prefix: 'typeSpecSelector')
+	, (self maybeNoParens: selector)
+	, (self token: '}')
 ]
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> unaryOp [
+
 	^ (self token: 'Plus') /
 	(self token: 'Minus') /
 	(self token: 'Not') /
@@ -735,23 +1033,30 @@ PP2FortranSrcGrammar >> valInteger [
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> valLogical [
 
-	
 	^ (self token: 'ValLogical')
-	  , ((self token: 'False') / (self token: 'True')) , tkNothing
+	, ((self token: 'False') / (self token: 'True'))
+	, tkNothing
+]
+
+{ #category : #'grammar-expression' }
+PP2FortranSrcGrammar >> valStar [
+
+	^ self token: 'ValStar'
 ]
 
 { #category : #'grammar-expression' }
 PP2FortranSrcGrammar >> value [
 
-	^ valInteger / ((self token: 'ValString') , tkString)
-	  / ((self token: 'ValHollerith') , tkString)
-	  / ((self token: 'ValVariable') , tkString)
-	  / ((self token: 'ValIntrinsic') , tkString)
-	  / ((self token: 'ValOperator') , tkString)
-	  / ((self token: 'ValType') , tkString)
-	"/ valReal / valComplex"
-	"/ valBoz"
+	^ valInteger 
 	/ valLogical
-	"/ valAssignment"
-	"/ valStar / valColon"
+	/ ((self token: 'ValString') , tkString)
+	/ ((self token: 'ValHollerith') , tkString)
+	/ ((self token: 'ValVariable') , tkString)
+	/ ((self token: 'ValIntrinsic') , tkString)
+	/ ((self token: 'ValOperator') , tkString)
+	/ ((self token: 'ValType') , tkString)
+	"/ valBoz"
+	"/ (self token: 'ValStar')"
+	"/ valReal / valComplex"
+	"/ valAssignment / valColon"
 ]
