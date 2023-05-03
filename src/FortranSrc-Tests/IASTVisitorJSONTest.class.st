@@ -160,6 +160,22 @@ IASTVisitorJSONTest >> testCommentOutside [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testEmptyBlockData [
+	| programFile prog |
+	programFile := self visitCode: '      BLOCK data hello
+      end
+'.
+
+	self assert: programFile class equals: IASTProgramFile.
+	self assert: programFile progUnits size equals: 1.
+	self assert: programFile progUnits first class equals: IASTBlockData.
+	prog := programFile progUnits first.
+	self assert: prog entityName equals: 'hello'.
+	self assert: prog body isEmpty.
+	self assert: prog comments isEmpty.
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testEmptyFunction [
 	| programFile fct |
 	programFile := self visitCode: '      integer function hello()
