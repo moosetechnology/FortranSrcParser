@@ -287,7 +287,7 @@ IASTVisitorJSON >> visitSpanOf: aNode [
 	
 	four := aSpanString copyFrom: colon+1 to: aSpanString size-1.
 	
-	^ FamixFortran77IndexedFileAnchor new
+	^ IASTIndexedFileAnchor new
 		  startLine: one asInteger ;
 		  startColumn: two asInteger ;
 		  endLine: three asInteger;
