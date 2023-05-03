@@ -451,6 +451,24 @@ IASTVisitorJSONTest >> testMultipleStatements [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testProgramWithEmptyDoStatement [
+	| prog programFile |
+	programFile := self visitCode: '      program hello
+      do i=1, n
+      enddo 
+      end
+'.
+
+	prog := programFile progUnits first.
+	self assert: prog accesses size equals: 2.
+	self assertCollection: (prog accesses collect: [ :each | each entityName ]) hasSameElements: #(i n)
+	
+
+	
+
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testProgramWithOneStatement [
 	| programFile prog |
 	programFile := self visitCode: '      program hello

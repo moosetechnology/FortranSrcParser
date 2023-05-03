@@ -183,6 +183,15 @@ IASTVisitorJSON >> visitDeclaration: aDeclarationNode [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitDo: aDoNode [
+	^{ self accept: ((aDoNode at: 'do_spec') at: 'initial' ).
+			self accept: ((aDoNode at: 'do_spec') at: 'limit' ).
+			self accept: ((aDoNode at: 'do_spec') at: 'increment' ).
+		   self accept: (aDoNode at: 'body') }
+		reject: #isNil.
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitExpr: anExprNode [
 	^self accept: (anExprNode at: 'contents')
 ]
