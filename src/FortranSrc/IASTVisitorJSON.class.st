@@ -64,7 +64,7 @@ IASTVisitorJSON >> model: aCollection [
 	model := aCollection
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'private - utilities' }
 IASTVisitorJSON >> valueNodeContent: aValueNode [
 	^((aValueNode at: 'value') at: 'contents')
 ]
