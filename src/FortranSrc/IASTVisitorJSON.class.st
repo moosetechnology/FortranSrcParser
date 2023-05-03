@@ -234,6 +234,14 @@ IASTVisitorJSON >> visitFunction_call: aFunctionCallNode [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitIf: aIfNode [
+	^{
+		self accept: (aIfNode at: 'conditions').
+		self accept: (aIfNode at: 'blocks') 
+	 } reject: #isNil
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitJSONArray: aNode [
 	^aNode collect: [ :each | self accept: each ]
 ]

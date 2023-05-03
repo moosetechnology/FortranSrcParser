@@ -486,6 +486,98 @@ IASTVisitorJSONTest >> testProgramWithOneStatement [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testProgramWithSimpleIfElseIfElseStatementWitBody [
+	| prog programFile varAccess |
+	programFile := self visitCode: '      program hello
+      if (i < j) then
+        i = i + 1
+      else if (j.gt.0) then
+        j = j - 1
+      else
+        i = j
+      endif
+      end
+'.
+
+	prog := programFile progUnits first.
+	self assert: prog accesses size equals: 9.
+	self assertCollection: (prog accesses collect: [ :each | each entityName ]) hasSameElements: #(i j).
+	self assert: prog accesses third isWrite.
+	self assert: prog accesses sixth isWrite.
+	self assert: prog accesses eighth isWrite.
+
+	varAccess := prog accesses seventh.
+	self assert: varAccess sourceAnchor startLine equals: 5.
+	self assert: varAccess sourceAnchor startColumn equals: 13.
+	self assert: varAccess sourceAnchor endLine equals: 5.
+	self assert: varAccess sourceAnchor endColumn equals: 14.
+
+	
+
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testProgramWithSimpleIfElseStatementWitBody [
+	| prog programFile |
+	programFile := self visitCode: '      program hello
+      if (i < j) then
+        i = i + 1
+      else
+        j = j - 1
+      endif
+      end
+'.
+
+	prog := programFile progUnits first.
+	self assert: prog accesses size equals: 6.
+	self assertCollection: (prog accesses collect: [ :each | each entityName ]) hasSameElements: #(i j).
+	self assert: prog accesses third isWrite.
+	self assert: prog accesses fifth isWrite.
+	
+
+	
+
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testProgramWithSimpleIfStatementWitBody [
+	| prog programFile |
+	programFile := self visitCode: '      program hello
+      if (i < j) then
+        i = j
+      endif
+      end
+'.
+
+	prog := programFile progUnits first.
+	self assert: prog accesses size equals: 4.
+	self assertCollection: (prog accesses collect: [ :each | each entityName ]) hasSameElements: #(i j).
+	self assert: prog accesses third isWrite.
+	
+
+	
+
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testProgramWithSimpleIfStatementWithoutBody [
+	| prog programFile |
+	programFile := self visitCode: '      program hello
+      if (i < j) then
+      endif
+      end
+'.
+
+	prog := programFile progUnits first.
+	self assert: prog accesses size equals: 2.
+	self assertCollection: (prog accesses collect: [ :each | each entityName ]) hasSameElements: #(i j)
+	
+
+	
+
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testStringVariableDeclaration [
 	| programFile stmt |
 	programFile := self visitCode: '      subroutine hello
