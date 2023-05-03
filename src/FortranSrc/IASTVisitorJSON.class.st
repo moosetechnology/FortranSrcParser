@@ -228,6 +228,11 @@ IASTVisitorJSON >> visitJSONNode: key value: aValue [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitMain: aMainProgramNode [
+	^self makeProgramUnitNode: IASTMainProgram with: aMainProgramNode
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitMeta: aNode [
 		self visitJSONDictionary: aNode
 ]
