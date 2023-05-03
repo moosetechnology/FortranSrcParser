@@ -141,7 +141,7 @@ IASTVisitorJSON >> visitCall: aCallNode [
 
 	astNode sourceAnchor: (self visitSpanOf: aCallNode).
 	arguments := (aCallNode at: 'arguments') at: 'list'.
-	astNode arguments: (arguments collect: [:arg | self accept: (arg at: 'expr')] thenReject: [:arg | arg isNil]).
+	astNode arguments: (arguments collect: [:arg | self accept: (arg at: 'expr')] thenReject: #isNil).
 	^{ astNode }
 
 ]
