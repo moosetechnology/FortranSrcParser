@@ -153,6 +153,18 @@ IASTVisitorJSON >> visitComment: aCommentNode [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitCommon: aCommonNode [
+	self flag: #TODO.
+	self shouldBeImplemented
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitData: aDataNode [
+	self flag: #TODO.
+	self shouldBeImplemented
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitDeclaration: aDeclarationNode [
 	| typeSpec |
 
