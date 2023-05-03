@@ -2,7 +2,8 @@ Class {
 	#name : #IASTVisitorJSON,
 	#superclass : #Object,
 	#instVars : [
-		'f77sourcefile'
+		'f77sourcefile',
+		'model'
 	],
 	#category : #'FortranSrc-Visitor'
 }
@@ -32,12 +33,11 @@ IASTVisitorJSON >> isESOPEFunction: aNode [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> makeProcedureNode: aIASTClass with: aProcedureNode [
+IASTVisitorJSON >> makeProgramUnitNode: aIASTClass with: aProgramUnitNode [
 	^aIASTClass new
-		entityName: (aProcedureNode at: 'name') ;
-		sourceAnchor: (self visitSpanOf: aProcedureNode) ;
-		parameters: (self visitArguments: (aProcedureNode at: 'arguments')) ;
-		body: (self visitBlocks: (aProcedureNode at: 'blocks')) ;
+		entityName: (aProgramUnitNode at: 'name') ;
+		sourceAnchor: (self visitSpanOf: aProgramUnitNode) ;
+		body: (self visitBlocks: (aProgramUnitNode at: 'blocks')) ;
 		yourself
 
 ]
