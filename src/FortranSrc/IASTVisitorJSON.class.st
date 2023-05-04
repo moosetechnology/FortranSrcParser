@@ -103,7 +103,7 @@ IASTVisitorJSON >> visitAssign_expression: anAssignExpressionNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitBase_type: aTypeNode [
-	^aTypeNode at: 'base_type'
+	^aTypeNode ifNotNil: [ aTypeNode at: 'base_type']
 ]
 
 { #category : #visiting }
