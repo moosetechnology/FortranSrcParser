@@ -469,6 +469,47 @@ IASTVisitorJSONTest >> testProgramWithEmptyDoStatement [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testProgramWithMultipleProgUnitsWithInvocation [
+
+	| iast node |
+	iast := self visitCode: '      program myprog
+      i = ifunc (i, j)
+      call mysub (name)
+      end
+
+      function ifunc( k, l )
+      ifunc = k + l
+      end
+
+      subroutine mysub (msg)
+      write(*,*) msg
+      end
+'.
+
+	self assert: iast progUnits size equals: 3.
+	
+	node := iast progUnits first.
+	self assert: node class equals: IASTMainProgram.
+	self assert: node entityName equals: 'myprog'.
+	self assert: node body size equals: 3.
+	self assert: node accesses size equals: 1.
+	self assert: node invocations size equals: 2.
+	
+	node := iast progUnits second.
+	self assert: node class equals: IASTFunction.
+	self assert: node parameters size equals: 2.
+	self assert: node parameters first entityName equals: 'k'.
+	self assert: node parameters second entityName equals: 'l'.
+	self assert: node accesses size equals: 3.
+
+	node := iast progUnits third.
+	self assert: node class equals: IASTSubroutine.
+	self assert: node parameters size equals: 1.
+	self assert: node parameters first entityName equals: 'msg'.
+	self assert: node accesses size equals: 1.
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testProgramWithOneStatement [
 	| programFile prog |
 	programFile := self visitCode: '      program hello
