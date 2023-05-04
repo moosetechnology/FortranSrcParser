@@ -408,6 +408,42 @@ IASTVisitorJSONTest >> testEsoAtTwoArgsReceivesVar [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testFunctionWithFunctionInvocation [
+
+	| iast fct |
+	iast := self visitCode: '      function efunc()
+      i = ifunc (i, j)
+      end
+
+      integer function ifunc( k, l )
+      end
+ '.
+
+	self assert: iast progUnits size equals: 2.
+	
+	fct := iast progUnits first.
+
+	self assert: fct class equals: IASTFunction.
+	self assert: fct entityName equals: 'efunc'.
+	self assert: fct body size equals: 2.
+	self assert: fct sourceAnchor startLine equals: 1.
+	self assert: fct sourceAnchor startColumn equals: 7.
+	self assert: fct sourceAnchor endLine equals: 3.
+	self assert: fct sourceAnchor endColumn equals: 10.
+	
+	 
+	fct := iast progUnits second.
+	self assert: fct class equals: IASTFunction.
+	self assert: fct parameters size equals: 2.
+	self assert: fct parameters first entityName equals: 'k'.
+	self assert: fct parameters second entityName equals: 'l'.
+	self assert: fct sourceAnchor startLine equals: 5.
+	self assert: fct sourceAnchor startColumn equals: 7.
+	self assert: fct sourceAnchor endLine equals: 6.
+	self assert: fct sourceAnchor endColumn equals: 10.
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testIntegerVariableDeclaration [
 	| programFile stmt |
 	programFile := self visitCode: '      subroutine hello
