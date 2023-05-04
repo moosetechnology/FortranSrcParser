@@ -7,32 +7,8 @@ Class {
 	#instVars : [
 		'visitor'
 	],
-	#category : #'FortranSrc-Tests'
+	#category : #'FortranSrc-Tests-Visitor'
 }
-
-{ #category : #parsing }
-IASTVisitorJSONTest >> astJSON: sourceCode [
-
-	| filename option |
-	option := 'serialize -t json -v77l encode'.
-	"option := ''."
-	filename := './fortran77.f'.
-	filename asFileReference writeStreamDo: [ :stream | 
-		stream truncate.
-		stream
-		<< (sourceCode copy replaceAll: Character cr with: Character lf) ].
-
-	LibC runCommand: ('{1} {2} "{3}" > "{3}.ast" 2> "{3}.err"' format: { 
-				 self fortranSrcPath.
-				 option.
-				 filename. })
-]
-
-{ #category : #parsing }
-IASTVisitorJSONTest >> fortranSrcPath [
-
-	^ 'fortran-src-extras'
-]
 
 { #category : #running }
 IASTVisitorJSONTest >> setUp [
@@ -733,11 +709,4 @@ IASTVisitorJSONTest >> testTwoIntegerVariableDeclarations [
 	self assert: stmt class equals: IASTVariable.
 	self assert: stmt entityName equals: 'j'.
 	self assert: stmt typeSpec equals: 'integer'.
-]
-
-{ #category : #parsing }
-IASTVisitorJSONTest >> visitCode: aString [
-	self astJSON: aString.
-	^'./fortran77.f.ast' asFileReference readStreamDo: [ :st |
-			visitor visitProgramFile: (NeoJSONReader fromString: st contents) ]
 ]
