@@ -119,37 +119,37 @@ IASTVisitorF77 >> model: anObject [
 
 { #category : #'private-creation' }
 IASTVisitorF77 >> newEntity: aClass [
-
-	^ aClass new
+	^aClass new
 		  mooseModel: model;
 		  yourself
 ]
 
 { #category : #'private-creation' }
 IASTVisitorF77 >> newIndexedFileAnchor: filename [
-
+	| file |
+	file := filename asFileReference.
 	^ (self newEntity: FamixFortran77IndexedFileAnchor)
 		  startLine: 1;
-		  endLine: (filename asFileReference
+		  endLine: (file
 				   ifExists: [ (self class getLines: filename) size ]
 				   ifAbsent: [ 1 ]);
 		  startColumn: 1;
-		  endColumn: (filename asFileReference
+		  endColumn: (file
 				   ifExists: [ (self class getLines: filename) last size + 1]
 				   ifAbsent: [ 1 ]);
-		  fileName: filename asFileReference basename;
+		  fileName: file basename;
 		  yourself
 ]
 
 { #category : #'private-creation' }
-IASTVisitorF77 >> newSourceAnchor: points [
+IASTVisitorF77 >> newSourceAnchor: aPlainSourceAnchor [
 
 	^ (self newEntity: FamixFortran77IndexedFileAnchor)
-		  startLine: points first x;
-		  endLine: points second x;
-		  startColumn: points first y;
-		  endColumn: points second y + 1;
-		  fileName: self f77sourcefile;
+		  startLine: aPlainSourceAnchor startLine ;
+		  endLine: aPlainSourceAnchor endLine ;
+		  startColumn: aPlainSourceAnchor startColumn ;
+		  endColumn: aPlainSourceAnchor endColumn ;
+		  fileName: aPlainSourceAnchor fileName ;
 		  yourself
 ]
 
@@ -194,12 +194,10 @@ IASTVisitorF77 >> visitIASTBlockData: aBlockData [
 
 { #category : #visiting }
 IASTVisitorF77 >> visitIASTComment: aComment [
-
 	| comment |
-	self flag: #TODO.
 
 	comment := aComment isProgUnit
-		           ifTrue: [ self newEntity: FamixFortran77PUComment ]
+		           ifTrue:  [ self newEntity: FamixFortran77PUComment ]
 		           ifFalse: [ self newEntity: FamixFortran77Comment ].
 	^ comment
 		  sourceAnchor: (self newSourceAnchor: aComment sourceAnchor);
@@ -218,7 +216,7 @@ IASTVisitorF77 >> visitIASTFunction: aFunction [
 		            sourceAnchor:
 			            (self newSourceAnchor: aFunction sourceAnchor);
 		            name: aFunction entityName;
-		            returnType: (aFunction returnType accept: self);
+		            returnType: (aFunction returnType ifNotNil: [ aFunction returnType accept: self ]);
 		            yourself.
 	stack push: function.
 	"prossess localVariables inside this progUnit"
@@ -315,14 +313,14 @@ IASTVisitorF77 >> visitIASTProgramFile: aProgramFile [
 		            filename: aProgramFile filename;
 		            version: aProgramFile version;
 		            name: (self class getBasename: aProgramFile filename);
-		            sourceAnchor:
-			            (self newIndexedFileAnchor: aProgramFile filename);
+		            sourceAnchor: (self newIndexedFileAnchor: aProgramFile filename);
 		            yourself.
 	stack push: progFile.
 	"process the programunits inside of this file"
-	aProgramFile progUnits do: [ :programUnit | 
-		progFile addProgramUnit: (programUnit accept: self) ].
-	stack pop
+	aProgramFile progUnits do: [ :progUnit | 
+		progFile addProgramUnit: (progUnit accept: self) ].
+	stack pop.
+	^progFile
 ]
 
 { #category : #visiting }
