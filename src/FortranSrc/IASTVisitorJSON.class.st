@@ -353,3 +353,9 @@ IASTVisitorJSON >> visitValue: aValueNode [
 			sourceAnchor: (self visitSpanOf: aValueNode) ]
 		ifFalse: [ nil ]
 ]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitWrite: aWriteNode [
+	self flag: #TODO. "take care of 'format' also"
+	^self accept: ((aWriteNode at: 'arguments') at: 'list')
+]
