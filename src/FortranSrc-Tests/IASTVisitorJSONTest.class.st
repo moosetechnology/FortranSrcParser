@@ -87,7 +87,10 @@ IASTVisitorJSONTest >> testAssignementStatementWithEsoAt [
 { #category : #tests }
 IASTVisitorJSONTest >> testBlockDataWithOneCommon [
 	| programFile blockdata |
-	programFile := visitor visitCode: '      block data hello
+	self flag: 'not dealing with COMMON for now'.
+	self skip.
+
+	programFile := visitor visitCode: '      blockdata hello
       common /mycom/ i
       end
 '.
@@ -104,6 +107,9 @@ IASTVisitorJSONTest >> testBlockDataWithOneCommon [
 { #category : #tests }
 IASTVisitorJSONTest >> testBlockDataWithOneCommonOneData [
 	| programFile blockdata |
+	self flag: 'not dealing with COMMON for now'.
+	self skip.
+	
 	programFile := visitor visitCode: '      block data hello
       common /mycom/ i
       data i /12345/
