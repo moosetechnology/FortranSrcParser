@@ -185,8 +185,7 @@ IASTVisitorJSON >> visitComment: aCommentNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitCommon: aCommonNode [
-	self flag: #TODO.
-	self shouldBeImplemented
+	self flag: 'ignore for now'
 ]
 
 { #category : #visiting }
