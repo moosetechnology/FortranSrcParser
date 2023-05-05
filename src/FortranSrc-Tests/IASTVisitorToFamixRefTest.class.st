@@ -26,11 +26,35 @@ IASTVisitorToFamixRefTest >> defaultAnchor [
 ]
 
 { #category : #running }
+IASTVisitorToFamixRefTest >> defaultTypeCharacter [
+	^IASTTypeRef new
+		entityName: 'character';
+		sourceAnchor: self defaultAnchor;
+		yourself
+]
+
+{ #category : #running }
+IASTVisitorToFamixRefTest >> defaultTypeInteger [
+	^IASTTypeRef new
+		entityName: 'integer';
+		sourceAnchor: self defaultAnchor;
+		yourself
+]
+
+{ #category : #running }
+IASTVisitorToFamixRefTest >> defaultTypeReal [
+	^IASTTypeRef new
+		entityName: 'real';
+		sourceAnchor: self defaultAnchor;
+		yourself
+]
+
+{ #category : #running }
 IASTVisitorToFamixRefTest >> defaultVariable [
 
 	^ IASTVariable new
 		   entityName: 'aVar';
-			typeSpec: 'integer'
+			typeSpec: self defaultTypeInteger;
 		 	yourself
 ]
 
