@@ -205,7 +205,8 @@ IASTVisitorJSONTest >> testEmptyFunction [
 	fct := programFile progUnits first.
 	self assert: fct entityName equals: 'hello'.
 	self assert: fct parameters isEmpty.
-	self assert: fct returnType equals: 'integer'.
+	self assert: fct returnType class equals: IASTTypeRef.
+	self assert: fct returnType entityName equals: 'integer'.
 	self assert: fct body isEmpty.
 
 	self assert: fct sourceAnchor notNil.
@@ -438,7 +439,8 @@ IASTVisitorJSONTest >> testIntegerVariableDeclaration [
 
 	self assert: stmt class equals: IASTVariable.
 	self assert: stmt entityName equals: 'i'.
-	self assert: stmt typeSpec equals: 'integer'.
+	self assert: stmt typeSpec class equals: IASTTypeRef.
+	self assert: stmt typeSpec entityName equals: 'integer'.
 ]
 
 { #category : #tests }
@@ -454,6 +456,7 @@ IASTVisitorJSONTest >> testMultipleStatements [
 
 	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTVariable.
+	self assert: stmt typeSpec class equals: IASTTypeRef.
 	self assert: stmt entityName equals: 'somevar'.
 
 	stmt := programFile progUnits first body second.
@@ -715,7 +718,8 @@ IASTVisitorJSONTest >> testStringVariableDeclaration [
 	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTVariable.
 	self assert: stmt entityName equals: 'str'.
-	self assert: stmt typeSpec equals: 'character'.
+	self assert: stmt typeSpec class equals: IASTTypeRef.
+	self assert: stmt typeSpec entityName equals: 'character'.
 
 ]
 
@@ -775,10 +779,12 @@ IASTVisitorJSONTest >> testTwoIntegerVariableDeclarations [
 	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTVariable.
 	self assert: stmt entityName equals: 'i'.
-	self assert: stmt typeSpec equals: 'integer'.
+	self assert: stmt typeSpec class equals: IASTTypeRef.
+	self assert: stmt typeSpec entityName equals: 'integer'.
 
 	stmt := programFile progUnits first body second.
 	self assert: stmt class equals: IASTVariable.
 	self assert: stmt entityName equals: 'j'.
-	self assert: stmt typeSpec equals: 'integer'.
+	self assert: stmt typeSpec class equals: IASTTypeRef.
+	self assert: stmt typeSpec entityName equals: 'integer'.
 ]
