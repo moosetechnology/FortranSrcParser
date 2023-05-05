@@ -12,6 +12,11 @@ Class {
 }
 
 { #category : #accessing }
+IASTIndexedFileAnchor >> accept: aVisitor [
+	^aVisitor visitIndexedFileAnchor: self
+]
+
+{ #category : #accessing }
 IASTIndexedFileAnchor >> endColumn [
 
 	^ endColumn
