@@ -655,6 +655,7 @@ IASTVisitorJSONTest >> testProgramWithSimpleIfElseStatementWitBody [
 	prog := programFile progUnits first.
 	self assert: prog accesses size equals: 6.
 	self assertCollection: (prog accesses collect: [ :each | each entityName ]) hasSameElements: #(i j).
+	self assert: (prog accesses select: [:each | each entityName = 'i']) size equals: 3.
 	self assert: prog accesses third isWrite.
 	self assert: prog accesses fifth isWrite.
 	
