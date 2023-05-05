@@ -1,5 +1,5 @@
 Class {
-	#name : #IASTVisitorF77,
+	#name : #IASTVisitorToFamixDef,
 	#superclass : #Object,
 	#instVars : [
 		'model',
@@ -10,19 +10,19 @@ Class {
 }
 
 { #category : #'private-helper' }
-IASTVisitorF77 class >> getBasename: filename [
+IASTVisitorToFamixDef class >> getBasename: filename [
 
 	^ filename asFileReference basename
 ]
 
 { #category : #'private-helper' }
-IASTVisitorF77 class >> getLines: filename [
+IASTVisitorToFamixDef class >> getLines: filename [
 
 	^ filename asFileReference contents lines
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> addAccessesTo: anEntity [
+IASTVisitorToFamixDef >> addAccessesTo: anEntity [
 
 	self flag: #FIXME. "have to be completed, ensure that variable exists or create it"
 	^ anEntity accesses collect: [ :varAccess | 1halt.
@@ -33,7 +33,7 @@ IASTVisitorF77 >> addAccessesTo: anEntity [
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> addInvocationsTo: anEntity [
+IASTVisitorToFamixDef >> addInvocationsTo: anEntity [
 
 	self flag: #FIXME. "have to be completed by adding a sender, receiver, candidates but here we have only: the caller(sender=aFunction) and the callee(receiver/only one candidates=inv)"
 	^ anEntity invocations collect: [ :inv | 
@@ -46,7 +46,7 @@ IASTVisitorF77 >> addInvocationsTo: anEntity [
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> addLocalVariablesTo: anEntity [
+IASTVisitorToFamixDef >> addLocalVariablesTo: anEntity [
 
 	self flag: #FIXME. "declaredType: var typeSpec"
 	^ anEntity localVariables collect: [ :var | 
@@ -57,7 +57,7 @@ IASTVisitorF77 >> addLocalVariablesTo: anEntity [
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> addParametersTo: anEntity [
+IASTVisitorToFamixDef >> addParametersTo: anEntity [
 
 	^ anEntity parameters collect: [ :param | 
 		  (self newEntity: FamixFortran77Parameter)
@@ -67,7 +67,7 @@ IASTVisitorF77 >> addParametersTo: anEntity [
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> defaultImplicitTyping: firstLetter [
+IASTVisitorToFamixDef >> defaultImplicitTyping: firstLetter [
 
 	"God is real . . . unless declared integer"
 
@@ -85,19 +85,19 @@ IASTVisitorF77 >> defaultImplicitTyping: firstLetter [
 ]
 
 { #category : #accessing }
-IASTVisitorF77 >> f77sourcefile [
+IASTVisitorToFamixDef >> f77sourcefile [
 
 	^ f77sourcefile
 ]
 
 { #category : #accessing }
-IASTVisitorF77 >> f77sourcefile: anObject [
+IASTVisitorToFamixDef >> f77sourcefile: anObject [
 
 	f77sourcefile := anObject
 ]
 
 { #category : #initialization }
-IASTVisitorF77 >> initialize [
+IASTVisitorToFamixDef >> initialize [
 
 	super initialize.
 	model := FamixFortran77Model new name: 'mooseModelF77'.
@@ -106,26 +106,26 @@ IASTVisitorF77 >> initialize [
 ]
 
 { #category : #accessing }
-IASTVisitorF77 >> model [
+IASTVisitorToFamixDef >> model [
 
 	^ model
 ]
 
 { #category : #accessing }
-IASTVisitorF77 >> model: anObject [
+IASTVisitorToFamixDef >> model: anObject [
 
 	model := anObject
 ]
 
 { #category : #'private-creation' }
-IASTVisitorF77 >> newEntity: aClass [
+IASTVisitorToFamixDef >> newEntity: aClass [
 	^aClass new
 		  mooseModel: model;
 		  yourself
 ]
 
 { #category : #'private-creation' }
-IASTVisitorF77 >> newIndexedFileAnchor: filename [
+IASTVisitorToFamixDef >> newIndexedFileAnchor: filename [
 	| file |
 	file := filename asFileReference.
 	^ (self newEntity: FamixFortran77IndexedFileAnchor)
@@ -142,19 +142,7 @@ IASTVisitorF77 >> newIndexedFileAnchor: filename [
 ]
 
 { #category : #'private-creation' }
-IASTVisitorF77 >> newSourceAnchor: aPlainSourceAnchor [
-
-	^ (self newEntity: FamixFortran77IndexedFileAnchor)
-		  startLine: aPlainSourceAnchor startLine ;
-		  endLine: aPlainSourceAnchor endLine ;
-		  startColumn: aPlainSourceAnchor startColumn ;
-		  endColumn: aPlainSourceAnchor endColumn ;
-		  fileName: aPlainSourceAnchor fileName ;
-		  yourself
-]
-
-{ #category : #'private-creation' }
-IASTVisitorF77 >> searchInKnownProgUnit: aName [
+IASTVisitorToFamixDef >> searchInKnownProgUnit: aName [
 
 	self flag: #TODO. "Search the known programunits for the one whose name matches the aName"
 	^ (model allWithSubTypesOf: FamixFortran77ProgramUnit) select:
@@ -162,59 +150,73 @@ IASTVisitorF77 >> searchInKnownProgUnit: aName [
 ]
 
 { #category : #'private-creation' }
-IASTVisitorF77 >> searchInLocalSymbolTable: aName [
+IASTVisitorToFamixDef >> searchInLocalSymbolTable: aName [
 
 	self flag: #TODO. "if absent look at implicit or ..."
 	^ stack top symbolTable at: aName ifAbsent: [ nil ]
 ]
 
 { #category : #accessing }
-IASTVisitorF77 >> stack [
+IASTVisitorToFamixDef >> stack [
 
 	^ stack
 ]
 
 { #category : #accessing }
-IASTVisitorF77 >> stack: anObject [
+IASTVisitorToFamixDef >> stack: anObject [
 
 	stack := anObject
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visit: anIASTModel [
+IASTVisitorToFamixDef >> visit: anIASTModel [
 
 	^ anIASTModel accept: self
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTBlockData: aBlockData [
+IASTVisitorToFamixDef >> visitIASTBlockData: aBlockData [
 
-	self flag: #TODO.
+	| blockdata |
+
+	blockdata := (self newEntity: FamixFortran77PUBlockdata)
+						sourceAnchor: (self visitIndexedFileAnchor: aBlockData sourceAnchor);
+						name: aBlockData entityName;
+						yourself.
+	stack push: blockdata.
+	
+	"prossess accesses"
+	aBlockData accesses do: [ :access | 
+		blockdata addAccess: (access accept: self) ].
+
+	"prossess the comments inside this progUnit"
+	aBlockData localComments do: [ :comment | 
+		blockdata addComment: (comment accept: self) ].
+
+	stack pop.
+	^ blockdata
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTComment: aComment [
+IASTVisitorToFamixDef >> visitIASTComment: aComment [
 	| comment |
 
 	comment := aComment isProgUnit
 		           ifTrue:  [ self newEntity: FamixFortran77PUComment ]
 		           ifFalse: [ self newEntity: FamixFortran77Comment ].
 	^ comment
-		  sourceAnchor: (self newSourceAnchor: aComment sourceAnchor);
+		  sourceAnchor: (self visitIndexedFileAnchor: aComment sourceAnchor);
 		  content: aComment text;
 		  yourself
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTFunction: aFunction [
+IASTVisitorToFamixDef >> visitIASTFunction: aFunction [
 
 	| function |
-	self flag: #TODO. "Add the body with statements (accesses, invocations, localVariables)."
-	self flag: #TODO. "declaredType <- aFunction returnType"
 
 	function := (self newEntity: FamixFortran77PUFunction)
-		            sourceAnchor:
-			            (self newSourceAnchor: aFunction sourceAnchor);
+		            sourceAnchor: (self visitIndexedFileAnchor: aFunction sourceAnchor);
 		            name: aFunction entityName;
 		            returnType: (aFunction returnType ifNotNil: [ aFunction returnType accept: self ]);
 		            yourself.
@@ -239,20 +241,19 @@ IASTVisitorF77 >> visitIASTFunction: aFunction [
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTImplicit: anImplicit [
+IASTVisitorToFamixDef >> visitIASTImplicit: anImplicit [
 
 	self flag: #TODO.
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTInvocation: anInvocation [
+IASTVisitorToFamixDef >> visitIASTInvocation: anInvocation [
 
 	| invocation |
 	self flag: #TODO. "howto process invocation arguments ?"
 
 	invocation := (self newEntity: FamixFortran77Invocation)
-		              sourceAnchor:
-			              (self newSourceAnchor: anInvocation sourceAnchor);
+		              sourceAnchor: (self visitIndexedFileAnchor: anInvocation sourceAnchor);
 		              yourself.
 	"anInvocation arguments do: [ :argument | invocation addArgument: (invocation accept: self) ]."
 	invocation target:
@@ -261,27 +262,25 @@ IASTVisitorF77 >> visitIASTInvocation: anInvocation [
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTMainProgram: aMainProgram [
+IASTVisitorToFamixDef >> visitIASTMainProgram: aMainProgram [
 
 	| main |
-	1 halt.
-	self flag: #TODO. "Add the body with statements (accesses, invocations, localVariables)."
+
 	main := (self newEntity: FamixFortran77PUMain)
-		        sourceAnchor:
-			        (self newSourceAnchor: aMainProgram sourceAnchor);
+		        sourceAnchor: (self visitIndexedFileAnchor: aMainProgram sourceAnchor);
 		        name: aMainProgram entityName;
 		        yourself.
 	stack push: main.
-	"prossess localVariables"
+
 	aMainProgram localVariables do: [ :localVariable | 
 		main addLocalVariable: (localVariable accept: self) ].
-	"prossess accesses"
+
 	aMainProgram accesses do: [ :access | 
 		main addAccess: (access accept: self) ].
-	"prossess invocations"
+	
 	aMainProgram invocations do: [ :invocation | 
 		main addOutgoingInvocation: (invocation accept: self) ].
-	"prossess the comments inside this progUnit"
+	
 	aMainProgram localComments do: [ :comment | 
 		main addComment: (comment accept: self) ].
 	stack pop.
@@ -289,7 +288,7 @@ IASTVisitorF77 >> visitIASTMainProgram: aMainProgram [
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTParameter: aParameter [
+IASTVisitorToFamixDef >> visitIASTParameter: aParameter [
 
 	| parameter declaredParam |
 	self flag: #TODO. "relation between parameter and localVariable declaration"
@@ -304,16 +303,14 @@ IASTVisitorF77 >> visitIASTParameter: aParameter [
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTProgramFile: aProgramFile [
+IASTVisitorToFamixDef >> visitIASTProgramFile: aProgramFile [
 
 	| progFile |
-	self flag: #TODO.
 	self f77sourcefile: aProgramFile filename.
 	progFile := (self newEntity: FamixFortran77ProgramFile)
 		            filename: aProgramFile filename;
 		            version: aProgramFile version;
 		            name: (self class getBasename: aProgramFile filename);
-		            sourceAnchor: (self newIndexedFileAnchor: aProgramFile filename);
 		            yourself.
 	stack push: progFile.
 	"process the programunits inside of this file"
@@ -324,14 +321,12 @@ IASTVisitorF77 >> visitIASTProgramFile: aProgramFile [
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTSubroutine: aSubroutine [
+IASTVisitorToFamixDef >> visitIASTSubroutine: aSubroutine [
 
 	| subroutine |
-	1 halt.
-	self flag: #TODO. "Add the body with statements (accesses, invocations, localVariables)"
+
 	subroutine := (self newEntity: FamixFortran77PUSubroutine)
-		              sourceAnchor:
-			              (self newSourceAnchor: aSubroutine sourceAnchor);
+		              sourceAnchor: (self visitIndexedFileAnchor: aSubroutine sourceAnchor) ;
 		              name: aSubroutine entityName;
 		              yourself.
 	stack push: subroutine.
@@ -356,7 +351,7 @@ IASTVisitorF77 >> visitIASTSubroutine: aSubroutine [
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTTypeRef: aType [
+IASTVisitorToFamixDef >> visitIASTTypeRef: aType [
 
 	| type |
 	self flag: #TODO. "How to deal with length and kind for example character*20 name produce aType object like:
@@ -374,7 +369,7 @@ IASTVisitorF77 >> visitIASTTypeRef: aType [
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTVarAccess: aVarAccess [
+IASTVisitorToFamixDef >> visitIASTVarAccess: aVarAccess [
 
 	| access target |
 	self flag: #TODO. "refactoring and other"
@@ -402,36 +397,47 @@ IASTVisitorF77 >> visitIASTVarAccess: aVarAccess [
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTVarEsoAr: aVarEsoAr [
+IASTVisitorToFamixDef >> visitIASTVarEsoAr: aVarEsoAr [
 
 	self flag: #TODO.
 	1halt.
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTVarEsoAt: aVarEsoAt [
+IASTVisitorToFamixDef >> visitIASTVarEsoAt: aVarEsoAt [
 
 	self flag: #TODO.
 	1halt.
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTVarEsoSl: aVarEsoSl [
+IASTVisitorToFamixDef >> visitIASTVarEsoSl: aVarEsoSl [
 
 	self flag: #TODO.
 	1halt.
 ]
 
 { #category : #visiting }
-IASTVisitorF77 >> visitIASTVariable: aVariable [
+IASTVisitorToFamixDef >> visitIASTVariable: aVariable [
 
 	| var |
-	self flag: #TODO.
 	var := (self newEntity: FamixFortran77Variable)
-		       sourceAnchor: (self newSourceAnchor: aVariable sourceAnchor);
+		       sourceAnchor: (self visitIndexedFileAnchor: aVariable sourceAnchor);
 		       name: aVariable entityName;
-		       fType: (aVariable typeSpec accept: self);
 		       yourself.
 	self stack top symbolTable at: var name put: var.
 	^ var
+]
+
+{ #category : #visiting }
+IASTVisitorToFamixDef >> visitIndexedFileAnchor: aSourceAnchor [
+	^aSourceAnchor
+	ifNil: [ nil ]
+	ifNotNil: [	(self newEntity: FamixFortran77IndexedFileAnchor)
+		  startLine: aSourceAnchor startLine ;
+		  endLine: aSourceAnchor endLine ;
+		  startColumn: aSourceAnchor startColumn ;
+		  endColumn: aSourceAnchor endColumn ;
+		  fileName: aSourceAnchor fileName ;
+		  yourself ]
 ]
