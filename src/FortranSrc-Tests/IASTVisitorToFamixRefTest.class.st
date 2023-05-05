@@ -63,31 +63,26 @@ IASTVisitorToFamixRefTest >> setUp [
 	super setUp.
 	
 	iast := IASTProgramFile new filename: 'fortran77.f' ; yourself.
-	visitor := IASTVisitorToFamixDef new.
+	visitor := IASTVisitorToFamixRef new
 ]
 
 { #category : #running }
 IASTVisitorToFamixRefTest >> testCreateFamixFortran77Access [
-	| entity access accessor variable |
-
-	variable  := IASTSubroutine new entityName: 'sub'; yourself.
+	| entity access accessor |
 
 	accessor := IASTMainProgram new
 			 entityName: 'main';
-			 body: { IASTInvocation new entityName: 'sub'; yourself };
+			 body: { self defaultVariable . IASTVarAccess new entityName: 'aVar'; yourself };
 			 yourself.
 	iast progUnits: { accessor }.
 
 	entity := iast accept: visitor.
 
-	self assert: entity programUnits first outgoingInvocations size equals: 1.
-	access := entity programUnits first outgoingInvocations first.
+	self assert: entity programUnits first accesses size equals: 1.
+	access := entity programUnits first accesses first.
 	
-	self assert: access class equals: FamixFortran77Invocation.
-	self assert: access sender equals: entity programUnits first.
-	
-	self assert: access candidates size equals: 1.
-	self assert: access candidates first equals: entity programUnits second.
+	self assert: access class equals: FamixFortran77Access.
+	self assert: access variable equals: entity programUnits first localVariables first.
 ]
 
 { #category : #running }
@@ -98,20 +93,21 @@ IASTVisitorToFamixRefTest >> testCreateFamixFortran77Invocation [
 
 	caller := IASTMainProgram new
 			 entityName: 'main';
-			 body: { IASTInvocation new entityName: 'sub'; yourself };
 			 yourself.
-	iast progUnits: { caller . callee }.
+	iast progUnits: { callee . caller }.
+	
+	caller body: { IASTInvocation new entityName: 'sub'; yourself }.
 
 	entity := iast accept: visitor.
 
-	self assert: entity programUnits first outgoingInvocations size equals: 1.
-	invok := entity programUnits first outgoingInvocations first.
+	self assert: entity programUnits second outgoingInvocations size equals: 1.
+	invok := entity programUnits second outgoingInvocations first.
 	
 	self assert: invok class equals: FamixFortran77Invocation.
-	self assert: invok sender equals: entity programUnits first.
+	self assert: invok sender equals: entity programUnits second.
 	
 	self assert: invok candidates size equals: 1.
-	self assert: invok candidates first equals: entity programUnits second.
+	self assert: invok candidates first equals: entity programUnits first.
 ]
 
 { #category : #running }
@@ -129,6 +125,6 @@ IASTVisitorToFamixRefTest >> testCreateFamixFortran77LocalVariable [
 
 	var := entity programUnits first localVariables first.
 	self assert: var class equals: FamixFortran77Variable.
-	self assert: var referredType class equals: FamixFortran77FType.
-	self assert: var referredType name equals: 'integer'.
+	self assert: var declaredType class equals: FamixFortran77FType.
+	self assert: var declaredType name equals: 'integer'.
 ]
