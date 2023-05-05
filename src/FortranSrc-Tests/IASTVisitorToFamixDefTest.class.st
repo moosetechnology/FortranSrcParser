@@ -33,7 +33,7 @@ IASTVisitorToFamixDefTest >> defaultVariable [
 
 	^ IASTVariable new
 		   entityName: 'aVar';
-			typeSpec: 'integer'
+			typeSpec: 'integer';
 		 	yourself
 ]
 
