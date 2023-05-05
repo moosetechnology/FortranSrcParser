@@ -127,7 +127,13 @@ IASTVisitorJSON >> visitAssign_expression: anAssignExpressionNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitBase_type: aTypeNode [
-	^aTypeNode ifNotNil: [ aTypeNode at: 'base_type']
+	^aTypeNode 
+		ifNotNil: [ 
+			IASTTypeRef new
+				entityName: (aTypeNode at: 'base_type');
+				sourceAnchor: (self visitSpanOf: aTypeNode);
+				yourself
+			]
 ]
 
 { #category : #visiting }
