@@ -100,12 +100,18 @@ IASTVisitorJSON >> valueNodeIsVariable: aValueNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitArguments: anArgumentsNode [
-	^(super visitArguments: anArgumentsNode) collect: [ :varAcces |
-		IASTParameter new
-			entityName: varAcces entityName ;
-			sourceAnchor: varAcces sourceAnchor ;
-			yourself
-	]
+	^(super visitArguments: anArgumentsNode)
+		select: #isNotNil
+		thenCollect: [ :each |
+			(each class = IASTVarAccess)
+			ifTrue: [
+				IASTParameter new
+				entityName: each entityName ;
+				sourceAnchor: each sourceAnchor ;
+				yourself
+			]
+			ifFalse: [ each ]
+		]
 ]
 
 { #category : #visiting }
@@ -266,9 +272,20 @@ IASTVisitorJSON >> visitExpr: anExprNode [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitFunctionStatement: aNode [
-	self flag: #TODO.
-	self shouldBeImplemented
+IASTVisitorJSON >> visitFunctionStatement: aFunctionNode [
+	"for now assuming this is an ESOat/ar/sl function"
+	| data esoFct |
+	data := super visitFunctionStatement: aFunctionNode.
+	
+	esoFct := (IASTVarEso newFrom: data second entityName)
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		isWrite: true ;
+		entities: (data third reject: #isNil) ;
+		yourself.
+
+	^data fourth
+		ifNil: [ { esoFct } ]
+		ifNotNil: [ { esoFct . data fourth } ]
 ]
 
 { #category : #visiting }
@@ -381,7 +398,7 @@ IASTVisitorJSON >> visitSpanOf: aNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitStatement: aStatementNode [
-	^(super visitStatement: aStatementNode) third
+	^(super visitStatement: aStatementNode) allButFirst: 2
 ]
 
 { #category : #visiting }

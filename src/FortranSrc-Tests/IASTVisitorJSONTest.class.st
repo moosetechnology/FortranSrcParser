@@ -100,7 +100,7 @@ IASTVisitorJSONTest >> testBlockDataWithOneCommon [
 	self assert: blockdata entityName equals: 'hello'.
 	self assert: blockdata body size equals: 1.
 	
-	var := blockdata body first.
+	var := blockdata body first first.
 	self assert: var class equals: IASTVariable.
 	self assert: var entityName equals: 'mycom'
 
@@ -326,13 +326,13 @@ IASTVisitorJSONTest >> testEmptySubroutineTwoParams [
 { #category : #tests }
 IASTVisitorJSONTest >> testEsoArTwoArgs [
 	| programFile stmt |
-	programFile := visitor visitCode: '      subroutine hello( name )
+	programFile := visitor visitCode: '      subroutine hello()
         esoar(baz,bar) = 5
       end
 '.
 
-	self assert: programFile progUnits first body size equals: 1.
-	stmt := programFile progUnits first body first.
+	self assert: programFile progUnits first body first size equals: 1.
+	stmt := programFile progUnits first body first first.
 	self assert: stmt class equals: IASTVarEsoAr.
 	self assert: stmt isWrite.
 	self assert: stmt entities size equals: 2.
@@ -342,13 +342,13 @@ IASTVisitorJSONTest >> testEsoArTwoArgs [
 { #category : #tests }
 IASTVisitorJSONTest >> testEsoArWithEsoAtArg [
 	| programFile esoar esoat |
-	programFile := visitor visitCode: '      subroutine hello( name )
+	programFile := visitor visitCode: '      subroutine hello( )
         esoar(esoat(baz,bar),2) = 5
       end
 '.
 
-	self assert: programFile progUnits first body size equals: 1.
-	esoar := programFile progUnits first body first.
+	self assert: programFile progUnits first body first size equals: 1.
+	esoar := programFile progUnits first body first first.
 
 	self assert: esoar class equals: IASTVarEsoAr.
 	self assert: esoar isWrite.
@@ -364,53 +364,56 @@ IASTVisitorJSONTest >> testEsoArWithEsoAtArg [
 { #category : #tests }
 IASTVisitorJSONTest >> testEsoAtOneArg [
 	| programFile stmt |
-	programFile := visitor visitCode: '      subroutine hello( name )
+	programFile := visitor visitCode: '      subroutine hello( )
         esoat(baz,2) = 5
       end
 '.
 
-	self assert: programFile progUnits first body size equals: 1.
-	stmt := programFile progUnits first body first.
+	self assert: programFile progUnits first body first size equals: 1.
+	stmt := programFile progUnits first body first first.
 	self assert: stmt class equals: IASTVarEsoAt.
 	self assert: stmt isWrite.
 	self assert: stmt entities size equals: 1.
-	self assert: stmt entities first class equals: IASTVarAccess.
+	self assert: stmt entities first class equals: IASTParameter.
 	self assert: stmt entities first entityName equals: 'baz'.
 ]
 
 { #category : #tests }
 IASTVisitorJSONTest >> testEsoAtTwoArgs [
 	| programFile stmt |
-	programFile := visitor visitCode: '      subroutine hello( name )
+	programFile := visitor visitCode: '      subroutine hello( )
         esoat(baz,bar) = 5
       end
 '.
 
-	self assert: programFile progUnits first body size equals: 1.
-	stmt := programFile progUnits first body first.
+	self assert: programFile progUnits first body first size equals: 1.
+	stmt := programFile progUnits first body first first.
 	self assert: stmt class equals: IASTVarEsoAt.
 	self assert: stmt isWrite.
 	self assert: stmt entities size equals: 2.
 	stmt entities do: [ :ent |
-		self assert: ent class equals: IASTVarAccess.
-		self assert: (#(baz bar) includes: ent entityName asSymbol).
-		self deny: ent isWrite.
+		self assert: ent class equals: IASTParameter.
+		self assert: (#(baz bar) includes: ent entityName asSymbol)
 	]
 ]
 
 { #category : #tests }
 IASTVisitorJSONTest >> testEsoAtTwoArgsReceivesVar [
-	| programFile stmt |
-	programFile := visitor visitCode: '      subroutine hello( name )
+	| programFile var |
+	programFile := visitor visitCode: '      subroutine hello( )
         esoat(baz,bar) = otherVar
       end
 '.
 
-	self assert: programFile progUnits first body size equals: 2.
-	stmt := programFile progUnits first body second.
-	self assert: stmt class equals: IASTVarAccess.
-	self assert: stmt entityName equals: 'othervar'.
-	self deny: stmt isWrite.
+	self assert: programFile progUnits first body first size equals: 2.
+
+	var := programFile progUnits first body first first.
+	self assert: var class equals: IASTVarEsoAt.
+
+	var := programFile progUnits first body first second.
+	self assert: var class equals: IASTVarAccess.
+	self assert: var entityName equals: 'othervar'.
+	self deny: var isWrite.
 ]
 
 { #category : #tests }

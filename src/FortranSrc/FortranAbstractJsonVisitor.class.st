@@ -55,6 +55,11 @@ FortranAbstractJsonVisitor >> visitBlocks: aBlockList [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitBody: aNode [
+	^self visitJsonElement: aNode
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitComment: aCommentNode [
 	"cannot call visitJsonMap: because contains a key 'comment' that would recursively loop on this method"
 
@@ -155,12 +160,22 @@ FortranAbstractJsonVisitor >> visitFunction: aFunctionNode [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitFunctionStatement: aFunctionStatementNode [
+	"'name' is an object, not a string so, cannot call #visitName: on it"
+	^{ self visitSpan: (aFunctionStatementNode at: 'span') .
+	 self visitJsonElement: (aFunctionStatementNode at: 'name') .
+	 self visitArguments: (aFunctionStatementNode at: 'arguments') .
+	 self visitBody: (aFunctionStatementNode at: 'body') }
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitFunctionWithBlocks: aFunctionNode [
 	^self visitJsonMap: aFunctionNode keys: #(span name type arguments blocks) "result subprograms"
 ]
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitFunctionWithBody: aFunctionNode [
+self flag: 'replaced by #visitFunctionStatement: ?'.
 	^self visitJsonMap: aFunctionNode keys: #(span name arguments body)
 ]
 
@@ -318,11 +333,11 @@ FortranAbstractJsonVisitor >> visitSpan: aSpanString [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitStatement: aStatementNode [
-	^(self visitJsonMap: aStatementNode keys: #(span label)) asOrderedCollection
-		addAll: ((self isTaggedStatement: aStatementNode)
+	^(self visitJsonMap: aStatementNode keys: #(span label))
+	 ,
+		((self isTaggedStatement: aStatementNode)
 			ifTrue: [ self visitJsonTaggedStatement: aStatementNode ]
-			ifFalse: [ self visitJsonElement: (aStatementNode at: 'statement') ]) ;
-		yourself
+			ifFalse: [ self visitJsonElement: (aStatementNode at: 'statement') ])
 ]
 
 { #category : #visiting }
