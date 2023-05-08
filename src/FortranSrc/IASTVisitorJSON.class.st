@@ -137,6 +137,12 @@ IASTVisitorJSON >> visitAssign_expression: anAssignExpressionNode [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitAssign_expressionStatement: aNode [
+	self flag: #TODO.
+	self shouldBeImplemented
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitBinary: aBinaryExpressionNode [
 	^{ 
 		self accept: (aBinaryExpressionNode at: 'left') .
@@ -173,6 +179,12 @@ IASTVisitorJSON >> visitCall: aCallNode [
 	astNode arguments: (arguments collect: [:arg | self accept: (arg at: 'expr')] thenReject: #isNil).
 	^{ astNode }
 
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitCallStatement: aNode [
+	self flag: #TODO.
+	self shouldBeImplemented
 ]
 
 { #category : #'private - parsing' }
@@ -267,11 +279,23 @@ IASTVisitorJSON >> visitExpr: anExprNode [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitFunctionStatement: aNode [
+	self flag: #TODO.
+	self shouldBeImplemented
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitFunctionWithBlocks: aFunctionNode [
-	^(self makeProgramUnitNode: IASTFunction with: aFunctionNode)
-		returnType: (self visitType: (aFunctionNode at: 'type')) ;
-		parameters: (self visitArguments: (aFunctionNode at: 'arguments')) ;
+	| data |
+	data := super visitFunctionWithBlocks: aFunctionNode.
+	^IASTFunction new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		entityName: data second ;
+		returnType: data third ;
+		parameters: data fourth ;
+		body: data fifth ;
 		yourself
+
 ]
 
 { #category : #visiting }

@@ -155,7 +155,7 @@ FortranAbstractJsonVisitor >> visitFunction: aFunctionNode [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitFunctionWithBlocks: aFunctionNode [
-	^self visitJsonMap: aFunctionNode keys: #(span name type arguments blocks result subprograms)
+	^self visitJsonMap: aFunctionNode keys: #(span name type arguments blocks) "result subprograms"
 ]
 
 { #category : #visiting }
