@@ -86,9 +86,7 @@ IASTVisitorJSONTest >> testAssignementStatementWithEsoAt [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testBlockDataWithOneCommon [
-	| programFile blockdata |
-	self flag: 'not dealing with COMMON for now'.
-	self skip.
+	| programFile blockdata var |
 
 	programFile := visitor visitCode: '      blockdata hello
       common /mycom/ i
@@ -97,11 +95,15 @@ IASTVisitorJSONTest >> testBlockDataWithOneCommon [
 
 	self assert: programFile class equals: IASTProgramFile.
 	self assert: programFile progUnits size equals: 1.
-	self assert: programFile progUnits first class equals: IASTBlockData.
+
 	blockdata := programFile progUnits first.
 	self assert: blockdata entityName equals: 'hello'.
-	self assert: blockdata body size equals: 3.
-	self assert: blockdata comments isEmpty.
+	self assert: blockdata body size equals: 1.
+	
+	var := blockdata body first.
+	self assert: var class equals: IASTVariable.
+	self assert: var entityName equals: 'mycom'
+
 ]
 
 { #category : #tests }
@@ -178,7 +180,7 @@ IASTVisitorJSONTest >> testCommentOutside [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testEmptyBlockData [
-	| programFile prog |
+	| programFile block |
 	programFile := visitor visitCode: '      BLOCK data hello
       end
 '.
@@ -186,10 +188,10 @@ IASTVisitorJSONTest >> testEmptyBlockData [
 	self assert: programFile class equals: IASTProgramFile.
 	self assert: programFile progUnits size equals: 1.
 	self assert: programFile progUnits first class equals: IASTBlockData.
-	prog := programFile progUnits first.
-	self assert: prog entityName equals: 'hello'.
-	self assert: prog body isEmpty.
-	self assert: prog comments isEmpty.
+	block := programFile progUnits first.
+	self assert: block entityName equals: 'hello'.
+	self assert: block body isEmpty.
+	self assert: block comments isEmpty.
 ]
 
 { #category : #tests }
@@ -394,7 +396,7 @@ IASTVisitorJSONTest >> testEsoAtTwoArgsReceivesVar [
 IASTVisitorJSONTest >> testFunctionWithFunctionInvocation [
 
 	| iast fct |
-	iast := visitor visitCode: '      function efunc()
+	iast := visitor visitCode: '      integer function efunc()
       i = ifunc (i, j)
       end
 
@@ -428,19 +430,21 @@ IASTVisitorJSONTest >> testFunctionWithFunctionInvocation [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testIntegerVariableDeclaration [
-	| programFile stmt |
+	| programFile var |
 	programFile := visitor visitCode: '      subroutine hello
       integer i
       end
 '.
 
 	self assert: programFile progUnits first body size equals: 1.
-	stmt := programFile progUnits first body first.
+	var := programFile progUnits first body first.
 
-	self assert: stmt class equals: IASTVariable.
-	self assert: stmt entityName equals: 'i'.
-	self assert: stmt typeSpec class equals: IASTTypeRef.
-	self assert: stmt typeSpec entityName equals: 'integer'.
+	self assert: var class equals: IASTVariable.
+	self assert: var entityName equals: 'i'.
+	self assert: var typeSpec class equals: IASTTypeRef.
+	self assert: var typeSpec entityName equals: 'integer'.
+	self assert: var sourceAnchor isNotNil.
+	self assert: var sourceAnchor class equals: IASTIndexedFileAnchor
 ]
 
 { #category : #tests }
@@ -563,7 +567,7 @@ IASTVisitorJSONTest >> testProgramWithMultipleProgUnitsWithInvocation [
       call mysub (name)
       end
 
-      function ifunc( k, l )
+      integer function ifunc( k, l )
       ifunc = k + l
       end
 

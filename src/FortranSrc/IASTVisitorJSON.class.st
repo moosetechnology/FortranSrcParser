@@ -1,6 +1,6 @@
 Class {
 	#name : #IASTVisitorJSON,
-	#superclass : #Object,
+	#superclass : #FortranAbstractJsonVisitor,
 	#instVars : [
 		'f77sourcefile',
 		'model'
@@ -8,7 +8,7 @@ Class {
 	#category : #'FortranSrc-Visitor'
 }
 
-{ #category : #visiting }
+{ #category : #'reflective operations' }
 IASTVisitorJSON >> accept: aNode [
 	aNode ifNil: [ ^nil ].
 	aNode isAssociation ifTrue: [ ^self visitJSONNode: aNode key value: aNode value ].
@@ -53,7 +53,7 @@ IASTVisitorJSON >> f77sourcefile [
 { #category : #'private - parsing' }
 IASTVisitorJSON >> fortranSrcPath [
 
-	^ 'fortran-src-extras'
+	^ '/home/anquetil/.cabal/bin/fortran-src-extras'
 ]
 
 { #category : #initialization }
@@ -69,7 +69,18 @@ IASTVisitorJSON >> isESOPEFunction: aNode [
 	^#(esoat esoar esosl) includes: (self valueNodeContent: aNode)
 ]
 
-{ #category : #visiting }
+{ #category : #'private - utilities' }
+IASTVisitorJSON >> makeIndexedAnchor: aPointPair [
+	^IASTIndexedFileAnchor new
+		  startLine: aPointPair first x ;
+		  startColumn: aPointPair first y ;
+		  endLine: aPointPair second x ;
+		  endColumn: aPointPair second y ;
+		  fileName: f77sourcefile;
+		  yourself
+]
+
+{ #category : #'private - utilities' }
 IASTVisitorJSON >> makeProgramUnitNode: aIASTClass with: aProgramUnitNode [
 	^aIASTClass new
 		entityName: (aProgramUnitNode at: 'name') ;
@@ -126,17 +137,6 @@ IASTVisitorJSON >> visitAssign_expression: anAssignExpressionNode [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitBase_type: aTypeNode [
-	^aTypeNode 
-		ifNotNil: [ 
-			IASTTypeRef new
-				entityName: (aTypeNode at: 'base_type');
-				sourceAnchor: (self visitSpanOf: aTypeNode);
-				yourself
-			]
-]
-
-{ #category : #visiting }
 IASTVisitorJSON >> visitBinary: aBinaryExpressionNode [
 	^{ 
 		self accept: (aBinaryExpressionNode at: 'left') .
@@ -146,12 +146,13 @@ IASTVisitorJSON >> visitBinary: aBinaryExpressionNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitBlock_data: aBlockDataNode [
-	^self makeProgramUnitNode: IASTBlockData with: aBlockDataNode
-]
-
-{ #category : #visiting }
-IASTVisitorJSON >> visitBlocks: aJSONArray [
-	^(self visitJSONArray: aJSONArray) flattened
+	| data |
+	data := super visitBlock_data: aBlockDataNode.
+	^IASTBlockData new
+		sourceAnchor: data first ;
+		entityName: data second ;
+		body: data third ;
+		yourself
 ]
 
 { #category : #visiting }
@@ -183,15 +184,33 @@ IASTVisitorJSON >> visitCode: aString [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitComment: aCommentNode [
+	| data |
+	data := super visitComment: aCommentNode.
 	^IASTComment new
-		text: (aCommentNode at: 'comment') ;
-		sourceAnchor: (self visitSpanOf: aCommentNode) ;
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		text: data second ;
 		yourself
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitCommon: aCommonNode [
-	self flag: 'ignore for now'
+IASTVisitorJSON >> visitCommon: aNode [
+	self flag: #TODO.
+	self shouldBeImplemented
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitCommonGroup: aCommonGroupNode [
+	| data |
+	data := self visitCommonGroupName: (aCommonGroupNode at: 'name').
+	^IASTVariable new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		entityName: (data second) ;
+		yourself
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitCommonStatement: aCommonStatementNode [
+	^self visitCommon_groups: (aCommonStatementNode at: 'common_groups')
 ]
 
 { #category : #visiting }
@@ -201,19 +220,35 @@ IASTVisitorJSON >> visitData: aDataNode [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitDeclaration: aDeclarationNode [
-	| typeSpec |
+IASTVisitorJSON >> visitDeclarationStatement: aDeclarationStatementNode [
+	| data |
 
-	typeSpec := self visitBase_type: (aDeclarationNode at: 'type').
-
-	^((aDeclarationNode at: 'declarators') at: 'list') collect: [ :declarator |
-		IASTVariable new
-			entityName: (self valueNodeContent: (declarator at: 'variable')) ;
-			sourceAnchor: (self visitSpanOf: declarator) ;
-			typeSpec: typeSpec ;
-			yourself
-	].
+	data := super visitDeclarationStatement: aDeclarationStatementNode.
+	data fourth do: [ :iastVar | iastVar typeSpec: data second ].
+	^data fourth
 	
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitDeclarator: aDeclaratorNode [
+	^self visitDeclaratorVariable: (aDeclaratorNode at: 'variable')
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitDeclaratorVariable: aDeclaratorVariableNode [
+	| data |
+	data := super visitDeclaratorVariable: aDeclaratorVariableNode.
+	^IASTVariable new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		entityName: data second ;
+		yourself
+	
+	
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitDeclarators: aDeclaratorsList [
+	^(super visitDeclarators: aDeclaratorsList) second
 ]
 
 { #category : #visiting }
@@ -232,15 +267,15 @@ IASTVisitorJSON >> visitExpr: anExprNode [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitFunction: aFunctionNode [
-	^(self isESOPEFunction: (aFunctionNode at: 'name'))
-		ifTrue:  [ self visitFunctionESOPE: aFunctionNode ]
-		ifFalse: [ self visitFunctionFortran: aFunctionNode ].
-
+IASTVisitorJSON >> visitFunctionWithBlocks: aFunctionNode [
+	^(self makeProgramUnitNode: IASTFunction with: aFunctionNode)
+		returnType: (self visitType: (aFunctionNode at: 'type')) ;
+		parameters: (self visitArguments: (aFunctionNode at: 'arguments')) ;
+		yourself
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitFunctionESOPE: aFunctionNode [
+IASTVisitorJSON >> visitFunctionWithBody: aFunctionNode [
 	| astRhsNode astLhsNode arguments |
 
 	astLhsNode := IASTVarEso newFrom: (self valueNodeContent: (aFunctionNode at: 'name')).
@@ -253,14 +288,6 @@ IASTVisitorJSON >> visitFunctionESOPE: aFunctionNode [
 	astRhsNode := self accept: (aFunctionNode at: 'body').
 
 	^astRhsNode ifNil: [ { astLhsNode } ] ifNotNil: [ { astLhsNode . astRhsNode } ]
-]
-
-{ #category : #visiting }
-IASTVisitorJSON >> visitFunctionFortran: aFunctionNode [
-	^(self makeProgramUnitNode: IASTFunction with: aFunctionNode)
-		returnType: (self visitBase_type: (aFunctionNode at: 'type')) ;
-		parameters: (self visitArguments: (aFunctionNode at: 'arguments')) ;
-		yourself
 ]
 
 { #category : #visiting }
@@ -278,11 +305,13 @@ IASTVisitorJSON >> visitIf: aIfNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitJSONArray: aNode [
+self flag: #REMOVE.
 	^aNode collect: [ :each | self accept: each ]
 ]
 
 { #category : #visiting }
 IASTVisitorJSON >> visitJSONDictionary: jsonDictionary [
+self flag: #REMOVE.
 	^jsonDictionary
 		at: 'tag'
 		ifPresent: [ :key | self visitJSONNode: key value: jsonDictionary ]
@@ -295,8 +324,15 @@ IASTVisitorJSON >> visitJSONDictionary: jsonDictionary [
 { #category : #visiting }
 IASTVisitorJSON >> visitJSONNode: key value: aValue [
 	| selector |
+self flag: #REMOVE.
 	selector := 'visit' , key capitalized , ':'.
 	^self perform: selector asSymbol with: aValue 
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitList: aNode [
+	self flag: #TODO.
+	self shouldBeImplemented
 ]
 
 { #category : #visiting }
@@ -305,18 +341,8 @@ IASTVisitorJSON >> visitMain: aMainProgramNode [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitMeta: aNode [
-	self visitJSONDictionary: aNode
-]
-
-{ #category : #visiting }
 IASTVisitorJSON >> visitMiFilename: aString [
 	f77sourcefile := aString
-]
-
-{ #category : #visiting }
-IASTVisitorJSON >> visitMiVersion: aNode [
-		
 ]
 
 { #category : #visiting }
@@ -339,32 +365,12 @@ IASTVisitorJSON >> visitProgram_units: aNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitSpanOf: aNode [
-	| one two three four colon dash aSpanString |
-	aSpanString := aNode at: 'span'.
-
-	colon := aSpanString indexOf: $:.
-	one := aSpanString copyFrom: 2 to: colon-1.
-	
-	dash := aSpanString indexOf: $-.
-	two := aSpanString copyFrom: colon+1 to: dash-1.
-	
-	colon := aSpanString indexOf: $: startingAt: dash.
-	three := aSpanString copyFrom: dash+1 to: colon-1.
-	
-	four := aSpanString copyFrom: colon+1 to: aSpanString size-1.
-	
-	^ IASTIndexedFileAnchor new
-		  startLine: one asInteger ;
-		  startColumn: two asInteger ;
-		  endLine: three asInteger;
-		  endColumn: four asInteger + 1;
-		  fileName: f77sourcefile;
-		  yourself
+	^self makeIndexedAnchor: (self visitSpan: (aNode at: 'span'))
 ]
 
 { #category : #visiting }
 IASTVisitorJSON >> visitStatement: aStatementNode [
-	^self accept: (aStatementNode at: 'statement')
+	^(super visitStatement: aStatementNode) third
 ]
 
 { #category : #visiting }
@@ -373,6 +379,17 @@ IASTVisitorJSON >> visitSubroutine: aSubroutineNode [
 		parameters: (self visitArguments: (aSubroutineNode at: 'arguments')) ;
 		yourself
 
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitType: aTypeNode [
+	| data |
+	data := (super visitType: aTypeNode) reject: #isNil.
+
+	^IASTTypeRef new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		entityName: (data second) ;
+		yourself
 ]
 
 { #category : #visiting }
