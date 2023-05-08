@@ -10,8 +10,9 @@ FortranAbstractJsonVisitor >> isTaggedStatement: aStatementNode [
 ]
 
 { #category : #visiting }
-FortranAbstractJsonVisitor >> visitArguments: anArgumentsNode [
-	^self visitJsonArray: (anArgumentsNode at: 'list')
+FortranAbstractJsonVisitor >> visitArguments: anArgumentList [
+	anArgumentList ifNil: [ ^#() ].
+	^self visitJsonArray: (anArgumentList at: 'list')
 ]
 
 { #category : #visiting }

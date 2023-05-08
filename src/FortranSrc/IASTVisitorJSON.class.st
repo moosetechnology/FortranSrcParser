@@ -112,8 +112,7 @@ IASTVisitorJSON >> valueNodeIsVariable: aValueNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitArguments: anArgumentsNode [
-	anArgumentsNode ifNil: [ ^#() ].
-	^(self visitJSONArray: (anArgumentsNode at: 'list')) collect: [ :varAcces |
+	^(super visitArguments: anArgumentsNode) collect: [ :varAcces |
 		IASTParameter new
 			entityName: varAcces entityName ;
 			sourceAnchor: varAcces sourceAnchor ;

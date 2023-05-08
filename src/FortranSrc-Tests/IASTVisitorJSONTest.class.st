@@ -222,6 +222,27 @@ IASTVisitorJSONTest >> testEmptyFunction [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testEmptyFunctionWithArguments [
+	| programFile fct param |
+	programFile := visitor visitCode: '      integer function hello(i,j)
+      end
+'.
+
+	fct := programFile progUnits first.
+	self assert: fct entityName equals: 'hello'.
+	self assert: fct parameters size equals: 2.
+
+	param := fct parameters first.
+	self assert: param class equals: IASTParameter.
+	self assert: param entityName equals: 'i'.
+
+	param := fct parameters second.
+	self assert: param class equals: IASTParameter.
+	self assert: param entityName equals: 'j'.
+
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testEmptyProgram [
 	| programFile prog |
 	programFile := visitor visitCode: '      program hello
