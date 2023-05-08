@@ -7,32 +7,8 @@ Class {
 	#instVars : [
 		'visitor'
 	],
-	#category : #'FortranSrc-Tests'
+	#category : #'FortranSrc-Tests-Visitor'
 }
-
-{ #category : #parsing }
-IASTVisitorJSONTest >> astJSON: sourceCode [
-
-	| filename option |
-	option := 'serialize -t json -v77l encode'.
-	"option := ''."
-	filename := './fortran77.f'.
-	filename asFileReference writeStreamDo: [ :stream | 
-		stream truncate.
-		stream
-		<< (sourceCode copy replaceAll: Character cr with: Character lf) ].
-
-	LibC runCommand: ('{1} {2} "{3}" > "{3}.ast" 2> "{3}.err"' format: { 
-				 self fortranSrcPath.
-				 option.
-				 filename. })
-]
-
-{ #category : #parsing }
-IASTVisitorJSONTest >> fortranSrcPath [
-
-	^ 'fortran-src-extras'
-]
 
 { #category : #running }
 IASTVisitorJSONTest >> setUp [
@@ -43,20 +19,20 @@ IASTVisitorJSONTest >> setUp [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testAssignementStatement [
-	| iast stmt |
-	iast := self visitCode: '      subroutine hello
+	| programFile stmt |
+	programFile := visitor visitCode: '      subroutine hello
       someVar = otherVar
       end
 '.
 
-	self assert: iast first body size equals: 2.
+	self assert: programFile progUnits first body size equals: 2.
 
-	stmt := iast first body first.
+	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTVarAccess.
 	self assert: stmt isWrite.
 	self assert: stmt entityName equals: 'somevar'.
 
-	stmt := iast first body second.
+	stmt := programFile progUnits first body second.
 	self assert: stmt class equals: IASTVarAccess.
 	self deny: stmt isWrite.
 	self assert: stmt entityName equals: 'othervar'.
@@ -65,23 +41,23 @@ IASTVisitorJSONTest >> testAssignementStatement [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testAssignementStatementWithComplexRHS [
-	| iast stmt |
-	iast := self visitCode: '      subroutine hello
+	| programFile stmt |
+	programFile := visitor visitCode: '      subroutine hello
       someVar = otherVar + thirdVar
       end
 '.
 
-	self assert: iast first body size equals: 3.
+	self assert: programFile progUnits first body size equals: 3.
 
-	stmt := iast first body first.
+	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTVarAccess.
 	self assert: stmt entityName equals: 'somevar'.
 
-	stmt := iast first body second.
+	stmt := programFile progUnits first body second.
 	self assert: stmt class equals: IASTVarAccess.
 	self assert: stmt entityName equals: 'othervar'.
 
-	stmt := iast first body third.
+	stmt := programFile progUnits first body third.
 	self assert: stmt class equals: IASTVarAccess.
 	self assert: stmt entityName equals: 'thirdvar'.
 
@@ -89,19 +65,19 @@ IASTVisitorJSONTest >> testAssignementStatementWithComplexRHS [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testAssignementStatementWithEsoAt [
-	| iast stmt |
-	iast := self visitCode: '      subroutine hello
+	| programFile stmt |
+	programFile := visitor visitCode: '      subroutine hello
       someVar = esoat(var,1)
       end
 '.
 
-	self assert: iast first body size equals: 2.
+	self assert: programFile progUnits first body size equals: 2.
 
-	stmt := iast first body first.
+	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTVarAccess.
 	self assert: stmt entityName equals: 'somevar'.
 
-	stmt := iast first body second.
+	stmt := programFile progUnits first body second.
 	self assert: stmt class equals: IASTVarEsoAt.
 	self deny: stmt isWrite.
 	self assert: stmt entities size equals: 1
@@ -109,17 +85,58 @@ IASTVisitorJSONTest >> testAssignementStatementWithEsoAt [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testComment [
-	| iast stmt |
-	iast := self visitCode: 'c     blah'.
+IASTVisitorJSONTest >> testBlockDataWithOneCommon [
+	| programFile blockdata |
+	self flag: 'not dealing with COMMON for now'.
+	self skip.
 
-	self assert: iast size equals: 1.
-	stmt := iast first.
+	programFile := visitor visitCode: '      blockdata hello
+      common /mycom/ i
+      end
+'.
+
+	self assert: programFile class equals: IASTProgramFile.
+	self assert: programFile progUnits size equals: 1.
+	self assert: programFile progUnits first class equals: IASTBlockData.
+	blockdata := programFile progUnits first.
+	self assert: blockdata entityName equals: 'hello'.
+	self assert: blockdata body size equals: 3.
+	self assert: blockdata comments isEmpty.
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testBlockDataWithOneCommonOneData [
+	| programFile blockdata |
+	self flag: 'not dealing with COMMON for now'.
+	self skip.
+	
+	programFile := visitor visitCode: '      block data hello
+      common /mycom/ i
+      data i /12345/
+      end
+'.
+
+	self assert: programFile class equals: IASTProgramFile.
+	self assert: programFile progUnits size equals: 1.
+	self assert: programFile progUnits first class equals: IASTBlockData.
+	blockdata := programFile progUnits first.
+	self assert: blockdata entityName equals: 'hello'.
+	self assert: blockdata body size equals: 3.
+	self assert: blockdata comments isEmpty.
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testComment [
+	| programFile stmt |
+	programFile := visitor visitCode: 'c     blah'.
+
+	self assert: programFile progUnits size equals: 1.
+	stmt := programFile progUnits first.
 	self assert: stmt class equals: IASTComment.
 	self assert: stmt text equals: '     blah'.
 
 	self assert: stmt sourceAnchor notNil.
-	self assert: stmt sourceAnchor class equals: FamixFortran77IndexedFileAnchor.
+	self assert: stmt sourceAnchor class equals: IASTIndexedFileAnchor.
 	self assert: stmt sourceAnchor fileName equals: './fortran77.f'.
 	self assert: stmt sourceAnchor startLine equals: 1.
 	self assert: stmt sourceAnchor startColumn equals: 1.
@@ -130,14 +147,14 @@ IASTVisitorJSONTest >> testComment [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testCommentInside [
-	| iast stmt |
-	iast := self visitCode: '      integer function hello()
+	| programFile stmt |
+	programFile := visitor visitCode: '      integer function hello()
 c     blah
       end
 '.
 
-	self assert: iast first body size equals: 1.
-	stmt := iast first body first.
+	self assert: programFile progUnits first body size equals: 1.
+	stmt := programFile progUnits first body first.
 
 	self assert: stmt class equals: IASTComment.
 	self assert: stmt text equals: '     blah'.
@@ -146,60 +163,119 @@ c     blah
 
 { #category : #tests }
 IASTVisitorJSONTest >> testCommentOutside [
-	| iast stmt |
-	iast := self visitCode: 'c     blah
+	| programFile stmt |
+	programFile := visitor visitCode: 'c     blah
       integer function hello()
       end
 '.
 
-	self assert: iast size equals: 2.
-	stmt := iast first.
+	self assert: programFile progUnits size equals: 2.
+	stmt := programFile progUnits first.
 	self assert: stmt class equals: IASTComment.
 	self assert: stmt text equals: '     blah'.
 
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testEmptyFunction [
-	| iast sub |
-	iast := self visitCode: '      integer function hello()
+IASTVisitorJSONTest >> testEmptyBlockData [
+	| programFile prog |
+	programFile := visitor visitCode: '      BLOCK data hello
       end
 '.
 
-	self assert: iast isCollection.
-	self assert: iast size equals: 1.
-	self assert: iast first class equals: IASTFunction.
-	sub := iast first.
-	self assert: sub entityName equals: 'hello'.
-	self assert: sub parameters isEmpty.
-	self assert: sub returnType equals: 'integer'.
-	self assert: sub body isEmpty.
+	self assert: programFile class equals: IASTProgramFile.
+	self assert: programFile progUnits size equals: 1.
+	self assert: programFile progUnits first class equals: IASTBlockData.
+	prog := programFile progUnits first.
+	self assert: prog entityName equals: 'hello'.
+	self assert: prog body isEmpty.
+	self assert: prog comments isEmpty.
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testEmptyFunction [
+	| programFile fct |
+	programFile := visitor visitCode: '      integer function hello()
+      end
+'.
+
+	self assert: programFile class equals: IASTProgramFile.
+	self assert: programFile progUnits size equals: 1.
+	self assert: programFile progUnits first class equals: IASTFunction.
+	fct := programFile progUnits first.
+	self assert: fct entityName equals: 'hello'.
+	self assert: fct parameters isEmpty.
+	self assert: fct returnType class equals: IASTTypeRef.
+	self assert: fct returnType entityName equals: 'integer'.
+	self assert: fct body isEmpty.
+
+	self assert: fct sourceAnchor notNil.
+	self assert: fct sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: fct sourceAnchor fileName equals: './fortran77.f'.
+	self assert: fct sourceAnchor startLine equals: 1.
+	self assert: fct sourceAnchor startColumn equals: 7.
+	self assert: fct sourceAnchor endLine equals: 2.
+	self assert: fct sourceAnchor endColumn equals: 10.
+
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testEmptyProgram [
+	| programFile prog |
+	programFile := visitor visitCode: '      program hello
+      end
+'.
+
+	self assert: programFile class equals: IASTProgramFile.
+	self assert: programFile progUnits size equals: 1.
+	self assert: programFile progUnits first class equals: IASTMainProgram.
+	prog := programFile progUnits first.
+	self assert: prog entityName equals: 'hello'.
+	self assert: prog body isEmpty.
+	self assert: prog comments isEmpty.
+
+	self assert: prog sourceAnchor notNil.
+	self assert: prog sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: prog sourceAnchor fileName equals: './fortran77.f'.
+	self assert: prog sourceAnchor startLine equals: 1.
+	self assert: prog sourceAnchor startColumn equals: 7.
+	self assert: prog sourceAnchor endLine equals: 2.
+	self assert: prog sourceAnchor endColumn equals: 10.
+
 ]
 
 { #category : #tests }
 IASTVisitorJSONTest >> testEmptySubroutine [
-	| iast sub |
-	iast := self visitCode: '      subroutine hello
+	| programFile sub |
+	programFile := visitor visitCode: '      subroutine hello
       end
 '.
 
-	self assert: iast isCollection.
-	self assert: iast size equals: 1.
-	self assert: iast first class equals: IASTSubroutine.
-	sub := iast first.
+	self assert: programFile class equals: IASTProgramFile.
+	self assert: programFile progUnits size equals: 1.
+	self assert: programFile progUnits first class equals: IASTSubroutine.
+	sub := programFile progUnits first.
 	self assert: sub entityName equals: 'hello'.
 	self assert: sub parameters isEmpty.
 	self assert: sub body isEmpty.
+
+	self assert: sub sourceAnchor notNil.
+	self assert: sub sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: sub sourceAnchor fileName equals: './fortran77.f'.
+	self assert: sub sourceAnchor startLine equals: 1.
+	self assert: sub sourceAnchor startColumn equals: 7.
+	self assert: sub sourceAnchor endLine equals: 2.
+	self assert: sub sourceAnchor endColumn equals: 10.
 ]
 
 { #category : #tests }
 IASTVisitorJSONTest >> testEmptySubroutineOneParam [
-	| iast sub |
-	iast := self visitCode: '      subroutine hello( name )
+	| programFile sub |
+	programFile := visitor visitCode: '      subroutine hello( name )
       end
 '.
 
-	sub := iast first.
+	sub := programFile progUnits first.
 	self assert: sub entityName equals: 'hello'.
 	self assert: sub parameters size equals: 1.
 	self assert: sub parameters first class equals: IASTParameter.
@@ -209,12 +285,12 @@ IASTVisitorJSONTest >> testEmptySubroutineOneParam [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testEmptySubroutineTwoParams [
-	| iast sub |
-	iast := self visitCode: '      subroutine hello( param1, param2 )
+	| programFile sub |
+	programFile := visitor visitCode: '      subroutine hello( param1, param2 )
       end
 '.
 
-	sub := iast first.
+	sub := programFile progUnits first.
 	self assert: sub entityName equals: 'hello'.
 	self assert: sub parameters size equals: 2.
 	self assert: sub parameters first class equals: IASTParameter.
@@ -226,14 +302,14 @@ IASTVisitorJSONTest >> testEmptySubroutineTwoParams [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testEsoArTwoArgs [
-	| iast stmt |
-	iast := self visitCode: '      subroutine hello( name )
+	| programFile stmt |
+	programFile := visitor visitCode: '      subroutine hello( name )
         esoar(baz,bar) = 5
       end
 '.
 
-	self assert: iast first body size equals: 1.
-	stmt := iast first body first.
+	self assert: programFile progUnits first body size equals: 1.
+	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTVarEsoAr.
 	self assert: stmt isWrite.
 	self assert: stmt entities size equals: 2.
@@ -242,14 +318,14 @@ IASTVisitorJSONTest >> testEsoArTwoArgs [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testEsoArWithEsoAtArg [
-	| iast esoar esoat |
-	iast := self visitCode: '      subroutine hello( name )
+	| programFile esoar esoat |
+	programFile := visitor visitCode: '      subroutine hello( name )
         esoar(esoat(baz,bar),2) = 5
       end
 '.
 
-	self assert: iast first body size equals: 1.
-	esoar := iast first body first.
+	self assert: programFile progUnits first body size equals: 1.
+	esoar := programFile progUnits first body first.
 
 	self assert: esoar class equals: IASTVarEsoAr.
 	self assert: esoar isWrite.
@@ -264,14 +340,14 @@ IASTVisitorJSONTest >> testEsoArWithEsoAtArg [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testEsoAtOneArg [
-	| iast stmt |
-	iast := self visitCode: '      subroutine hello( name )
+	| programFile stmt |
+	programFile := visitor visitCode: '      subroutine hello( name )
         esoat(baz,2) = 5
       end
 '.
 
-	self assert: iast first body size equals: 1.
-	stmt := iast first body first.
+	self assert: programFile progUnits first body size equals: 1.
+	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTVarEsoAt.
 	self assert: stmt isWrite.
 	self assert: stmt entities size equals: 1.
@@ -281,14 +357,14 @@ IASTVisitorJSONTest >> testEsoAtOneArg [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testEsoAtTwoArgs [
-	| iast stmt |
-	iast := self visitCode: '      subroutine hello( name )
+	| programFile stmt |
+	programFile := visitor visitCode: '      subroutine hello( name )
         esoat(baz,bar) = 5
       end
 '.
 
-	self assert: iast first body size equals: 1.
-	stmt := iast first body first.
+	self assert: programFile progUnits first body size equals: 1.
+	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTVarEsoAt.
 	self assert: stmt isWrite.
 	self assert: stmt entities size equals: 2.
@@ -301,56 +377,94 @@ IASTVisitorJSONTest >> testEsoAtTwoArgs [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testEsoAtTwoArgsReceivesVar [
-	| iast stmt |
-	iast := self visitCode: '      subroutine hello( name )
+	| programFile stmt |
+	programFile := visitor visitCode: '      subroutine hello( name )
         esoat(baz,bar) = otherVar
       end
 '.
 
-	self assert: iast first body size equals: 2.
-	stmt := iast first body second.
+	self assert: programFile progUnits first body size equals: 2.
+	stmt := programFile progUnits first body second.
 	self assert: stmt class equals: IASTVarAccess.
 	self assert: stmt entityName equals: 'othervar'.
 	self deny: stmt isWrite.
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testFunctionWithFunctionInvocation [
+
+	| iast fct |
+	iast := visitor visitCode: '      function efunc()
+      i = ifunc (i, j)
+      end
+
+      integer function ifunc( k, l )
+      end
+ '.
+
+	self assert: iast progUnits size equals: 2.
+	
+	fct := iast progUnits first.
+
+	self assert: fct class equals: IASTFunction.
+	self assert: fct entityName equals: 'efunc'.
+	self assert: fct body size equals: 2.
+	self assert: fct sourceAnchor startLine equals: 1.
+	self assert: fct sourceAnchor startColumn equals: 7.
+	self assert: fct sourceAnchor endLine equals: 3.
+	self assert: fct sourceAnchor endColumn equals: 10.
+	
+	 
+	fct := iast progUnits second.
+	self assert: fct class equals: IASTFunction.
+	self assert: fct parameters size equals: 2.
+	self assert: fct parameters first entityName equals: 'k'.
+	self assert: fct parameters second entityName equals: 'l'.
+	self assert: fct sourceAnchor startLine equals: 5.
+	self assert: fct sourceAnchor startColumn equals: 7.
+	self assert: fct sourceAnchor endLine equals: 6.
+	self assert: fct sourceAnchor endColumn equals: 10.
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testIntegerVariableDeclaration [
-	| iast stmt |
-	iast := self visitCode: '      subroutine hello
+	| programFile stmt |
+	programFile := visitor visitCode: '      subroutine hello
       integer i
       end
 '.
 
-	self assert: iast first body size equals: 1.
-	stmt := iast first body first.
+	self assert: programFile progUnits first body size equals: 1.
+	stmt := programFile progUnits first body first.
 
 	self assert: stmt class equals: IASTVariable.
 	self assert: stmt entityName equals: 'i'.
-	self assert: stmt typeSpec equals: 'integer'.
+	self assert: stmt typeSpec class equals: IASTTypeRef.
+	self assert: stmt typeSpec entityName equals: 'integer'.
 ]
 
 { #category : #tests }
 IASTVisitorJSONTest >> testMultipleStatements [
-	| iast stmt |
-	iast := self visitCode: '      subroutine hello
+	| programFile stmt |
+	programFile := visitor visitCode: '      subroutine hello
       integer someVar
       someVar = 3 * someVar
       end
 '.
 
-	self assert: iast first body size equals: 3.
+	self assert: programFile progUnits first body size equals: 3.
 
-	stmt := iast first body first.
+	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTVariable.
+	self assert: stmt typeSpec class equals: IASTTypeRef.
 	self assert: stmt entityName equals: 'somevar'.
 
-	stmt := iast first body second.
+	stmt := programFile progUnits first body second.
 	self assert: stmt class equals: IASTVarAccess.
 	self assert: stmt isWrite.
 	self assert: stmt entityName equals: 'somevar'.
 
-	stmt := iast first body third.
+	stmt := programFile progUnits first body third.
 	self assert: stmt class equals: IASTVarAccess.
 	self deny: stmt isWrite.
 	self assert: stmt entityName equals: 'somevar'.
@@ -358,33 +472,268 @@ IASTVisitorJSONTest >> testMultipleStatements [
 ]
 
 { #category : #tests }
+IASTVisitorJSONTest >> testProgramWithEmptyDoStatement [
+	| prog programFile |
+	programFile := visitor visitCode: '      program hello
+      do i=1, n
+      enddo 
+      end
+'.
+
+	prog := programFile progUnits first.
+	self assert: prog accesses size equals: 2.
+	self assertCollection: (prog accesses collect: [ :each | each entityName ]) hasSameElements: #(i n)
+	
+
+	
+
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testProgramWithEsopeCode [
+	| prog programFile |
+	programFile := visitor visitCode: '      subroutine demo
+      integer i
+      integer n
+cESO  segment foo
+         real bar(n)
+cESO  endsegment
+cESO  pointeur baz.foo
+      n=3
+cESO  segini,baz
+      i=1
+      ESOAr(ESOAt(baz,bar),i)=i*i
+cESO  segsup,baz
+      end
+'.
+
+	prog := programFile progUnits first.
+	self assert: prog class equals: IASTSubroutine.
+	
+	self assert: prog body size equals: 13.
+	self assert: prog comments size equals: 5.
+	self assert: prog accesses size equals: 4.
+	self assert: prog localVariables size equals: 3.
+	
+
+	
+
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testProgramWithHiddenSegmentInside [
+	| prog programFile |
+	programFile := visitor visitCode: '      program hello
+cESO  segment test
+        integer a(n),b(m)
+cESO  endsegment
+cESO  pointeur ptr1.test
+cESO  segini ptr1
+      size = ESOSl(ESOat(ptr1,a), 1)
+      do i=1, size
+        ESOAr(ESOAt(ptr1,a),i)=i*i
+      enddo
+      size = ESOSl(ESOat(ptr1,b),1)
+      do i=1, size
+        ESOAr(ESOAt(ptr1,b),i)=3*i
+      enddo
+cESO  segsup ptr1     
+      end
+'.
+
+	prog := programFile progUnits first.
+	self assert: prog class equals: IASTMainProgram.
+	
+	self assert: prog body size equals: 20.
+	self assert: prog comments size equals: 5.
+	self assert: prog accesses size equals: 9.
+	self assert: prog localVariables size equals: 2.
+	
+
+	
+
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testProgramWithMultipleProgUnitsWithInvocation [
+
+	| iast node |
+	iast := visitor visitCode: '      program myprog
+      i = ifunc (i, j)
+      call mysub (name)
+      end
+
+      function ifunc( k, l )
+      ifunc = k + l
+      end
+
+      subroutine mysub (msg)
+      write(*,*) msg
+      end
+'.
+
+	self assert: iast progUnits size equals: 3.
+	
+	node := iast progUnits first.
+	self assert: node class equals: IASTMainProgram.
+	self assert: node entityName equals: 'myprog'.
+	self assert: node body size equals: 3.
+	self assert: node accesses size equals: 1.
+	self assert: node invocations size equals: 2.
+	
+	node := iast progUnits second.
+	self assert: node class equals: IASTFunction.
+	self assert: node parameters size equals: 2.
+	self assert: node parameters first entityName equals: 'k'.
+	self assert: node parameters second entityName equals: 'l'.
+	self assert: node accesses size equals: 3.
+
+	node := iast progUnits third.
+	self assert: node class equals: IASTSubroutine.
+	self assert: node parameters size equals: 1.
+	self assert: node parameters first entityName equals: 'msg'.
+	self assert: node accesses size equals: 1.
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testProgramWithOneStatement [
+	| programFile prog |
+	programFile := visitor visitCode: '      program hello
+      a = -b
+      end
+'.
+
+	self assert: programFile class equals: IASTProgramFile.
+	self assert: programFile progUnits size equals: 1.
+	self assert: programFile progUnits first class equals: IASTMainProgram.
+	prog := programFile progUnits first.
+	self assert: prog entityName equals: 'hello'.
+	self assert: prog body size equals: 2.
+	self assert: prog comments isEmpty.
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testProgramWithSimpleIfElseIfElseStatementWitBody [
+	| prog programFile varAccess |
+	programFile := visitor visitCode: '      program hello
+      if (i < j) then
+        i = i + 1
+      else if (j.gt.0) then
+        j = j - 1
+      else
+        i = j
+      endif
+      end
+'.
+
+	prog := programFile progUnits first.
+	self assert: prog accesses size equals: 9.
+	self assertCollection: (prog accesses collect: [ :each | each entityName ]) hasSameElements: #(i j).
+	self assert: prog accesses third isWrite.
+	self assert: prog accesses sixth isWrite.
+	self assert: prog accesses eighth isWrite.
+
+	varAccess := prog accesses seventh.
+	self assert: varAccess sourceAnchor startLine equals: 5.
+	self assert: varAccess sourceAnchor startColumn equals: 13.
+	self assert: varAccess sourceAnchor endLine equals: 5.
+	self assert: varAccess sourceAnchor endColumn equals: 14.
+
+	
+
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testProgramWithSimpleIfElseStatementWitBody [
+	| prog programFile |
+	programFile := visitor visitCode: '      program hello
+      if (i < j) then
+        i = i + 1
+      else
+        j = j - 1
+      endif
+      end
+'.
+
+	prog := programFile progUnits first.
+	self assert: prog accesses size equals: 6.
+	self assertCollection: (prog accesses collect: [ :each | each entityName ]) hasSameElements: #(i j).
+	self assert: (prog accesses select: [:each | each entityName = 'i']) size equals: 3.
+	self assert: prog accesses third isWrite.
+	self assert: prog accesses fifth isWrite.
+	
+
+	
+
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testProgramWithSimpleIfStatementWitBody [
+	| prog programFile |
+	programFile := visitor visitCode: '      program hello
+      if (i < j) then
+        i = j
+      endif
+      end
+'.
+
+	prog := programFile progUnits first.
+	self assert: prog accesses size equals: 4.
+	self assertCollection: (prog accesses collect: [ :each | each entityName ]) hasSameElements: #(i j).
+	self assert: prog accesses third isWrite.
+	
+
+	
+
+]
+
+{ #category : #tests }
+IASTVisitorJSONTest >> testProgramWithSimpleIfStatementWithoutBody [
+	| prog programFile |
+	programFile := visitor visitCode: '      program hello
+      if (i < j) then
+      endif
+      end
+'.
+
+	prog := programFile progUnits first.
+	self assert: prog accesses size equals: 2.
+	self assertCollection: (prog accesses collect: [ :each | each entityName ]) hasSameElements: #(i j)
+	
+
+	
+
+]
+
+{ #category : #tests }
 IASTVisitorJSONTest >> testStringVariableDeclaration [
-	| iast stmt |
-	iast := self visitCode: '      subroutine hello
+	| programFile stmt |
+	programFile := visitor visitCode: '      subroutine hello
       character*8 str
       end
 '.
 
-	self assert: iast first body size equals: 1.
+	self assert: programFile progUnits first body size equals: 1.
 
-	stmt := iast first body first.
+	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTVariable.
 	self assert: stmt entityName equals: 'str'.
-	self assert: stmt typeSpec equals: 'character'.
+	self assert: stmt typeSpec class equals: IASTTypeRef.
+	self assert: stmt typeSpec entityName equals: 'character'.
 
 ]
 
 { #category : #tests }
 IASTVisitorJSONTest >> testSubroutineInvocation [
-	| iast stmt |
-	iast := self visitCode: '      subroutine hello
+	| programFile stmt |
+	programFile := visitor visitCode: '      subroutine hello
       call someSubRoutine
       end
 '.
 
-	self assert: iast first body size equals: 1.
+	self assert: programFile progUnits first body size equals: 1.
 
-	stmt := iast first body first.
+	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTInvocation.
 	self assert: stmt entityName equals: 'somesubroutine'.
 	self assert: stmt arguments size equals: 0
@@ -393,15 +742,15 @@ IASTVisitorJSONTest >> testSubroutineInvocation [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testSubroutineInvocationWithArguments [
-	| iast stmt arg |
-	iast := self visitCode: '      subroutine hello
+	| programFile stmt arg |
+	programFile := visitor visitCode: '      subroutine hello
       call someSubRoutine(bar,5,baz)
       end
 '.
 
-	self assert: iast first body size equals: 1.
+	self assert: programFile progUnits first body size equals: 1.
 
-	stmt := iast first body first.
+	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTInvocation.
 	self assert: stmt entityName equals: 'somesubroutine'.
 	self assert: stmt arguments size equals: 2.
@@ -419,28 +768,23 @@ IASTVisitorJSONTest >> testSubroutineInvocationWithArguments [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testTwoIntegerVariableDeclarations [
-	| iast stmt |
-	iast := self visitCode: '      subroutine hello
+	| programFile stmt |
+	programFile := visitor visitCode: '      subroutine hello
       integer i,j
       end
 '.
 
-	self assert: iast first body size equals: 2.
+	self assert: programFile progUnits first body size equals: 2.
 
-	stmt := iast first body first.
+	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTVariable.
 	self assert: stmt entityName equals: 'i'.
-	self assert: stmt typeSpec equals: 'integer'.
+	self assert: stmt typeSpec class equals: IASTTypeRef.
+	self assert: stmt typeSpec entityName equals: 'integer'.
 
-	stmt := iast first body second.
+	stmt := programFile progUnits first body second.
 	self assert: stmt class equals: IASTVariable.
 	self assert: stmt entityName equals: 'j'.
-	self assert: stmt typeSpec equals: 'integer'.
-]
-
-{ #category : #parsing }
-IASTVisitorJSONTest >> visitCode: aString [
-	self astJSON: aString.
-	^'./fortran77.f.ast' asFileReference readStreamDo: [ :st |
-			visitor visitProgramFile: (NeoJSONReader fromString: st contents) ]
+	self assert: stmt typeSpec class equals: IASTTypeRef.
+	self assert: stmt typeSpec entityName equals: 'integer'.
 ]

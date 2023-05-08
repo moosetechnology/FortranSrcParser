@@ -2,7 +2,6 @@ Class {
 	#name : #IASTVarAccess,
 	#superclass : #IASTEntityRef,
 	#instVars : [
-		'isAssigned',
 		'isWrite'
 	],
 	#category : #'FortranSrc-intrermediateAST'
@@ -12,18 +11,6 @@ Class {
 IASTVarAccess >> accept: aVisitor [
 
 	^ aVisitor visitIASTVarAccess: self.
-]
-
-{ #category : #accessing }
-IASTVarAccess >> isAssigned [
-
-	^ isAssigned ifNil: [ isAssigned := false ]
-]
-
-{ #category : #accessing }
-IASTVarAccess >> isAssigned: anObject [
-
-	isAssigned := anObject
 ]
 
 { #category : #accessing }
