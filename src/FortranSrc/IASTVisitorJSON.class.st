@@ -18,20 +18,8 @@ IASTVisitorJSON >> accept: aNode [
 
 { #category : #'private - parsing' }
 IASTVisitorJSON >> astJSON: sourceCode [
-
-	| filename option |
-	option := 'serialize -t json -v77l encode'.
-	"option := ''."
-	filename := './fortran77.f'.
-	filename asFileReference writeStreamDo: [ :stream | 
-		stream truncate.
-		stream
-		<< (sourceCode copy replaceAll: Character cr with: Character lf) ].
-
-	LibC runCommand: ('{1} {2} "{3}" > "{3}.ast" 2> "{3}.err"' format: { 
-				 self fortranSrcPath.
-				 option.
-				 filename. })
+	FortranProjectImporter new
+		astJSON: sourceCode
 ]
 
 { #category : #'reflective operations' }
@@ -189,7 +177,7 @@ IASTVisitorJSON >> visitCallStatement: aNode [
 { #category : #'private - parsing' }
 IASTVisitorJSON >> visitCode: aString [
 	self astJSON: aString.
-	^'./fortran77.f.ast' asFileReference readStreamDo: [ :st |
+	^'./fortran77.f.json' asFileReference readStreamDo: [ :st |
 			self visitProgramFile: (NeoJSONReader fromString: st contents) ]
 ]
 
