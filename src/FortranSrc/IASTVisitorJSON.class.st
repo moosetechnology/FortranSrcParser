@@ -52,10 +52,10 @@ IASTVisitorJSON >> initialize [
 ]
 
 { #category : #testing }
-IASTVisitorJSON >> isESOPEFunction: aNode [
-	aNode isString ifTrue: [ ^false ].
+IASTVisitorJSON >> isESOPEFunction: aString [
+	aString isString ifFalse: [ ^false ].
 
-	^#(esoat esoar esosl) includes: (self valueNodeContent: aNode)
+	^#(esoat esoar esosl) includes: aString
 ]
 
 { #category : #'private - utilities' }
@@ -113,9 +113,9 @@ IASTVisitorJSON >> visitArgument: anArgumentNode [
 
 	(arg class = IASTVarAccess)
 		ifTrue: [ arg := IASTParameter new
-			entityName: data second entityName ;
+			entityName: arg entityName ;
+			sourceAnchor: arg sourceAnchor ;
 			yourself ].
-	arg sourceAnchor: (self makeIndexedAnchor: data first).
 
 	^arg
 ]
@@ -169,8 +169,10 @@ IASTVisitorJSON >> visitCallStatement: aCallNode [
 		ifTrue:  [ IASTVarEso newFrom: data second entityName ]
 		ifFalse: [ data second ].
 
-	astNode arguments: data third.
-	^{ astNode }
+	^{ astNode
+			sourceAnchor: (self makeIndexedAnchor: data first) ;
+			arguments: data third ;
+			yourself }
 
 ]
 
@@ -263,7 +265,7 @@ IASTVisitorJSON >> visitDo_spec: aDoSpecNode [
 { #category : #visiting }
 IASTVisitorJSON >> visitFunctionAsValue: aFunctionNode [
 	| data |
-	
+
 	data := super visitFunctionAsValue: aFunctionNode.
 	^IASTInvocation new
 		entityName:  data second ;

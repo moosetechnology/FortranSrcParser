@@ -205,6 +205,7 @@ FortranAbstractJsonVisitor >> visitFunction: aFunctionNode [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitFunctionAsValue: aFunctionNode [
+
 	^{self visitSpan: (aFunctionNode at: 'span') .
 	 self visitFunctionCalledName: (aFunctionNode at: 'value' at: 'contents') }
 ]
