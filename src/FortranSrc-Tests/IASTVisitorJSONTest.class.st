@@ -19,23 +19,23 @@ IASTVisitorJSONTest >> setUp [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testAssignementStatement [
-	| programFile stmt |
+	| programFile var |
 	programFile := visitor visitCode: '      subroutine hello
       someVar = otherVar
       end
 '.
 
-	self assert: programFile progUnits first body size equals: 2.
+	self assert: programFile progUnits first body first size equals: 2.
 
-	stmt := programFile progUnits first body first.
-	self assert: stmt class equals: IASTVarAccess.
-	self assert: stmt isWrite.
-	self assert: stmt entityName equals: 'somevar'.
+	var := programFile progUnits first body first first.
+	self assert: var class equals: IASTVarAccess.
+	self assert: var isWrite.
+	self assert: var entityName equals: 'somevar'.
 
-	stmt := programFile progUnits first body second.
-	self assert: stmt class equals: IASTVarAccess.
-	self deny: stmt isWrite.
-	self assert: stmt entityName equals: 'othervar'.
+	var := programFile progUnits first body first second.
+	self assert: var class equals: IASTVarAccess.
+	self deny: var isWrite.
+	self assert: var entityName equals: 'othervar'.
 
 ]
 
@@ -47,17 +47,17 @@ IASTVisitorJSONTest >> testAssignementStatementWithComplexRHS [
       end
 '.
 
-	self assert: programFile progUnits first body size equals: 3.
+	self assert: programFile progUnits first body first size equals: 3.
 
-	stmt := programFile progUnits first body first.
+	stmt := programFile progUnits first body first first.
 	self assert: stmt class equals: IASTVarAccess.
 	self assert: stmt entityName equals: 'somevar'.
 
-	stmt := programFile progUnits first body second.
+	stmt := programFile progUnits first body first second.
 	self assert: stmt class equals: IASTVarAccess.
 	self assert: stmt entityName equals: 'othervar'.
 
-	stmt := programFile progUnits first body third.
+	stmt := programFile progUnits first body first third.
 	self assert: stmt class equals: IASTVarAccess.
 	self assert: stmt entityName equals: 'thirdvar'.
 
@@ -71,13 +71,13 @@ IASTVisitorJSONTest >> testAssignementStatementWithEsoAt [
       end
 '.
 
-	self assert: programFile progUnits first body size equals: 2.
+	self assert: programFile progUnits first body first size equals: 2.
 
-	stmt := programFile progUnits first body first.
+	stmt := programFile progUnits first body first first.
 	self assert: stmt class equals: IASTVarAccess.
 	self assert: stmt entityName equals: 'somevar'.
 
-	stmt := programFile progUnits first body second.
+	stmt := programFile progUnits first body first second.
 	self assert: stmt class equals: IASTVarEsoAt.
 	self deny: stmt isWrite.
 	self assert: stmt entities size equals: 1
@@ -434,7 +434,7 @@ IASTVisitorJSONTest >> testFunctionWithFunctionInvocation [
 
 	self assert: fct class equals: IASTFunction.
 	self assert: fct entityName equals: 'efunc'.
-	self assert: fct body size equals: 2.
+	self assert: fct body first size equals: 2.
 	self assert: fct sourceAnchor startLine equals: 1.
 	self assert: fct sourceAnchor startColumn equals: 7.
 	self assert: fct sourceAnchor endLine equals: 3.
@@ -480,19 +480,19 @@ IASTVisitorJSONTest >> testMultipleStatements [
       end
 '.
 
-	self assert: programFile progUnits first body size equals: 3.
+	self assert: programFile progUnits first body size equals: 2.
 
-	stmt := programFile progUnits first body first.
+	stmt := programFile progUnits first body first first.
 	self assert: stmt class equals: IASTVariable.
 	self assert: stmt typeSpec class equals: IASTTypeRef.
 	self assert: stmt entityName equals: 'somevar'.
 
-	stmt := programFile progUnits first body second.
+	stmt := programFile progUnits first body second first.
 	self assert: stmt class equals: IASTVarAccess.
 	self assert: stmt isWrite.
 	self assert: stmt entityName equals: 'somevar'.
 
-	stmt := programFile progUnits first body third.
+	stmt := programFile progUnits first body second second.
 	self assert: stmt class equals: IASTVarAccess.
 	self deny: stmt isWrite.
 	self assert: stmt entityName equals: 'somevar'.

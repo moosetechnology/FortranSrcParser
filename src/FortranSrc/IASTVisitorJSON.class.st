@@ -116,23 +116,16 @@ IASTVisitorJSON >> visitArguments: anArgumentsNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitAssign_expression: anAssignExpressionNode [
-	| lhsNode rhsNodes |
-	lhsNode := self accept: (anAssignExpressionNode at: 'target').
-	lhsNode isWrite: true.
-	
-	rhsNodes := self accept: (anAssignExpressionNode at: 'expression').
+	| data |
+	data := super visitAssign_expression: anAssignExpressionNode.
 
-	^(rhsNodes isCollection 
-		ifTrue:  [ { lhsNode } , rhsNodes ]
-		ifFalse: [ { lhsNode . rhsNodes } ]
-	 ) reject: #isNil
+	data first isWrite: true.
+	^(data second isCollection 
+		ifTrue:  [ { data first } , data second ]
+		ifFalse: [ { data first . data second } ]
+	 )
+	 reject: #isNil.
 
-]
-
-{ #category : #visiting }
-IASTVisitorJSON >> visitAssign_expressionStatement: aNode [
-	self flag: #TODO.
-	self shouldBeImplemented
 ]
 
 { #category : #visiting }
@@ -258,12 +251,18 @@ IASTVisitorJSON >> visitDeclarators: aDeclaratorsList [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitDo: aDoNode [
-	^{ 
-		self accept: ((aDoNode at: 'do_spec') at: 'initial' ).
-		self accept: ((aDoNode at: 'do_spec') at: 'limit' ).
-		self accept: ((aDoNode at: 'do_spec') at: 'increment' ).
-		self accept: (aDoNode at: 'body')
-	 } reject: #isNil.
+	| data |
+	data := (super visitDo: aDoNode).
+	^data second , data third
+	 
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitDo_spec: aDoSpecNode [
+	| data |
+	data := (super visitDo_spec: aDoSpecNode).
+	^data allButFirst flattened reject: #isNil
+	 
 ]
 
 { #category : #visiting }
@@ -355,12 +354,6 @@ IASTVisitorJSON >> visitJSONNode: key value: aValue [
 self flag: #REMOVE.
 	selector := 'visit' , key capitalized , ':'.
 	^self perform: selector asSymbol with: aValue 
-]
-
-{ #category : #visiting }
-IASTVisitorJSON >> visitList: aNode [
-	self flag: #TODO.
-	self shouldBeImplemented
 ]
 
 { #category : #visiting }

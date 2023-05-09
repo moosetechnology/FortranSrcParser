@@ -22,6 +22,14 @@ FortranAbstractJsonVisitor >> visitAssign_expression: anAssignExpressionNode [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitAssign_expressionStatement: anAssignExpressionNode [
+	"assign_expression and assign_expressionStatement are the same"
+
+	^self visitAssign_expression: anAssignExpressionNode
+
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitAttributes: aNode [
 	^nil
 ]
@@ -143,12 +151,22 @@ FortranAbstractJsonVisitor >> visitDeclarators: aDeclaratorsList [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitDo: aDoNode [
-	^self visitJsonMap: aDoNode keys: #(span initial limit increment body)
+	^self visitJsonMap: aDoNode keys: #(span do_spec body)
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitDo_spec: aDoSpecNode [
+	^self visitJsonMap: aDoSpecNode keys: #(span initial limit increment)
 ]
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitExpr: anExprNode [
 	^self visitJsonElement: (anExprNode at: 'contents')
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitExpression: aExpressionNode [
+	^self visitJsonElement: aExpressionNode
 ]
 
 { #category : #visiting }
@@ -194,8 +212,13 @@ FortranAbstractJsonVisitor >> visitImplicitStatement: anImpliciteStatementNode [
 ]
 
 { #category : #visiting }
-FortranAbstractJsonVisitor >> visitInitial: aNode [
-	^nil
+FortranAbstractJsonVisitor >> visitIncrement: anIncrementNode [
+	^self visitJsonElement: anIncrementNode
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitInitial: anInitialNode [
+	^self visitJsonElement: anInitialNode
 ]
 
 { #category : #'visiting - reflectivity' }
@@ -268,6 +291,16 @@ FortranAbstractJsonVisitor >> visitLabel: aNode [
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitLength: aNode [
 	^nil
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitLimit: aLimitNode [
+	^self visitJsonElement: aLimitNode
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitList: aListNode [
+	^self visitJsonElement: aListNode
 ]
 
 { #category : #visiting }
@@ -348,6 +381,11 @@ FortranAbstractJsonVisitor >> visitSubprograms: aNode [
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitSubroutine: aSubroutineNode [
 	^self visitJsonMap: aSubroutineNode keys: #(span name arguments blocks)
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitTarget: aTargetNode [
+	^self visitJsonElement: aTargetNode
 ]
 
 { #category : #visiting }
