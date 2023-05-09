@@ -145,8 +145,9 @@ IASTVisitorJSONTest >> testCallToWrite [
 	self assert: stmt sourceAnchor isNotNil.
 
 	arg := stmt arguments first.
-	self assert: arg class equals: IASTParameter.
+	self assert: arg class equals: IASTVarAccess.
 	self assert: arg entityName equals: 'msg'.
+	self deny: arg isWrite
 
 ]
 
@@ -397,8 +398,9 @@ IASTVisitorJSONTest >> testEsoAtOneArg [
 	self assert: stmt class equals: IASTVarEsoAt.
 	self assert: stmt isWrite.
 	self assert: stmt entities size equals: 1.
-	self assert: stmt entities first class equals: IASTParameter.
+	self assert: stmt entities first class equals: IASTVarAccess.
 	self assert: stmt entities first entityName equals: 'baz'.
+	self deny: stmt entities first isWrite
 ]
 
 { #category : #tests }
@@ -415,8 +417,9 @@ IASTVisitorJSONTest >> testEsoAtTwoArgs [
 	self assert: stmt isWrite.
 	self assert: stmt entities size equals: 2.
 	stmt entities do: [ :ent |
-		self assert: ent class equals: IASTParameter.
-		self assert: (#(baz bar) includes: ent entityName asSymbol)
+		self assert: ent class equals: IASTVarAccess.
+		self assert: (#(baz bar) includes: ent entityName asSymbol).
+		self deny:ent isWrite
 	]
 ]
 

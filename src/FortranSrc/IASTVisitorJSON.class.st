@@ -25,12 +25,13 @@ IASTVisitorJSON >> astJSON: sourceCode [
 { #category : #'reflective operations' }
 IASTVisitorJSON >> doesNotUnderstand: message [
 
-	| code |
+	"| code |
 	(message selector beginsWith: 'visit') ifFalse: [ ^ self ].
 	code := message selector asString , ' aNode
 	self flag: #TODO.
 	self shouldBeImplemented'.
-	self class compile: code classified: 'visiting'
+	self class compile: code classified: 'visiting'"
+	super doesNotUnderstand: message
 ]
 
 { #category : #accessing }
@@ -100,16 +101,22 @@ IASTVisitorJSON >> valueNodeIsVariable: aValueNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitArgument: anArgumentNode [
+	"used for argument in subprogram calls and parameter in subprogram definition"
+
 	| data arg |
 	data := super visitArgument: anArgumentNode.
-	arg := data second.
-	arg ifNotNil: [
-		(arg class = IASTVarAccess)
-			ifTrue: [ arg := IASTParameter new
-				entityName: data second entityName ;
-				yourself ].
-		arg sourceAnchor: (self makeIndexedAnchor: data first)
-	].
+	data isCollection ifFalse: [ ^data ].
+	data ifEmpty: [ ^nil ].
+ 
+	arg := (data size = 1) ifTrue: [ data first ] ifFalse: [ data second ].
+	arg ifNil: [ ^nil ].
+
+	(arg class = IASTVarAccess)
+		ifTrue: [ arg := IASTParameter new
+			entityName: data second entityName ;
+			yourself ].
+	arg sourceAnchor: (self makeIndexedAnchor: data first).
+
 	^arg
 ]
 
@@ -117,7 +124,6 @@ IASTVisitorJSON >> visitArgument: anArgumentNode [
 IASTVisitorJSON >> visitArguments: anArgumentList [
 	^(super visitArguments: anArgumentList)
 		reject: #isNil
-
 ]
 
 { #category : #visiting }
@@ -136,10 +142,10 @@ IASTVisitorJSON >> visitAssign_expression: anAssignExpressionNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitBinary: aBinaryExpressionNode [
-	^{ 
-		self accept: (aBinaryExpressionNode at: 'left') .
-		self accept: (aBinaryExpressionNode at: 'right') 
-	 } reject: #isNil
+	| data |
+	data := super visitBinary: aBinaryExpressionNode.
+	^{ data second . data fourth }
+		reject: #isNil
 ]
 
 { #category : #visiting }
@@ -183,12 +189,6 @@ IASTVisitorJSON >> visitComment: aCommentNode [
 		sourceAnchor: (self makeIndexedAnchor: data first) ;
 		text: data second ;
 		yourself
-]
-
-{ #category : #visiting }
-IASTVisitorJSON >> visitCommon: aNode [
-	self flag: #TODO.
-	self shouldBeImplemented
 ]
 
 { #category : #visiting }
@@ -261,11 +261,6 @@ IASTVisitorJSON >> visitDo_spec: aDoSpecNode [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitExpr: anExprNode [
-	^self accept: (anExprNode at: 'contents')
-]
-
-{ #category : #visiting }
 IASTVisitorJSON >> visitFunctionAsValue: aFunctionNode [
 	| data |
 	
@@ -308,36 +303,10 @@ IASTVisitorJSON >> visitFunctionWithBlocks: aFunctionNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitIf: aIfNode [
-	^{
-		self accept: (aIfNode at: 'conditions').
-		self accept: (aIfNode at: 'blocks') 
-	 } reject: #isNil
-]
+	| data |
+	data := super visitIf: aIfNode.
 
-{ #category : #visiting }
-IASTVisitorJSON >> visitJSONArray: aNode [
-self flag: #REMOVE.
-	^aNode collect: [ :each | self accept: each ]
-]
-
-{ #category : #visiting }
-IASTVisitorJSON >> visitJSONDictionary: jsonDictionary [
-self flag: #REMOVE.
-	^jsonDictionary
-		at: 'tag'
-		ifPresent: [ :key | self visitJSONNode: key value: jsonDictionary ]
-		ifAbsent: [ 	jsonDictionary keysAndValuesDo: [ :key :value |
-			self visitJSONNode: key value: value ]
-		]
-
-]
-
-{ #category : #visiting }
-IASTVisitorJSON >> visitJSONNode: key value: aValue [
-	| selector |
-self flag: #REMOVE.
-	selector := 'visit' , key capitalized , ':'.
-	^self perform: selector asSymbol with: aValue 
+	^(data allButFirst: 2) flattened reject: #isNil
 ]
 
 { #category : #visiting }
@@ -364,11 +333,6 @@ IASTVisitorJSON >> visitProgramFile: aProgramFileNode [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitProgram_units: aNode [
-	^self visitJSONArray: aNode
-]
-
-{ #category : #visiting }
 IASTVisitorJSON >> visitSpanOf: aNode [
 	^self makeIndexedAnchor: (self visitSpan: (aNode at: 'span'))
 ]
@@ -380,10 +344,15 @@ IASTVisitorJSON >> visitStatement: aStatementNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitSubroutine: aSubroutineNode [
-	^(self makeProgramUnitNode: IASTSubroutine with: aSubroutineNode)
-		parameters: (self visitArguments: (aSubroutineNode at: 'arguments')) ;
-		yourself
+	| data |
+	data := super visitSubroutine: aSubroutineNode.
 
+	^IASTSubroutine new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		entityName: data second ;
+		parameters: data third ;
+		body: data fourth ;
+		yourself
 ]
 
 { #category : #visiting }
@@ -399,7 +368,10 @@ IASTVisitorJSON >> visitType: aTypeNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitUnary: aUnaryNode [
-	^{ self accept: (aUnaryNode at: 'expression') } reject: #isNil
+	| data |
+	data := super visitUnary: aUnaryNode.
+
+	^data third ifNil: [ nil ] ifNotNil: #yourself
 ]
 
 { #category : #visiting }
