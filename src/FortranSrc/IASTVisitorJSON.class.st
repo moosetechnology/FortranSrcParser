@@ -99,19 +99,25 @@ IASTVisitorJSON >> valueNodeIsVariable: aValueNode [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitArguments: anArgumentsNode [
-	^(super visitArguments: anArgumentsNode)
-		select: #isNotNil
-		thenCollect: [ :each |
-			(each class = IASTVarAccess)
-			ifTrue: [
-				IASTParameter new
-				entityName: each entityName ;
-				sourceAnchor: each sourceAnchor ;
-				yourself
-			]
-			ifFalse: [ each ]
-		]
+IASTVisitorJSON >> visitArgument: anArgumentNode [
+	| data arg |
+	data := super visitArgument: anArgumentNode.
+	arg := data second.
+	arg ifNotNil: [
+		(arg class = IASTVarAccess)
+			ifTrue: [ arg := IASTParameter new
+				entityName: data second entityName ;
+				yourself ].
+		arg sourceAnchor: (self makeIndexedAnchor: data first)
+	].
+	^arg
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitArguments: anArgumentList [
+	^(super visitArguments: anArgumentList)
+		reject: #isNil
+
 ]
 
 { #category : #visiting }
@@ -145,26 +151,6 @@ IASTVisitorJSON >> visitBlock_data: aBlockDataNode [
 		entityName: data second ;
 		body: data third ;
 		yourself
-]
-
-{ #category : #visiting }
-IASTVisitorJSON >> visitCall: aCallNode [
-	"used for call statements (and cannot be an ESOPE function),
-	 and Function_call statement (and can be an ESOPE function)"
-	| astNode arguments |
-	
-	astNode := (self isESOPEFunction: (aCallNode at: 'function'))
-		ifTrue:  [ IASTVarEso newFrom: (self valueNodeContent: (aCallNode at: 'function')) ]
-		ifFalse: [ IASTInvocation new
-			entityName:  (self valueNodeContent: (aCallNode at: 'function')) ;
-			yourself.
-		].
-
-	astNode sourceAnchor: (self visitSpanOf: aCallNode).
-	arguments := (aCallNode at: 'arguments') at: 'list'.
-	astNode arguments: (arguments collect: [:arg | self accept: (arg at: 'expr')] thenReject: #isNil).
-	^{ astNode }
-
 ]
 
 { #category : #visiting }
@@ -427,7 +413,13 @@ IASTVisitorJSON >> visitValue: aValueNode [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitWrite: aWriteNode [
-	self flag: #TODO. "take care of 'format' also"
-	^self accept: ((aWriteNode at: 'arguments') at: 'list')
+IASTVisitorJSON >> visitWriteStatement: aWriteStatementNode [
+	| data |
+	data := super visitWriteStatement: aWriteStatementNode.
+
+	^{ IASTInvocation new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		entityName: 'write' ;
+		arguments: data third ;
+		yourself }
 ]

@@ -10,9 +10,16 @@ FortranAbstractJsonVisitor >> isTaggedStatement: aStatementNode [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitArgument: anArgumentNode [
+	"ignore other members for now"
+
+	^self visitJsonMap: anArgumentNode keys: #(span expr)
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitArguments: anArgumentList [
 	anArgumentList ifNil: [ ^#() ].
-	^self visitJsonArray: (anArgumentList at: 'list')
+	^(anArgumentList at: 'list') collect: [ :each | self visitArgument: each]
 ]
 
 { #category : #visiting }
@@ -173,6 +180,11 @@ FortranAbstractJsonVisitor >> visitExpr: anExprNode [
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitExpression: aExpressionNode [
 	^self visitJsonElement: aExpressionNode
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitFormat: aFormatNode [
+	^nil
 ]
 
 { #category : #visiting }
@@ -411,6 +423,6 @@ FortranAbstractJsonVisitor >> visitUnary: aUnaryNode [
 ]
 
 { #category : #visiting }
-FortranAbstractJsonVisitor >> visitWrite: aWriteNode [
-	^self visitJsonMap: aWriteNode keys: #(span format arguments)
+FortranAbstractJsonVisitor >> visitWriteStatement: aWriteStatementNode [
+	^self visitJsonMap: aWriteStatementNode keys: #(span format arguments)
 ]
