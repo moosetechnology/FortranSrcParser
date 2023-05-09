@@ -260,6 +260,16 @@ FortranAbstractJsonVisitor >> visitInitial: anInitialNode [
 	^self visitJsonElement: anInitialNode
 ]
 
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitInteger: anIntegerNode [
+	^self visitIntegerLiteralValue: (anIntegerNode at: 'contents')
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitIntegerLiteralValue: anIntegerLiteralValueNode [
+	^anIntegerLiteralValueNode first
+]
+
 { #category : #'visiting - reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonArray: aNode [
 	^aNode collect: [ :each | self visitJsonElement: each ]
@@ -392,6 +402,18 @@ FortranAbstractJsonVisitor >> visitProgram_units: aNode [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitReal: aRealNode [
+	^self visitRealLiteralValue: (aRealNode at: 'contents')
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitRealLiteralValue: aRealLiteralValueNode [
+	self flag: #TODO.
+
+	^nil
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitRight: aRightNode [
 	^self visitJsonElement: aRightNode
 ]
@@ -457,7 +479,18 @@ FortranAbstractJsonVisitor >> visitUnary: aUnaryNode [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitValue: aValueNode [
-	^self visitJsonMap: aValueNode keys: #(span expression)
+	^{ self visitSpan: (aValueNode at: 'span') .
+	 self visitJsonTaggedElement: (aValueNode at: 'value') }
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitVariable: aVariableNode [
+	^self visitVariableName: (aVariableNode at: 'contents')
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitVariableName: aString [
+	^aString
 ]
 
 { #category : #visiting }

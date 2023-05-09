@@ -8,30 +8,10 @@ Class {
 	#category : #'FortranSrc-Visitor'
 }
 
-{ #category : #'reflective operations' }
-IASTVisitorJSON >> accept: aNode [
-	aNode ifNil: [ ^nil ].
-	aNode isAssociation ifTrue: [ ^self visitJSONNode: aNode key value: aNode value ].
-	aNode isDictionary  ifTrue: [ ^self visitJSONDictionary: aNode ].
-	aNode isArray  ifTrue: [ ^self visitJSONArray: aNode ].
-]
-
 { #category : #'private - parsing' }
 IASTVisitorJSON >> astJSON: sourceCode [
 	FortranProjectImporter new
 		astJSON: sourceCode
-]
-
-{ #category : #'reflective operations' }
-IASTVisitorJSON >> doesNotUnderstand: message [
-
-	"| code |
-	(message selector beginsWith: 'visit') ifFalse: [ ^ self ].
-	code := message selector asString , ' aNode
-	self flag: #TODO.
-	self shouldBeImplemented'.
-	self class compile: code classified: 'visiting'"
-	super doesNotUnderstand: message
 ]
 
 { #category : #accessing }
@@ -69,16 +49,6 @@ IASTVisitorJSON >> makeIndexedAnchor: aPointPair [
 		  yourself
 ]
 
-{ #category : #'private - utilities' }
-IASTVisitorJSON >> makeProgramUnitNode: aIASTClass with: aProgramUnitNode [
-	^aIASTClass new
-		entityName: (aProgramUnitNode at: 'name') ;
-		sourceAnchor: (self visitSpanOf: aProgramUnitNode) ;
-		body: (self visitBlocks: (aProgramUnitNode at: 'blocks')) ;
-		yourself
-
-]
-
 { #category : #accessing }
 IASTVisitorJSON >> model [
 	^ model
@@ -87,16 +57,6 @@ IASTVisitorJSON >> model [
 { #category : #accessing }
 IASTVisitorJSON >> model: aCollection [
 	model := aCollection
-]
-
-{ #category : #'private - utilities' }
-IASTVisitorJSON >> valueNodeContent: aValueNode [
-	^((aValueNode at: 'value') at: 'contents')
-]
-
-{ #category : #testing }
-IASTVisitorJSON >> valueNodeIsVariable: aValueNode [
-	^((aValueNode at: 'value') at: 'tag') = 'variable'
 ]
 
 { #category : #visiting }
@@ -312,8 +272,21 @@ IASTVisitorJSON >> visitIf: aIfNode [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitInteger: anIntegerNode [
+	^nil
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitMain: aMainProgramNode [
-	^self makeProgramUnitNode: IASTMainProgram with: aMainProgramNode
+ 	| data |
+	data := super visitMain: aMainProgramNode.
+
+	^IASTMainProgram new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		entityName: data second ;
+		body: data third ;
+		yourself
+
 ]
 
 { #category : #visiting }
@@ -332,6 +305,11 @@ IASTVisitorJSON >> visitProgramFile: aProgramFileNode [
 	self model add: programFile.
 	^ programFile
 		
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitReal: aRealNode [
+	^nil
 ]
 
 { #category : #visiting }
@@ -378,12 +356,27 @@ IASTVisitorJSON >> visitUnary: aUnaryNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitValue: aValueNode [
-	^(self valueNodeIsVariable: aValueNode)
-		ifTrue: [ IASTVarAccess new
-			isWrite: false ;
-			entityName: (self valueNodeContent: aValueNode) ;
-			sourceAnchor: (self visitSpanOf: aValueNode) ]
-		ifFalse: [ nil ]
+	| data |
+
+	data := super visitValue: aValueNode.
+
+	^data second
+		ifNil: [ nil ]
+		ifNotNil: [ :var |
+			var
+				sourceAnchor: (self makeIndexedAnchor: data first) ;
+				yourself ]
+]
+
+{ #category : #visiting }
+IASTVisitorJSON >> visitVariable: aVariableNode [
+	| data |
+	data := super visitVariable: aVariableNode.
+
+	^IASTVarAccess new
+		isWrite: false ;
+		entityName: data ;
+		yourself
 ]
 
 { #category : #visiting }

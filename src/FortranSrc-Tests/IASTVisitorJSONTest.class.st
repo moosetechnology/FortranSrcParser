@@ -389,7 +389,7 @@ IASTVisitorJSONTest >> testEsoArWithEsoAtArg [
 IASTVisitorJSONTest >> testEsoAtOneArg [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello( )
-        esoat(baz,2) = 5
+        esoat(baz,2) = 5.3
       end
 '.
 
