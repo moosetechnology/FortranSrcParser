@@ -68,6 +68,12 @@ FortranAbstractJsonVisitor >> visitBody: aNode [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitCallStatement: aCallStatementNode [
+
+	^self visitJsonMap: aCallStatementNode keys: #(span function arguments)
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitComment: aCommentNode [
 	"cannot call visitJsonMap: because contains a key 'comment' that would recursively loop on this method"
 
@@ -173,8 +179,19 @@ FortranAbstractJsonVisitor >> visitExpression: aExpressionNode [
 FortranAbstractJsonVisitor >> visitFunction: aFunctionNode [
 	^(aFunctionNode includesKey: 'blocks')
 	 ifTrue: [ self visitFunctionWithBlocks: aFunctionNode ]
-	 ifFalse: [ self visitFunctionWithBody: aFunctionNode ]
+	 ifFalse: [ self visitFunctionAsValue: aFunctionNode ]
 
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitFunctionAsValue: aFunctionNode [
+	^{self visitSpan: (aFunctionNode at: 'span') .
+	 self visitFunctionCalledName: (aFunctionNode at: 'value' at: 'contents') }
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitFunctionCalledName: aString [
+	^aString
 ]
 
 { #category : #visiting }
@@ -192,14 +209,9 @@ FortranAbstractJsonVisitor >> visitFunctionWithBlocks: aFunctionNode [
 ]
 
 { #category : #visiting }
-FortranAbstractJsonVisitor >> visitFunctionWithBody: aFunctionNode [
-self flag: 'replaced by #visitFunctionStatement: ?'.
-	^self visitJsonMap: aFunctionNode keys: #(span name arguments body)
-]
-
-{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitFunction_call: aFunctionCallNode [
-	^self visitJsonMap: aFunctionCallNode keys: #(span function arguments)
+
+	^self visitCallStatement: aFunctionCallNode
 ]
 
 { #category : #visiting }

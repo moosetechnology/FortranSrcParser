@@ -634,10 +634,12 @@ IASTVisitorJSONTest >> testProgramWithOneStatement [
 	self assert: programFile class equals: IASTProgramFile.
 	self assert: programFile progUnits size equals: 1.
 	self assert: programFile progUnits first class equals: IASTMainProgram.
+
 	prog := programFile progUnits first.
 	self assert: prog entityName equals: 'hello'.
-	self assert: prog body size equals: 2.
+	self assert: prog body size equals: 1.
 	self assert: prog comments isEmpty.
+	self assert: prog body first size equals: 2.
 ]
 
 { #category : #tests }
@@ -759,9 +761,9 @@ IASTVisitorJSONTest >> testSubroutineInvocation [
       end
 '.
 
-	self assert: programFile progUnits first body size equals: 1.
+	self assert: programFile progUnits first body first size equals: 1.
 
-	stmt := programFile progUnits first body first.
+	stmt := programFile progUnits first body first first.
 	self assert: stmt class equals: IASTInvocation.
 	self assert: stmt entityName equals: 'somesubroutine'.
 	self assert: stmt arguments size equals: 0
@@ -776,9 +778,9 @@ IASTVisitorJSONTest >> testSubroutineInvocationWithArguments [
       end
 '.
 
-	self assert: programFile progUnits first body size equals: 1.
+	self assert: programFile progUnits first body first size equals: 1.
 
-	stmt := programFile progUnits first body first.
+	stmt := programFile progUnits first body first first.
 	self assert: stmt class equals: IASTInvocation.
 	self assert: stmt entityName equals: 'somesubroutine'.
 	self assert: stmt arguments size equals: 2.

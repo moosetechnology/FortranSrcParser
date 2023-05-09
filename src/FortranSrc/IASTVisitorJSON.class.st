@@ -168,9 +168,18 @@ IASTVisitorJSON >> visitCall: aCallNode [
 ]
 
 { #category : #visiting }
-IASTVisitorJSON >> visitCallStatement: aNode [
-	self flag: #TODO.
-	self shouldBeImplemented
+IASTVisitorJSON >> visitCallStatement: aCallNode [
+	| astNode data |
+	
+	data := super visitCallStatement: aCallNode.
+
+	astNode := (self isESOPEFunction: data second entityName)
+		ifTrue:  [ IASTVarEso newFrom: data second entityName ]
+		ifFalse: [ data second ].
+
+	astNode arguments: data third.
+	^{ astNode }
+
 ]
 
 { #category : #'private - parsing' }
@@ -271,6 +280,16 @@ IASTVisitorJSON >> visitExpr: anExprNode [
 ]
 
 { #category : #visiting }
+IASTVisitorJSON >> visitFunctionAsValue: aFunctionNode [
+	| data |
+	
+	data := super visitFunctionAsValue: aFunctionNode.
+	^IASTInvocation new
+		entityName:  data second ;
+		yourself
+]
+
+{ #category : #visiting }
 IASTVisitorJSON >> visitFunctionStatement: aFunctionNode [
 	"for now assuming this is an ESOat/ar/sl function"
 	| data esoFct |
@@ -299,27 +318,6 @@ IASTVisitorJSON >> visitFunctionWithBlocks: aFunctionNode [
 		body: data fifth ;
 		yourself
 
-]
-
-{ #category : #visiting }
-IASTVisitorJSON >> visitFunctionWithBody: aFunctionNode [
-	| astRhsNode astLhsNode arguments |
-
-	astLhsNode := IASTVarEso newFrom: (self valueNodeContent: (aFunctionNode at: 'name')).
-	astLhsNode sourceAnchor: (self visitSpanOf: aFunctionNode).
-	astLhsNode isWrite: true.
-
-	arguments := (aFunctionNode at: 'arguments') at: 'list'.
-	astLhsNode entities: (arguments collect: [:arg | self accept: arg] thenReject: #isNil).
-
-	astRhsNode := self accept: (aFunctionNode at: 'body').
-
-	^astRhsNode ifNil: [ { astLhsNode } ] ifNotNil: [ { astLhsNode . astRhsNode } ]
-]
-
-{ #category : #visiting }
-IASTVisitorJSON >> visitFunction_call: aFunctionCallNode [
-	^(self visitCall: aFunctionCallNode) anyOne
 ]
 
 { #category : #visiting }
