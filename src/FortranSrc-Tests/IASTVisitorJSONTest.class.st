@@ -460,8 +460,8 @@ IASTVisitorJSONTest >> testIntegerVariableDeclaration [
       end
 '.
 
-	self assert: programFile progUnits first body size equals: 1.
-	var := programFile progUnits first body first.
+	self assert: programFile progUnits first body first size equals: 1.
+	var := programFile progUnits first body first first.
 
 	self assert: var class equals: IASTVariable.
 	self assert: var entityName equals: 'i'.
@@ -735,19 +735,19 @@ IASTVisitorJSONTest >> testProgramWithSimpleIfStatementWithoutBody [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testStringVariableDeclaration [
-	| programFile stmt |
+	| programFile var |
 	programFile := visitor visitCode: '      subroutine hello
       character*8 str
       end
 '.
 
-	self assert: programFile progUnits first body size equals: 1.
+	self assert: programFile progUnits first body first  size equals: 1.
 
-	stmt := programFile progUnits first body first.
-	self assert: stmt class equals: IASTVariable.
-	self assert: stmt entityName equals: 'str'.
-	self assert: stmt typeSpec class equals: IASTTypeRef.
-	self assert: stmt typeSpec entityName equals: 'character'.
+	var := programFile progUnits first body first first.
+	self assert: var class equals: IASTVariable.
+	self assert: var entityName equals: 'str'.
+	self assert: var typeSpec class equals: IASTTypeRef.
+	self assert: var typeSpec entityName equals: 'character'.
 
 ]
 
@@ -796,23 +796,23 @@ IASTVisitorJSONTest >> testSubroutineInvocationWithArguments [
 
 { #category : #tests }
 IASTVisitorJSONTest >> testTwoIntegerVariableDeclarations [
-	| programFile stmt |
+	| programFile var |
 	programFile := visitor visitCode: '      subroutine hello
       integer i,j
       end
 '.
 
-	self assert: programFile progUnits first body size equals: 2.
+	self assert: programFile progUnits first body first size equals: 2.
 
-	stmt := programFile progUnits first body first.
-	self assert: stmt class equals: IASTVariable.
-	self assert: stmt entityName equals: 'i'.
-	self assert: stmt typeSpec class equals: IASTTypeRef.
-	self assert: stmt typeSpec entityName equals: 'integer'.
+	var := programFile progUnits first body first first.
+	self assert: var class equals: IASTVariable.
+	self assert: var entityName equals: 'i'.
+	self assert: var typeSpec class equals: IASTTypeRef.
+	self assert: var typeSpec entityName equals: 'integer'.
 
-	stmt := programFile progUnits first body second.
-	self assert: stmt class equals: IASTVariable.
-	self assert: stmt entityName equals: 'j'.
-	self assert: stmt typeSpec class equals: IASTTypeRef.
-	self assert: stmt typeSpec entityName equals: 'integer'.
+	var := programFile progUnits first body first second.
+	self assert: var class equals: IASTVariable.
+	self assert: var entityName equals: 'j'.
+	self assert: var typeSpec class equals: IASTTypeRef.
+	self assert: var typeSpec entityName equals: 'integer'.
 ]
