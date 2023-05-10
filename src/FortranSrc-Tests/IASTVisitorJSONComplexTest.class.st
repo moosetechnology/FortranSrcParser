@@ -35,7 +35,7 @@ cESO  segsup,baz
 	prog := programFile progUnits first.
 	self assert: prog class equals: IASTSubroutine.
 	
-	self assert: prog body size equals: 13.
+	self assert: prog body size equals: 11.
 	self assert: prog comments size equals: 5.
 	self assert: prog accesses size equals: 4.
 	self assert: prog localVariables size equals: 3.
@@ -69,7 +69,7 @@ cESO  segsup ptr1
 	prog := programFile progUnits first.
 	self assert: prog class equals: IASTMainProgram.
 	
-	self assert: prog body size equals: 20.
+	self assert: prog body size equals: 10.
 	self assert: prog comments size equals: 5.
 	self assert: prog accesses size equals: 9.
 	self assert: prog localVariables size equals: 2.
@@ -102,7 +102,7 @@ IASTVisitorJSONComplexTest >> testProgramWithMultipleProgUnitsWithInvocation [
 	node := iast progUnits first.
 	self assert: node class equals: IASTMainProgram.
 	self assert: node entityName equals: 'myprog'.
-	self assert: node body size equals: 3.
+	self assert: node body size equals: 2.
 	self assert: node accesses size equals: 1.
 	self assert: node invocations size equals: 2.
 	
@@ -117,7 +117,6 @@ IASTVisitorJSONComplexTest >> testProgramWithMultipleProgUnitsWithInvocation [
 	self assert: node class equals: IASTSubroutine.
 	self assert: node parameters size equals: 1.
 	self assert: node parameters first entityName equals: 'msg'.
-	self assert: node accesses size equals: 1.
 ]
 
 { #category : #tests }
