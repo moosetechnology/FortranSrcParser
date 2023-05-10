@@ -393,7 +393,7 @@ FortranAbstractJsonVisitor >> visitOp: anOpNode [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitProgramFile: aProgramFileNode [
-	^self visitJsonElement: aProgramFileNode
+	^self visitJsonMap: aProgramFileNode keys: #(meta program_units)
 ]
 
 { #category : #visiting }

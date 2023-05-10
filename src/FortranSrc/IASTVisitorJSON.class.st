@@ -296,11 +296,12 @@ IASTVisitorJSON >> visitMiFilename: aString [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitProgramFile: aProgramFileNode [
-	| programFile |
-	self visitMeta: (aProgramFileNode at: 'meta').
+	| programFile data |
+	data := super visitProgramFile: aProgramFileNode.
+
 	programFile := IASTProgramFile new
 		filename: self f77sourcefile ;
-		progUnits: (self visitProgram_units: (aProgramFileNode at: 'program_units')) ;
+		progUnits: data second ;
 		yourself.
 	self model add: programFile.
 	^ programFile
