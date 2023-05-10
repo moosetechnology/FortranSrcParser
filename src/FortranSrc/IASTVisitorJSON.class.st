@@ -320,7 +320,11 @@ IASTVisitorJSON >> visitSpanOf: aNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitStatement: aStatementNode [
-	^(super visitStatement: aStatementNode) allButFirst: 2
+	"not interested in 'span' and 'label'
+	so overwrite completely the super method"
+	^(self isTaggedStatement: aStatementNode)
+			ifTrue: [ self visitJsonTaggedStatement: aStatementNode ]
+			ifFalse: [ self visitJsonElement: (aStatementNode at: 'statement') ]
 ]
 
 { #category : #visiting }

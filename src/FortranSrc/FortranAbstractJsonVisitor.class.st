@@ -182,7 +182,9 @@ FortranAbstractJsonVisitor >> visitDo_spec: aDoSpecNode [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitExpr: anExprNode [
-	^self visitJsonElement: (anExprNode at: 'contents')
+	^(anExprNode includesKey: 'tag')
+		ifTrue: [ self visitJsonTaggedElement: anExprNode ]
+		ifFalse: [ self visitJsonElement: (anExprNode at: 'contents') ]
 ]
 
 { #category : #visiting }
@@ -192,7 +194,13 @@ FortranAbstractJsonVisitor >> visitExpression: aExpressionNode [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitFormat: aFormatNode [
-	^nil
+	^{ self visitSpan: (aFormatNode at: 'span') .
+	  (aFormatNode at: 'list') collect: [ :each | self visitFormatArgument: each ] }
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitFormatArgument: aFormatArgumentNode [
+	^self visitArgument: aFormatArgumentNode
 ]
 
 { #category : #visiting }
@@ -334,8 +342,8 @@ FortranAbstractJsonVisitor >> visitJsonTaggedStatement: aStatementNode [
 ]
 
 { #category : #visiting }
-FortranAbstractJsonVisitor >> visitLabel: aNode [
-	^nil
+FortranAbstractJsonVisitor >> visitLabel: aLabelNode [
+	^self visitJsonElement: aLabelNode
 ]
 
 { #category : #visiting }
@@ -444,12 +452,17 @@ FortranAbstractJsonVisitor >> visitSpan: aSpanString [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitStar: aStarNode [
+	^nil
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitStatement: aStatementNode [
 	^(self visitJsonMap: aStatementNode keys: #(span label))
 	 ,
-		((self isTaggedStatement: aStatementNode)
+	{ ((self isTaggedStatement: aStatementNode)
 			ifTrue: [ self visitJsonTaggedStatement: aStatementNode ]
-			ifFalse: [ self visitJsonElement: (aStatementNode at: 'statement') ])
+			ifFalse: [ self visitJsonElement: (aStatementNode at: 'statement') ]) }
 ]
 
 { #category : #visiting }
