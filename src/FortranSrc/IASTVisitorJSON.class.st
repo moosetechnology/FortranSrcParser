@@ -125,9 +125,9 @@ IASTVisitorJSON >> visitCallStatement: aCallNode [
 	
 	data := super visitCallStatement: aCallNode.
 
-	astNode := (self isESOPEFunction: data second entityName)
-		ifTrue:  [ IASTVarEso newFrom: data second entityName ]
-		ifFalse: [ data second ].
+	astNode := (self isESOPEFunction: data second)
+		ifTrue:  [ IASTVarEso newFrom: data second ]
+		ifFalse: [ IASTInvocation new entityName: data second ; yourself ].
 
 	^{ astNode
 			sourceAnchor: (self makeIndexedAnchor: data first) ;
@@ -224,12 +224,9 @@ IASTVisitorJSON >> visitDo_spec: aDoSpecNode [
 
 { #category : #visiting }
 IASTVisitorJSON >> visitFunctionAsValue: aFunctionNode [
-	| data |
+	^(super visitFunctionAsValue: aFunctionNode)
+		second
 
-	data := super visitFunctionAsValue: aFunctionNode.
-	^IASTInvocation new
-		entityName:  data second ;
-		yourself
 ]
 
 { #category : #visiting }
