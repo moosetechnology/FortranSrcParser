@@ -2,7 +2,7 @@
 An IASTVisitorF77Test is a test class for testing the behavior of IASTVisitorF77
 "
 Class {
-	#name : #IASTVisitorToFamixDefTest,
+	#name : #IASTToFamixVisitorTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'visitor',
@@ -12,7 +12,7 @@ Class {
 }
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> anchorFrom: startPoint to: endPoint [
+IASTToFamixVisitorTest >> anchorFrom: startPoint to: endPoint [
 	^IASTIndexedFileAnchor new
 		startLine: startPoint x ;
 		startColumn: startPoint y;
@@ -23,28 +23,52 @@ IASTVisitorToFamixDefTest >> anchorFrom: startPoint to: endPoint [
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> defaultAnchor [
+IASTToFamixVisitorTest >> defaultAnchor [
 	^ self anchorFrom: 1 @ 7 to: 2 @ 10
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> defaultVariable [
-	^ IASTVariable new
-		entityName: 'aVar';
-		typeSpec: 'integer';
+IASTToFamixVisitorTest >> defaultTypeCharacter [
+	^IASTTypeRef new
+		entityName: 'character';
+		sourceAnchor: self defaultAnchor;
 		yourself
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> setUp [
-	super setUp.
-	
-	programFile := IASTProgramFile new filename: 'fortran77.f' ; yourself.
-	visitor := IASTVisitorToFamixDef new.
+IASTToFamixVisitorTest >> defaultTypeInteger [
+	^IASTTypeRef new
+		entityName: 'integer';
+		sourceAnchor: self defaultAnchor;
+		yourself
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77 [
+IASTToFamixVisitorTest >> defaultTypeReal [
+	^IASTTypeRef new
+		entityName: 'real';
+		sourceAnchor: self defaultAnchor;
+		yourself
+]
+
+{ #category : #running }
+IASTToFamixVisitorTest >> defaultVariable [
+	^ IASTVariable new
+		entityName: 'aVar';
+		typeSpec: self defaultTypeInteger;
+		yourself
+]
+
+{ #category : #running }
+IASTToFamixVisitorTest >> setUp [
+	super setUp.
+	
+	programFile := IASTProgramFile new filename: 'fortran77.f' ; yourself.
+	visitor := IASTToFamixVisitor new.
+]
+
+{ #category : #running }
+IASTToFamixVisitorTest >> testCreateFamixFortran77 [
 
 	| entity var |
 	programFile progUnits: { IASTSubroutine new
@@ -67,7 +91,7 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77 [
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77Comment [
+IASTToFamixVisitorTest >> testCreateFamixFortran77Comment [
 
 	| entity comment |
 
@@ -91,7 +115,7 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77Comment [
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77InvocationCalleeBeforeCaller [
+IASTToFamixVisitorTest >> testCreateFamixFortran77InvocationWithoutTestingTarget [
 	| entity invocation caller callee |
 
 	callee := IASTSubroutine new entityName: 'sub'; yourself.
@@ -109,37 +133,10 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77InvocationCalleeBeforeCalle
 	
 	self assert: invocation class equals: FamixFortran77Invocation.
 	self assert: invocation sender equals: entity programUnits second.
-	
-	self assert: invocation candidates size equals: 1.
-	self assert: invocation candidates first equals: entity programUnits first.
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77InvocationCallerBeforeCallee [
-	| entity invocation caller callee |
-
-	callee := IASTSubroutine new entityName: 'sub'; yourself.
-
-	caller := IASTMainProgram new
-			entityName: 'main';
-			body: { IASTInvocation new entityName: 'sub'; yourself };
-			yourself.
-	programFile progUnits: { caller . callee }.
-
-	entity := programFile accept: visitor.
-
-	self assert: entity programUnits second outgoingInvocations size equals: 1.
-	invocation := entity programUnits second outgoingInvocations first.
-	
-	self assert: invocation class equals: FamixFortran77Invocation.
-	self assert: invocation sender equals: entity programUnits second.
-	
-	self assert: invocation candidates size equals: 1.
-	self assert: invocation candidates first equals: entity programUnits first.
-]
-
-{ #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77LocalVariable [
+IASTToFamixVisitorTest >> testCreateFamixFortran77LocalVariable [
 
 	| entity var |
 	programFile progUnits: { IASTSubroutine new
@@ -161,7 +158,7 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77LocalVariable [
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUBlockdata [
+IASTToFamixVisitorTest >> testCreateFamixFortran77PUBlockdata [
 
 	| entity |
 	programFile progUnits: { IASTBlockData new
@@ -181,7 +178,7 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUBlockdata [
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUComment [
+IASTToFamixVisitorTest >> testCreateFamixFortran77PUComment [
 	| entity |
 	programFile progUnits: { IASTComment new
 		text: ' a comment' ;
@@ -201,7 +198,7 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUComment [
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUFunction [
+IASTToFamixVisitorTest >> testCreateFamixFortran77PUFunction [
 
 	| entity |
 	programFile progUnits: { IASTFunction new
@@ -220,7 +217,7 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUFunction [
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUMain [
+IASTToFamixVisitorTest >> testCreateFamixFortran77PUMain [
 
 	| entity |
 	programFile progUnits: { IASTMainProgram new
@@ -239,7 +236,7 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUMain [
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77ProgramFile [
+IASTToFamixVisitorTest >> testCreateFamixFortran77ProgramFile [
 	| entity |
 	entity := programFile accept: visitor.
 	
@@ -249,7 +246,7 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77ProgramFile [
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77SourceAnchor [
+IASTToFamixVisitorTest >> testCreateFamixFortran77SourceAnchor [
 	| entity |
 	entity := self defaultAnchor accept: visitor.
 	
@@ -262,7 +259,7 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77SourceAnchor [
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77Subroutine [
+IASTToFamixVisitorTest >> testCreateFamixFortran77Subroutine [
 
 	| entity |
 	programFile progUnits: { IASTSubroutine new
