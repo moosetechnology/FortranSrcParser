@@ -138,7 +138,7 @@ RunDemos class >> runner: anEsopeSourceCode [
 
 	irModel := parser model.
 
-	visitorForIr := IASTVisitorF77 new.
+	visitorForIr := IASTVisitorToFamixDef new.
 	visitorForIr model
 		rootFolder: FileSystem workingDirectory;
 		name: 'mooseModelF77-' , self counter asString.
