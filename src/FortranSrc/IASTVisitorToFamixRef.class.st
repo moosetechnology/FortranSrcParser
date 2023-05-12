@@ -21,6 +21,14 @@ IASTVisitorToFamixRef class >> getLines: filename [
 	^ filename asFileReference contents lines
 ]
 
+{ #category : #'private-helper' }
+IASTVisitorToFamixRef class >> newFrom: aMooseModel [
+	"Answer an instance with same model as aMooseModel."
+	^self new
+		  model: aMooseModel;
+		  yourself
+]
+
 { #category : #visiting }
 IASTVisitorToFamixRef >> addAccessesTo: anEntity [
 
@@ -96,13 +104,21 @@ IASTVisitorToFamixRef >> f77sourcefile: anObject [
 	f77sourcefile := anObject
 ]
 
+{ #category : #visiting }
+IASTVisitorToFamixRef >> findEntity: anEntity forType: aType [
+	^((self model allWithSubTypesOf:  aType) select: [ :each | 1halt.
+		each class = aType and: [ 
+		each name = anEntity entityName ]]) first.
+]
+
 { #category : #initialization }
 IASTVisitorToFamixRef >> initialize [
 
 	super initialize.
-	model := FamixFortran77Model new name: 'mooseModelF77'.
+	"f77sourcefile := ''.
+	model := FamixFortran77Model new name: 'mooseModelF77'."
 	stack := Stack new.
-	f77sourcefile := ''
+	
 ]
 
 { #category : #accessing }
@@ -256,11 +272,9 @@ IASTVisitorToFamixRef >> visitIASTInvocation: anInvocation [
 	| invocation |
 	self flag: #TODO. "howto process invocation arguments ?"
 
-	invocation := (self newEntity: FamixFortran77Invocation)
-		              sourceAnchor: (self visitIndexedFileAnchor: anInvocation sourceAnchor);
-		              yourself.
+	invocation := (self findEntity: anInvocation forType: FamixFortran77Invocation).
 	"anInvocation arguments do: [ :argument | invocation addArgument: (invocation accept: self) ]."
-	invocation target: (self searchInKnownProgUnit: anInvocation entityName).
+	invocation target: (self searchInKnownProgUnit: anInvocation).
 	^ invocation
 ]
 
@@ -269,23 +283,12 @@ IASTVisitorToFamixRef >> visitIASTMainProgram: aMainProgram [
 
 	| main |
 
-	main := (self newEntity: FamixFortran77PUMain)
-		        sourceAnchor: (self visitIndexedFileAnchor: aMainProgram sourceAnchor);
-		        name: aMainProgram entityName;
-		        yourself.
+	main := (self findEntity: aMainProgram forType: FamixFortran77PUMain).
 	stack push: main.
-
-	aMainProgram localVariables do: [ :localVariable | 
-		main addLocalVariable: (localVariable accept: self) ].
-
-	aMainProgram accesses do: [ :access | 
-		main addAccess: (access accept: self) ].
 	
 	aMainProgram invocations do: [ :invocation | 
 		main addOutgoingInvocation: (invocation accept: self) ].
-	
-	aMainProgram localComments do: [ :comment | 
-		main addComment: (comment accept: self) ].
+
 	stack pop.
 	^ main
 ]
@@ -310,17 +313,14 @@ IASTVisitorToFamixRef >> visitIASTProgramFile: aProgramFile [
 
 	| progFile |
 	self f77sourcefile: aProgramFile filename.
-	progFile := (self newEntity: FamixFortran77ProgramFile)
-		            filename: aProgramFile filename;
-		            version: aProgramFile version;
-		            name: (self class getBasename: aProgramFile filename);
-		            yourself.
+	progFile := ((self model allWithSubTypesOf: FamixFortran77Entity) select: [ 
+		             :each | each class = FamixFortran77ProgramFile and: [ each name = aProgramFile filename ]]) anyOne.
 	stack push: progFile.
 	"process the programunits inside of this file"
 	aProgramFile progUnits do: [ :progUnit | 
 		progFile addProgramUnit: (progUnit accept: self) ].
 	stack pop.
-	^progFile
+	^ progFile
 ]
 
 { #category : #visiting }
@@ -328,26 +328,11 @@ IASTVisitorToFamixRef >> visitIASTSubroutine: aSubroutine [
 
 	| subroutine |
 
-	subroutine := (self newEntity: FamixFortran77PUSubroutine)
-		              sourceAnchor: (self visitIndexedFileAnchor: aSubroutine sourceAnchor) ;
-		              name: aSubroutine entityName;
-		              yourself.
+	subroutine := (self findEntity: aSubroutine forType: FamixFortran77PUSubroutine).
 	stack push: subroutine.
-	"prossess localVariables"
-	aSubroutine localVariables do: [ :localVariable | 
-		subroutine addLocalVariable: (localVariable accept: self) ].
-	"prossess parameters"
-	aSubroutine parameters do: [ :parameter | 
-		subroutine addParameter: (parameter accept: self) ].
-	"prossess accesses"
-	aSubroutine accesses do: [ :access | 
-		subroutine addAccess: (access accept: self) ].
-	"prossess invocations"
+
 	aSubroutine invocations do: [ :invocation | 
 		subroutine addOutgoingInvocation: (invocation accept: self) ].
-	"prossess the comments inside this progUnit"
-	aSubroutine localComments do: [ :comment | 
-		subroutine addComment: (comment accept: self) ].
 
 	stack pop.
 	^ subroutine
