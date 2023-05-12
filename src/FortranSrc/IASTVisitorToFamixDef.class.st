@@ -142,11 +142,15 @@ IASTVisitorToFamixDef >> newIndexedFileAnchor: filename [
 ]
 
 { #category : #'private-creation' }
-IASTVisitorToFamixDef >> searchInKnownProgUnit: aName [
+IASTVisitorToFamixDef >> searchInKnownProgUnit: anInvocation [
 
-	self flag: #TODO. "Search the known programunits for the one whose name matches the aName"
-	^ (model allWithSubTypesOf: FamixFortran77ProgramUnit) select:
-		  [ :progUnit | progUnit name = aName ]
+	self flag: #TODO. "Search in the known programunits for the one whose name matches the aName"
+	self flag: #TODO. "Process arguments too ?"
+	1halt.
+	^ (model allWithSubTypesOf: FamixFortran77PUProcedure) select: [ 
+		  :procedure | 
+		  procedure name = anInvocation entityName and: [ 
+			   procedure parameters size = anInvocation arguments size ] ]
 ]
 
 { #category : #'private-creation' }
@@ -251,13 +255,13 @@ IASTVisitorToFamixDef >> visitIASTInvocation: anInvocation [
 
 	| invocation |
 	self flag: #TODO. "howto process invocation arguments ?"
-
+1halt.
 	invocation := (self newEntity: FamixFortran77Invocation)
-		              sourceAnchor: (self visitIndexedFileAnchor: anInvocation sourceAnchor);
-		              yourself.
+		sourceAnchor: (self visitIndexedFileAnchor: anInvocation sourceAnchor);
+		attributeAt: 'iast' put: anInvocation;
+		yourself.
 	"anInvocation arguments do: [ :argument | invocation addArgument: (invocation accept: self) ]."
-	invocation target:
-		(self searchInKnownProgUnit: anInvocation entityName).
+	"invocation target: (self searchInKnownProgUnit: anInvocation)."
 	^ invocation
 ]
 
@@ -290,11 +294,10 @@ IASTVisitorToFamixDef >> visitIASTMainProgram: aMainProgram [
 { #category : #visiting }
 IASTVisitorToFamixDef >> visitIASTParameter: aParameter [
 
-	| parameter declaredParam |
+	| parameter |
 	self flag: #TODO. "relation between parameter and localVariable declaration"
 	parameter := (self newEntity: FamixFortran77Parameter)
-		             sourceAnchor:
-			             (self newSourceAnchor: aParameter sourceAnchor);
+		             sourceAnchor: (self visitIndexedFileAnchor: aParameter sourceAnchor);
 		             name: aParameter entityName;
 		             yourself.
 	"declaredParam := self searchInLocalSymbolTable: aParameter entityName.
@@ -360,7 +363,7 @@ IASTVisitorToFamixDef >> visitIASTTypeRef: aType [
 	- length: 20
 	- kind: nil"
 	type := (self newEntity: FamixFortran77FType)
-		        sourceAnchor: (self newSourceAnchor: aType sourceAnchor);
+		        sourceAnchor: (self visitIndexedFileAnchor: aType sourceAnchor);
 		        name: aType entityName;
 		        length: aType length;
 		        kind: aType kind;
@@ -374,8 +377,7 @@ IASTVisitorToFamixDef >> visitIASTVarAccess: aVarAccess [
 	| access target |
 	self flag: #TODO. "refactoring and other"
 	access := (self newEntity: FamixFortran77Access)
-		          sourceAnchor:
-			          (self newSourceAnchor: aVarAccess sourceAnchor);
+		          sourceAnchor: (self visitIndexedFileAnchor: aVarAccess sourceAnchor);
 		          isWrite: aVarAccess isWrite;
 		          yourself.
 	target := self searchInLocalSymbolTable: aVarAccess entityName.
