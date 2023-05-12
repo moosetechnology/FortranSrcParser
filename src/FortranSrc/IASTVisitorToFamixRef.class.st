@@ -142,11 +142,15 @@ IASTVisitorToFamixRef >> newIndexedFileAnchor: filename [
 ]
 
 { #category : #'private-creation' }
-IASTVisitorToFamixRef >> searchInKnownProgUnit: aName [
+IASTVisitorToFamixRef >> searchInKnownProgUnit: anInvocation [
 
-	self flag: #TODO. "Search the known programunits for the one whose name matches the aName"
-	^ (model allWithSubTypesOf: FamixFortran77ProgramUnit) select:
-		  [ :progUnit | progUnit name = aName ]
+	self flag: #TODO. "Search in the known programunits for the one whose name matches the aName"
+	self flag: #TODO. "Process arguments too ?"
+	1halt.
+	^ (model allWithSubTypesOf: FamixFortran77PUProcedure) select: [ 
+		  :procedure | 
+		  procedure name = anInvocation entityName and: [ 
+			   procedure parameters size = anInvocation arguments size ] ]
 ]
 
 { #category : #'private-creation' }
