@@ -290,11 +290,10 @@ IASTVisitorToFamixDef >> visitIASTMainProgram: aMainProgram [
 { #category : #visiting }
 IASTVisitorToFamixDef >> visitIASTParameter: aParameter [
 
-	| parameter declaredParam |
+	| parameter |
 	self flag: #TODO. "relation between parameter and localVariable declaration"
 	parameter := (self newEntity: FamixFortran77Parameter)
-		             sourceAnchor:
-			             (self newSourceAnchor: aParameter sourceAnchor);
+		             sourceAnchor: (self visitIndexedFileAnchor: aParameter sourceAnchor);
 		             name: aParameter entityName;
 		             yourself.
 	"declaredParam := self searchInLocalSymbolTable: aParameter entityName.
@@ -360,7 +359,7 @@ IASTVisitorToFamixDef >> visitIASTTypeRef: aType [
 	- length: 20
 	- kind: nil"
 	type := (self newEntity: FamixFortran77FType)
-		        sourceAnchor: (self newSourceAnchor: aType sourceAnchor);
+		        sourceAnchor: (self visitIndexedFileAnchor: aType sourceAnchor);
 		        name: aType entityName;
 		        length: aType length;
 		        kind: aType kind;
@@ -374,8 +373,7 @@ IASTVisitorToFamixDef >> visitIASTVarAccess: aVarAccess [
 	| access target |
 	self flag: #TODO. "refactoring and other"
 	access := (self newEntity: FamixFortran77Access)
-		          sourceAnchor:
-			          (self newSourceAnchor: aVarAccess sourceAnchor);
+		          sourceAnchor: (self visitIndexedFileAnchor: aVarAccess sourceAnchor);
 		          isWrite: aVarAccess isWrite;
 		          yourself.
 	target := self searchInLocalSymbolTable: aVarAccess entityName.
