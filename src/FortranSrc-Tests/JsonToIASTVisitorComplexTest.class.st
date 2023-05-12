@@ -1,5 +1,5 @@
 Class {
-	#name : #IASTVisitorJSONComplexTest,
+	#name : #JsonToIASTVisitorComplexTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'visitor'
@@ -8,14 +8,14 @@ Class {
 }
 
 { #category : #running }
-IASTVisitorJSONComplexTest >> setUp [
+JsonToIASTVisitorComplexTest >> setUp [
 	super setUp.
 	
-	visitor := IASTVisitorJSON new
+	visitor := JsonToIASTVisitor new
 ]
 
 { #category : #tests }
-IASTVisitorJSONComplexTest >> testProgramWithEsopeCode [
+JsonToIASTVisitorComplexTest >> testProgramWithEsopeCode [
 	| prog programFile |
 	programFile := visitor visitCode: '      subroutine demo
       integer i
@@ -46,7 +46,7 @@ cESO  segsup,baz
 ]
 
 { #category : #tests }
-IASTVisitorJSONComplexTest >> testProgramWithHiddenSegmentInside [
+JsonToIASTVisitorComplexTest >> testProgramWithHiddenSegmentInside [
 	| prog programFile |
 	programFile := visitor visitCode: '      program hello
 cESO  segment test
@@ -80,7 +80,7 @@ cESO  segsup ptr1
 ]
 
 { #category : #tests }
-IASTVisitorJSONComplexTest >> testProgramWithMultipleProgUnitsWithInvocation [
+JsonToIASTVisitorComplexTest >> testProgramWithMultipleProgUnitsWithInvocation [
 
 	| iast node |
 	iast := visitor visitCode: '      program myprog
@@ -120,7 +120,7 @@ IASTVisitorJSONComplexTest >> testProgramWithMultipleProgUnitsWithInvocation [
 ]
 
 { #category : #tests }
-IASTVisitorJSONComplexTest >> testProgramWithSimpleIfElseIfElseStatementWitBody [
+JsonToIASTVisitorComplexTest >> testProgramWithSimpleIfElseIfElseStatementWitBody [
 	| prog programFile varAccess |
 	programFile := visitor visitCode: '      program hello
       if (i < j) then

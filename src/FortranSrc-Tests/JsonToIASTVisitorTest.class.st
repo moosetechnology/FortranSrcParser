@@ -2,7 +2,7 @@
 An IASTVisitorJSONTest is a test class for testing the behavior of IASTVisitorJSON
 "
 Class {
-	#name : #IASTVisitorJSONTest,
+	#name : #JsonToIASTVisitorTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'visitor'
@@ -11,14 +11,14 @@ Class {
 }
 
 { #category : #running }
-IASTVisitorJSONTest >> setUp [
+JsonToIASTVisitorTest >> setUp [
 	super setUp.
 	
-	visitor := IASTVisitorJSON new
+	visitor := JsonToIASTVisitor new
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testAssignementStatement [
+JsonToIASTVisitorTest >> testAssignementStatement [
 	| programFile var |
 	programFile := visitor visitCode: '      subroutine hello
       someVar = otherVar
@@ -40,7 +40,7 @@ IASTVisitorJSONTest >> testAssignementStatement [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testAssignementStatementWithComplexRHS [
+JsonToIASTVisitorTest >> testAssignementStatementWithComplexRHS [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello
       someVar = otherVar + thirdVar
@@ -64,7 +64,7 @@ IASTVisitorJSONTest >> testAssignementStatementWithComplexRHS [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testAssignementStatementWithEsoAt [
+JsonToIASTVisitorTest >> testAssignementStatementWithEsoAt [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello
       someVar = esoat(var,1)
@@ -85,7 +85,7 @@ IASTVisitorJSONTest >> testAssignementStatementWithEsoAt [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testBlockDataWithOneCommon [
+JsonToIASTVisitorTest >> testBlockDataWithOneCommon [
 	| programFile blockdata var |
 
 	programFile := visitor visitCode: '      blockdata hello
@@ -107,7 +107,7 @@ IASTVisitorJSONTest >> testBlockDataWithOneCommon [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testBlockDataWithOneCommonOneData [
+JsonToIASTVisitorTest >> testBlockDataWithOneCommonOneData [
 	| programFile blockdata |
 	self flag: 'not dealing with COMMON for now'.
 	self skip.
@@ -128,7 +128,7 @@ IASTVisitorJSONTest >> testBlockDataWithOneCommonOneData [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testCallToWrite [
+JsonToIASTVisitorTest >> testCallToWrite [
 
 	| programFile stmt arg |
 	programFile := visitor visitCode: '      subroutine mysub (msg)
@@ -152,7 +152,7 @@ IASTVisitorJSONTest >> testCallToWrite [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testComment [
+JsonToIASTVisitorTest >> testComment [
 	| programFile stmt |
 	programFile := visitor visitCode: 'c     blah'.
 
@@ -172,7 +172,7 @@ IASTVisitorJSONTest >> testComment [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testCommentInside [
+JsonToIASTVisitorTest >> testCommentInside [
 	| programFile stmt |
 	programFile := visitor visitCode: '      integer function hello()
 c     blah
@@ -188,7 +188,7 @@ c     blah
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testCommentOutside [
+JsonToIASTVisitorTest >> testCommentOutside [
 	| programFile stmt |
 	programFile := visitor visitCode: 'c     blah
       integer function hello()
@@ -203,7 +203,7 @@ IASTVisitorJSONTest >> testCommentOutside [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testEmptyBlockData [
+JsonToIASTVisitorTest >> testEmptyBlockData [
 	| programFile block |
 	programFile := visitor visitCode: '      BLOCK data hello
       end
@@ -219,7 +219,7 @@ IASTVisitorJSONTest >> testEmptyBlockData [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testEmptyFunction [
+JsonToIASTVisitorTest >> testEmptyFunction [
 	| programFile fct |
 	programFile := visitor visitCode: '      integer function hello()
       end
@@ -246,7 +246,7 @@ IASTVisitorJSONTest >> testEmptyFunction [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testEmptyFunctionWithArguments [
+JsonToIASTVisitorTest >> testEmptyFunctionWithArguments [
 	| programFile fct param |
 	programFile := visitor visitCode: '      integer function hello(i,j)
       end
@@ -267,7 +267,7 @@ IASTVisitorJSONTest >> testEmptyFunctionWithArguments [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testEmptyProgram [
+JsonToIASTVisitorTest >> testEmptyProgram [
 	| programFile prog |
 	programFile := visitor visitCode: '      program hello
       end
@@ -292,7 +292,7 @@ IASTVisitorJSONTest >> testEmptyProgram [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testEmptySubroutine [
+JsonToIASTVisitorTest >> testEmptySubroutine [
 	| programFile sub |
 	programFile := visitor visitCode: '      subroutine hello
       end
@@ -316,7 +316,7 @@ IASTVisitorJSONTest >> testEmptySubroutine [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testEmptySubroutineOneParam [
+JsonToIASTVisitorTest >> testEmptySubroutineOneParam [
 	| programFile sub |
 	programFile := visitor visitCode: '      subroutine hello( name )
       end
@@ -331,7 +331,7 @@ IASTVisitorJSONTest >> testEmptySubroutineOneParam [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testEmptySubroutineTwoParams [
+JsonToIASTVisitorTest >> testEmptySubroutineTwoParams [
 	| programFile sub |
 	programFile := visitor visitCode: '      subroutine hello( param1, param2 )
       end
@@ -348,7 +348,7 @@ IASTVisitorJSONTest >> testEmptySubroutineTwoParams [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testEsoArTwoArgs [
+JsonToIASTVisitorTest >> testEsoArTwoArgs [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello()
         esoar(baz,bar) = 5
@@ -364,7 +364,7 @@ IASTVisitorJSONTest >> testEsoArTwoArgs [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testEsoArWithEsoAtArg [
+JsonToIASTVisitorTest >> testEsoArWithEsoAtArg [
 	| programFile esoar esoat |
 	programFile := visitor visitCode: '      subroutine hello( )
         esoar(esoat(baz,bar),2) = 5
@@ -386,7 +386,7 @@ IASTVisitorJSONTest >> testEsoArWithEsoAtArg [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testEsoAtOneArg [
+JsonToIASTVisitorTest >> testEsoAtOneArg [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello( )
         esoat(baz,2) = 5.3
@@ -404,7 +404,7 @@ IASTVisitorJSONTest >> testEsoAtOneArg [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testEsoAtTwoArgs [
+JsonToIASTVisitorTest >> testEsoAtTwoArgs [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello( )
         esoat(baz,bar) = 5
@@ -424,7 +424,7 @@ IASTVisitorJSONTest >> testEsoAtTwoArgs [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testEsoAtTwoArgsReceivesVar [
+JsonToIASTVisitorTest >> testEsoAtTwoArgsReceivesVar [
 	| programFile var |
 	programFile := visitor visitCode: '      subroutine hello( )
         esoat(baz,bar) = otherVar
@@ -443,7 +443,7 @@ IASTVisitorJSONTest >> testEsoAtTwoArgsReceivesVar [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testFunctionWithFunctionInvocation [
+JsonToIASTVisitorTest >> testFunctionWithFunctionInvocation [
 
 	| iast fct |
 	iast := visitor visitCode: '      integer function efunc()
@@ -479,7 +479,7 @@ IASTVisitorJSONTest >> testFunctionWithFunctionInvocation [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testIntegerVariableDeclaration [
+JsonToIASTVisitorTest >> testIntegerVariableDeclaration [
 	| programFile var |
 	programFile := visitor visitCode: '      subroutine hello
       integer i
@@ -498,7 +498,7 @@ IASTVisitorJSONTest >> testIntegerVariableDeclaration [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testMultipleStatements [
+JsonToIASTVisitorTest >> testMultipleStatements [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello
       integer someVar
@@ -526,7 +526,7 @@ IASTVisitorJSONTest >> testMultipleStatements [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testProgramWithEmptyDoStatement [
+JsonToIASTVisitorTest >> testProgramWithEmptyDoStatement [
 	| prog programFile |
 	programFile := visitor visitCode: '      program hello
       do i=1, n
@@ -544,7 +544,7 @@ IASTVisitorJSONTest >> testProgramWithEmptyDoStatement [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testProgramWithOneStatement [
+JsonToIASTVisitorTest >> testProgramWithOneStatement [
 	| programFile prog |
 	programFile := visitor visitCode: '      program hello
       a = -b
@@ -563,7 +563,7 @@ IASTVisitorJSONTest >> testProgramWithOneStatement [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testProgramWithSimpleIfElseStatementWitBody [
+JsonToIASTVisitorTest >> testProgramWithSimpleIfElseStatementWitBody [
 	| prog programFile |
 	programFile := visitor visitCode: '      program hello
       if (i < j) then
@@ -587,7 +587,7 @@ IASTVisitorJSONTest >> testProgramWithSimpleIfElseStatementWitBody [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testProgramWithSimpleIfStatementWitBody [
+JsonToIASTVisitorTest >> testProgramWithSimpleIfStatementWitBody [
 	| prog programFile |
 	programFile := visitor visitCode: '      program hello
       if (i < j) then
@@ -607,7 +607,7 @@ IASTVisitorJSONTest >> testProgramWithSimpleIfStatementWitBody [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testProgramWithSimpleIfStatementWithoutBody [
+JsonToIASTVisitorTest >> testProgramWithSimpleIfStatementWithoutBody [
 	| prog programFile |
 	programFile := visitor visitCode: '      program hello
       if (i < j) then
@@ -625,7 +625,7 @@ IASTVisitorJSONTest >> testProgramWithSimpleIfStatementWithoutBody [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testStringVariableDeclaration [
+JsonToIASTVisitorTest >> testStringVariableDeclaration [
 	| programFile var |
 	programFile := visitor visitCode: '      subroutine hello
       character*8 str
@@ -643,7 +643,7 @@ IASTVisitorJSONTest >> testStringVariableDeclaration [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testSubroutineInvocation [
+JsonToIASTVisitorTest >> testSubroutineInvocation [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello
       call someSubRoutine
@@ -660,7 +660,7 @@ IASTVisitorJSONTest >> testSubroutineInvocation [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testSubroutineInvocationWithArguments [
+JsonToIASTVisitorTest >> testSubroutineInvocationWithArguments [
 	| programFile stmt arg |
 	programFile := visitor visitCode: '      subroutine hello
       call someSubRoutine(bar,5,baz)
@@ -684,7 +684,7 @@ IASTVisitorJSONTest >> testSubroutineInvocationWithArguments [
 ]
 
 { #category : #tests }
-IASTVisitorJSONTest >> testTwoIntegerVariableDeclarations [
+JsonToIASTVisitorTest >> testTwoIntegerVariableDeclarations [
 	| programFile var |
 	programFile := visitor visitCode: '      subroutine hello
       integer i,j
