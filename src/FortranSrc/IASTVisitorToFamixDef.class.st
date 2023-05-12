@@ -251,13 +251,13 @@ IASTVisitorToFamixDef >> visitIASTInvocation: anInvocation [
 
 	| invocation |
 	self flag: #TODO. "howto process invocation arguments ?"
-
+1halt.
 	invocation := (self newEntity: FamixFortran77Invocation)
-		              sourceAnchor: (self visitIndexedFileAnchor: anInvocation sourceAnchor);
-		              yourself.
+		sourceAnchor: (self visitIndexedFileAnchor: anInvocation sourceAnchor);
+		attributeAt: 'iast' put: anInvocation;
+		yourself.
 	"anInvocation arguments do: [ :argument | invocation addArgument: (invocation accept: self) ]."
-	invocation target:
-		(self searchInKnownProgUnit: anInvocation entityName).
+	"invocation target: (self searchInKnownProgUnit: anInvocation)."
 	^ invocation
 ]
 
