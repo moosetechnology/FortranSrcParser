@@ -23,9 +23,7 @@ IASTInvocation >> arguments [
 { #category : #accessing }
 IASTInvocation >> arguments: aNodes [
 
-	arguments := aNodes ifNil: [ #(  ) ] ifNotNil: [ 
-		             aNodes flattened
-			             select: [ :node | node class = IASTVarAccess ] ]
+	arguments := aNodes
 ]
 
 { #category : #accessing }

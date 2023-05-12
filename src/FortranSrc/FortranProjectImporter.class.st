@@ -64,6 +64,23 @@ FortranProjectImporter >> annotatedFortranFiles [
 	^ self buildDirectory allChildrenMatching: '*.f'
 ]
 
+{ #category : #fast }
+FortranProjectImporter >> astJSON: sourceCode [
+
+	| filename option |
+	option := 'serialize -t json -v77l encode'.
+	filename := './fortran77.f'.
+	filename asFileReference writeStreamDo: [ :stream | 
+		stream truncate.
+		stream
+		<< (sourceCode copy replaceAll: Character cr with: Character lf) ].
+
+	LibC runCommand: ('{1} {2} "{3}" > "{3}.json" 2> "{3}.err"' format: { 
+				 self fortranSrcPath.
+				 option.
+				 filename. })
+]
+
 { #category : #accessing }
 FortranProjectImporter >> astParser [
 
@@ -108,6 +125,12 @@ FortranProjectImporter >> esopeFiles [
 	^ self srcDirectory allChildrenMatching: '*.e'
 ]
 
+{ #category : #fast }
+FortranProjectImporter >> fortranSrcPath [
+
+	^ '/home/anquetil/.cabal/bin/fortran-src-extras'
+]
+
 { #category : #initialization }
 FortranProjectImporter >> from: aFileReference [
 
@@ -118,9 +141,9 @@ FortranProjectImporter >> from: aFileReference [
 FortranProjectImporter >> initialize [
 
 	super initialize.
-	rootFolder := self rootFolder.
+	"rootFolder := self rootFolder.
 	parser := self parser.
-	model := self model
+	model := self model"
 ]
 
 { #category : #accessing }
