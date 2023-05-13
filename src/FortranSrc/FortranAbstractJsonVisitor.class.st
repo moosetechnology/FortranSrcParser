@@ -72,6 +72,7 @@ FortranAbstractJsonVisitor >> visitBlock_data: aBlockDataNode [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitBlocks: aBlockList [
+	aBlockList ifNil: [ ^#() ].
 	^self visitJsonArray: aBlockList
 ]
 
@@ -130,7 +131,9 @@ FortranAbstractJsonVisitor >> visitCommon_groups: aCommonGroupsNode [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitConditions: aConditionList [
-	^self visitJsonArray: aConditionList
+	^aConditionList collect: [ :aCondition |
+		{ self visitIfCondition: aCondition first .
+	     self visitThenPart: aCondition second } ]
 ]
 
 { #category : #visiting }
@@ -259,13 +262,16 @@ FortranAbstractJsonVisitor >> visitFunction_call: aFunctionCallNode [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitIf: anIfNode [
-	"ignoring key: end_label"
-	^self
-		visitJsonMap: anIfNode
-		keys: ((anIfNode at: 'blocks')
-			ifNil: [ #(span label conditions) ]
-			ifNotNil: [  #(span label conditions blocks) ])
+	"The THEN-Part is in 'conditions', the ELSE-PART in 'blocks', if no ELSE-PART, then 'blocks' is nil'
+	 ignoring key: end_label"
 
+	^self visitJsonMap: anIfNode keys: #(span label conditions blocks)
+
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitIfCondition: anIfConditionNode [
+	^self visitJsonElement: anIfConditionNode
 ]
 
 { #category : #visiting }
