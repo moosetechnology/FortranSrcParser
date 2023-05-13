@@ -419,6 +419,11 @@ FortranAbstractJsonVisitor >> visitMain: aProgramNode [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitMessage: aStopMessageNode [
+	^self visitJsonElement: aStopMessageNode 
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitMeta: aMetaNode [
 	^self visitJsonMap: aMetaNode keys: #(miVersion miFilename)
 ]
@@ -476,6 +481,11 @@ FortranAbstractJsonVisitor >> visitRealLiteralValue: aRealLiteralValueNode [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitReturn_spec: aReturn_specNode [
+	^self visitJsonMap: aReturn_specNode keys: #(span target)
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitRight: aRightNode [
 	^self visitJsonElement: aRightNode
 ]
@@ -520,6 +530,22 @@ FortranAbstractJsonVisitor >> visitStatement: aStatementNode [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitStopStatement: aStopStatementNode [
+	^self visitJsonMap: aStopStatementNode keys: #(span message)
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitString: aString [
+	"for clarity String nodes are 'transformed' in StringLiteralValue nodes"
+	^self visitStringLiteralValue: aString
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitStringLiteralValue: aString [
+	^aString
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitSubprograms: aNode [
 	^nil
 ]
@@ -532,6 +558,11 @@ FortranAbstractJsonVisitor >> visitSubroutine: aSubroutineNode [
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitTarget: aTargetNode [
 	^self visitJsonElement: aTargetNode
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitThenPart: aThenPartNode [
+	^self visitJsonElement: aThenPartNode
 ]
 
 { #category : #visiting }
