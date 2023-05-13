@@ -121,6 +121,7 @@ IASTVisitorJSONTest >> testBlockDataWithOneCommonOneData [
 	self assert: programFile class equals: IASTProgramFile.
 	self assert: programFile progUnits size equals: 1.
 	self assert: programFile progUnits first class equals: IASTBlockData.
+
 	blockdata := programFile progUnits first.
 	self assert: blockdata entityName equals: 'hello'.
 	self assert: blockdata body size equals: 3.

@@ -352,7 +352,7 @@ FortranAbstractJsonVisitor >> visitJsonNode: key value: aValue [
 { #category : #'visiting - reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonTaggedElement: jsonDictionary [
 	"similar to #visitJsonNode: , but removes first the 'tag' key from the JsonDisctionary
-	 so that it is not visited again"
+	 so that it is not visited again (not sure this is needed ...?)"
 	| key |
 	key := jsonDictionary removeKey: 'tag'.
 	^self visitJsonNode: key value: jsonDictionary
@@ -572,7 +572,9 @@ FortranAbstractJsonVisitor >> visitTrueLiteralValue: aString [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitType: aTypeNode [
-	^self visitJsonElement: aTypeNode
+
+	self flag: 'need to consider "selector", for example for lenght of character type'.
+	^self visitJsonMap: aTypeNode keys: #(span base_type)
 ]
 
 { #category : #visiting }

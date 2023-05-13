@@ -193,6 +193,7 @@ IASTVisitorJSON >> visitDeclarator: aDeclaratorNode [
 IASTVisitorJSON >> visitDeclaratorVariable: aDeclaratorVariableNode [
 	| data |
 	data := super visitDeclaratorVariable: aDeclaratorVariableNode.
+
 	^IASTVariable new
 		sourceAnchor: (self makeIndexedAnchor: data first) ;
 		entityName: data second ;
