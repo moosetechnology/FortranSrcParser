@@ -46,7 +46,10 @@ FortranAbstractJsonVisitor >> visitAttributes: aNode [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitBase_type: aString [
-	^aString
+	"to offer the possibility to handle each baseType differently, we create #visitXYZBaseType: methods"
+
+	^self visitJsonNode: (aString , 'BaseType') value: aString
+
 ]
 
 { #category : #visiting }
@@ -81,6 +84,12 @@ FortranAbstractJsonVisitor >> visitBody: aNode [
 FortranAbstractJsonVisitor >> visitCallStatement: aCallStatementNode [
 
 	^self visitJsonMap: aCallStatementNode keys: #(span function arguments)
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitCharacterBaseType: aString [
+	^aString
+
 ]
 
 { #category : #visiting }
@@ -193,6 +202,11 @@ FortranAbstractJsonVisitor >> visitExpression: aExpressionNode [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitFalseLiteralValue: aString [
+	^aString
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitFormat: aFormatNode [
 	^{ self visitSpan: (aFormatNode at: 'span') .
 	  (aFormatNode at: 'list') collect: [ :each | self visitFormatArgument: each ] }
@@ -270,7 +284,14 @@ FortranAbstractJsonVisitor >> visitInitial: anInitialNode [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitInteger: anIntegerNode [
+	"for clarity Integer nodes are 'transformed' in IntegerLiteralValue nodes"
 	^self visitIntegerLiteralValue: (anIntegerNode at: 'contents')
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitIntegerBaseType: aString [
+	^aString
+
 ]
 
 { #category : #visiting }
@@ -367,6 +388,26 @@ FortranAbstractJsonVisitor >> visitList: aListNode [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitLogical: aLogicalNode [
+	"for clarity Logical nodes are 'transformed' in LogicalLiteralValue nodes"
+	^self visitLogicalLiteralValue: (aLogicalNode at: 'contents')
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitLogicalBaseType: aString [
+	^aString
+
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitLogicalLiteralValue: aString [
+	"for clarity we create #visitTrueLiteralValue: and #visitFalseLiteralValue:"
+	^(aString = 'true')
+		ifTrue: [ self visitTrueLiteralValue: aString ]
+		ifFalse: [ self visitFalseLiteralValue: aString ]
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitMain: aProgramNode [
 	^self visitJsonMap: aProgramNode keys: #(span name blocks subprograms)
 ]
@@ -411,7 +452,14 @@ FortranAbstractJsonVisitor >> visitProgram_units: aNode [
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitReal: aRealNode [
+	"for clarity Real nodes are 'transformed' in RealLiteralValue nodes"
 	^self visitRealLiteralValue: (aRealNode at: 'contents')
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitRealBaseType: aString [
+	^aString
+
 ]
 
 { #category : #visiting }
@@ -478,6 +526,11 @@ FortranAbstractJsonVisitor >> visitSubroutine: aSubroutineNode [
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitTarget: aTargetNode [
 	^self visitJsonElement: aTargetNode
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitTrueLiteralValue: aString [
+	^aString
 ]
 
 { #category : #visiting }
