@@ -188,6 +188,11 @@ FortranAbstractJsonVisitor >> visitDeclarators: aDeclaratorsList [
 	
 ]
 
+{ #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitDivision: aDivisionOperatorNode [
+	^'division'
+]
+
 { #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitDo: aDoNode [
 	^self visitJsonMap: aDoNode keys: #(span do_spec body)
@@ -463,12 +468,13 @@ FortranAbstractJsonVisitor >> visitMiVersion: aString [
 ]
 
 { #category : #'visiting expression' }
-FortranAbstractJsonVisitor >> visitMinus: anMinusOperatorNode [
+FortranAbstractJsonVisitor >> visitMinus: aMinusOperatorNode [
+	"unary minus"
 	^'minus'
 ]
 
 { #category : #'visiting expression' }
-FortranAbstractJsonVisitor >> visitMultiplication: anMultiplicationOperatorNode [
+FortranAbstractJsonVisitor >> visitMultiplication: aMultiplicationOperatorNode [
 	^'multiplication'
 ]
 
@@ -588,7 +594,7 @@ FortranAbstractJsonVisitor >> visitSubroutine: aSubroutineNode [
 ]
 
 { #category : #'visiting expression' }
-FortranAbstractJsonVisitor >> visitSubtraction: anSubtractionOperatorNode [
+FortranAbstractJsonVisitor >> visitSubtraction: aSubtractionOperatorNode [
 	^'subtraction'
 ]
 
