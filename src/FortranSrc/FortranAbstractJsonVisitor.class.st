@@ -9,6 +9,11 @@ FortranAbstractJsonVisitor >> isTaggedStatement: aStatementNode [
 	^(aStatementNode at: 'statement') includesKey: 'tag'
 ]
 
+{ #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitAddition: anAdditionOperatorNode [
+	^'addition'
+]
+
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitArgument: anArgumentNode [
 	"used for argument in subprogram calls and parameter in subprogram definition
@@ -276,7 +281,9 @@ FortranAbstractJsonVisitor >> visitIfCondition: anIfConditionNode [
 ]
 
 { #category : #'visiting statement' }
-FortranAbstractJsonVisitor >> visitImplicitStatement: anImpliciteStatementNode [
+FortranAbstractJsonVisitor >> visitImplicitStatement: anImplicitstatementNode [
+	
+	^self visitJsonMap: anImplicitstatementNode keys:  #(span items)
 ]
 
 { #category : #visiting }
@@ -304,6 +311,16 @@ FortranAbstractJsonVisitor >> visitIntegerBaseType: aString [
 { #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitIntegerLiteralValue: anIntegerLiteralValueNode [
 	^anIntegerLiteralValueNode first
+]
+
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitItems: anImplicitItemsNode [
+	"'items' in implicit statement"
+
+	^anImplicitItemsNode
+		ifNil: [ nil ]
+		ifNotNil: [ self notYetImplemented ]
+
 ]
 
 { #category : #'visiting - reflectivity' }
@@ -442,9 +459,8 @@ FortranAbstractJsonVisitor >> visitName: aString [
 
 { #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitOp: anOpNode [
-	"should be a dictionnary with a 'tag' key and a string for value: 'multiplication', 'addition', ...
-	 May be should #visitMultiplication:, #visitAddition:, ... ? "
-	^anOpNode at: 'tag'
+	"should be a dictionnary with a 'tag' key and a string for value: 'multiplication', 'addition', ..."
+	^self visitJsonTaggedElement: anOpNode
 ]
 
 { #category : #visiting }
