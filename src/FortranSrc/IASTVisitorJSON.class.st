@@ -86,7 +86,7 @@ IASTVisitorJSON >> visitArguments: anArgumentList [
 		reject: #isNil
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 IASTVisitorJSON >> visitAssign_expression: anAssignExpressionNode [
 	| data |
 	data := super visitAssign_expression: anAssignExpressionNode.
@@ -100,7 +100,7 @@ IASTVisitorJSON >> visitAssign_expression: anAssignExpressionNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 IASTVisitorJSON >> visitBinary: aBinaryExpressionNode [
 	| data |
 	data := super visitBinary: aBinaryExpressionNode.
@@ -119,7 +119,7 @@ IASTVisitorJSON >> visitBlock_data: aBlockDataNode [
 		yourself
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 IASTVisitorJSON >> visitCallStatement: aCallNode [
 	| astNode data |
 	
@@ -136,14 +136,14 @@ IASTVisitorJSON >> visitCallStatement: aCallNode [
 
 ]
 
-{ #category : #'private - parsing' }
+{ #category : #visiting }
 IASTVisitorJSON >> visitCode: aString [
 	self astJSON: aString.
 	^'./fortran77.f.json' asFileReference readStreamDo: [ :st |
 			self visitProgramFile: (NeoJSONReader fromString: st contents) ]
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 IASTVisitorJSON >> visitComment: aCommentNode [
 	| data |
 	data := super visitComment: aCommentNode.
@@ -153,7 +153,7 @@ IASTVisitorJSON >> visitComment: aCommentNode [
 		yourself
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 IASTVisitorJSON >> visitCommonGroup: aCommonGroupNode [
 	| data |
 	data := self visitCommonGroupName: (aCommonGroupNode at: 'name').
@@ -163,7 +163,7 @@ IASTVisitorJSON >> visitCommonGroup: aCommonGroupNode [
 		yourself
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 IASTVisitorJSON >> visitCommonStatement: aCommonStatementNode [
 	^self visitCommon_groups: (aCommonStatementNode at: 'common_groups')
 ]
@@ -174,7 +174,7 @@ IASTVisitorJSON >> visitData: aDataNode [
 	self shouldBeImplemented
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 IASTVisitorJSON >> visitDeclarationStatement: aDeclarationStatementNode [
 	| data |
 
@@ -184,12 +184,12 @@ IASTVisitorJSON >> visitDeclarationStatement: aDeclarationStatementNode [
 	
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 IASTVisitorJSON >> visitDeclarator: aDeclaratorNode [
 	^self visitDeclaratorVariable: (aDeclaratorNode at: 'variable')
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 IASTVisitorJSON >> visitDeclaratorVariable: aDeclaratorVariableNode [
 	| data |
 	data := super visitDeclaratorVariable: aDeclaratorVariableNode.
@@ -202,12 +202,12 @@ IASTVisitorJSON >> visitDeclaratorVariable: aDeclaratorVariableNode [
 	
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 IASTVisitorJSON >> visitDeclarators: aDeclaratorsList [
 	^(super visitDeclarators: aDeclaratorsList) second
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 IASTVisitorJSON >> visitDo: aDoNode [
 	| data |
 	data := (super visitDo: aDoNode).
@@ -215,7 +215,7 @@ IASTVisitorJSON >> visitDo: aDoNode [
 	 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 IASTVisitorJSON >> visitDo_spec: aDoSpecNode [
 	| data |
 	data := (super visitDo_spec: aDoSpecNode).
@@ -223,14 +223,14 @@ IASTVisitorJSON >> visitDo_spec: aDoSpecNode [
 	 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 IASTVisitorJSON >> visitFunctionAsValue: aFunctionNode [
 	^(super visitFunctionAsValue: aFunctionNode)
 		second
 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 IASTVisitorJSON >> visitFunctionStatement: aFunctionNode [
 	"for now assuming this is an ESOat/ar/sl function"
 	| data esoFct |
@@ -261,7 +261,7 @@ IASTVisitorJSON >> visitFunctionWithBlocks: aFunctionNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 IASTVisitorJSON >> visitIf: aIfNode [
 	| data |
 	data := super visitIf: aIfNode.
@@ -269,7 +269,7 @@ IASTVisitorJSON >> visitIf: aIfNode [
 	^(data allButFirst: 2) flattened reject: #isNil
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 IASTVisitorJSON >> visitInteger: anIntegerNode [
 	^nil
 ]
@@ -306,7 +306,7 @@ IASTVisitorJSON >> visitProgramFile: aProgramFileNode [
 		
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 IASTVisitorJSON >> visitReal: aRealNode [
 	^nil
 ]
@@ -316,7 +316,7 @@ IASTVisitorJSON >> visitSpanOf: aNode [
 	^self makeIndexedAnchor: (self visitSpan: (aNode at: 'span'))
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 IASTVisitorJSON >> visitStatement: aStatementNode [
 	"not interested in 'span' and 'label'
 	so overwrite completely the super method"
@@ -349,7 +349,7 @@ IASTVisitorJSON >> visitType: aTypeNode [
 		yourself
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 IASTVisitorJSON >> visitUnary: aUnaryNode [
 	| data |
 	data := super visitUnary: aUnaryNode.
@@ -357,7 +357,7 @@ IASTVisitorJSON >> visitUnary: aUnaryNode [
 	^data third ifNil: [ nil ] ifNotNil: #yourself
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 IASTVisitorJSON >> visitValue: aValueNode [
 	| data |
 
@@ -371,7 +371,7 @@ IASTVisitorJSON >> visitValue: aValueNode [
 				yourself ]
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 IASTVisitorJSON >> visitVariable: aVariableNode [
 	| data |
 	data := super visitVariable: aVariableNode.
@@ -382,7 +382,7 @@ IASTVisitorJSON >> visitVariable: aVariableNode [
 		yourself
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 IASTVisitorJSON >> visitWriteStatement: aWriteStatementNode [
 	| data |
 	data := super visitWriteStatement: aWriteStatementNode.

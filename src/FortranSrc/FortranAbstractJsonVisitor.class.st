@@ -25,13 +25,13 @@ FortranAbstractJsonVisitor >> visitArguments: anArgumentList [
 	^(anArgumentList at: 'list') collect: [ :each | self visitArgument: each]
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitAssign_expression: anAssignExpressionNode [
 	^self visitJsonMap: anAssignExpressionNode keys: #(target expression)
 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitAssign_expressionStatement: anAssignExpressionNode [
 	"assign_expression and assign_expressionStatement are the same"
 
@@ -41,10 +41,11 @@ FortranAbstractJsonVisitor >> visitAssign_expressionStatement: anAssignExpressio
 
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitAttributes: aNode [
+
 	^nil
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitBase_type: aString [
 	"to offer the possibility to handle each baseType differently, we create #visitXYZBaseType: methods"
 
@@ -52,7 +53,7 @@ FortranAbstractJsonVisitor >> visitBase_type: aString [
 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitBinary: aBinaryExpressionNode [
 	^self visitJsonMap: aBinaryExpressionNode keys: #( span left op right)
 ]
@@ -70,30 +71,30 @@ FortranAbstractJsonVisitor >> visitBlock_data: aBlockDataNode [
 	 { self visitBlockDataBlocks: (aBlockDataNode at: 'blocks') }
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitBlocks: aBlockList [
 	aBlockList ifNil: [ ^#() ].
 	^self visitJsonArray: aBlockList
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitBody: aNode [
 	^self visitJsonElement: aNode
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitCallStatement: aCallStatementNode [
 
 	^self visitJsonMap: aCallStatementNode keys: #(span function arguments)
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitCharacterBaseType: aString [
 	^aString
 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitComment: aCommentNode [
 	"cannot call visitJsonMap: because contains a key 'comment' that would recursively loop on this method"
 
@@ -101,42 +102,42 @@ FortranAbstractJsonVisitor >> visitComment: aCommentNode [
 	 aCommentNode at: 'comment'}
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitCommonGroup: aCommonGroupNode [
 	^{ self visitSpan: (aCommonGroupNode at: 'span') .
 	 self visitCommonGroupName: (aCommonGroupNode at: 'name') .
 	 self visitCommonGroupVars: (aCommonGroupNode at: 'vars' at: 'list') }
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitCommonGroupName: aCommonGroupNameNode [
 	^{ self visitSpan: (aCommonGroupNameNode at: 'span') .
 	 aCommonGroupNameNode at: 'value' at: 'contents' }
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitCommonGroupVars: aCommonGroupVarList [
 	^aCommonGroupVarList collect: [ :each | self visitDeclarator: each ]
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitCommonStatement: aCommonStatementNode [
 	^self visitJsonMap: aCommonStatementNode keys: #(span common_groups)
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitCommon_groups: aCommonGroupsNode [
 	^(aCommonGroupsNode at: 'list') collect: [ :each | self visitCommonGroup: each ]
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitConditions: aConditionList [
 	^aConditionList collect: [ :aCondition |
 		{ self visitIfCondition: aCondition first .
 	     self visitThenPart: aCondition second } ]
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitDeclarationStatement: aDeclarationStatementNode [
 	"tagged element 'declaration'"
 
@@ -144,7 +145,7 @@ FortranAbstractJsonVisitor >> visitDeclarationStatement: aDeclarationStatementNo
 	
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitDeclarator: aDeclaratorNode [
 	"visit method for the last two have special names
 	 - 'type' contains a string which is not compatible with #visitType:
@@ -156,24 +157,24 @@ FortranAbstractJsonVisitor >> visitDeclarator: aDeclaratorNode [
 	 self visitDeclaratorVariable: (aDeclaratorNode at: 'variable') }
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitDeclaratorType: aString [
 	^aString 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitDeclaratorVariable: aDeclaratorVariableNode [
 	"vist span and value content"
 	^{self visitSpan: (aDeclaratorVariableNode at: 'span') .
 	 self visitDeclaratorVariableContent: (aDeclaratorVariableNode at: 'value' at: 'contents') }
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitDeclaratorVariableContent: aString [
 	^aString
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitDeclarators: aDeclaratorsList [
 	"visit span and list of declarators"
 
@@ -182,29 +183,29 @@ FortranAbstractJsonVisitor >> visitDeclarators: aDeclaratorsList [
 	
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitDo: aDoNode [
 	^self visitJsonMap: aDoNode keys: #(span do_spec body)
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitDo_spec: aDoSpecNode [
 	^self visitJsonMap: aDoSpecNode keys: #(span initial limit increment)
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitExpr: anExprNode [
 	^(anExprNode includesKey: 'tag')
 		ifTrue: [ self visitJsonTaggedElement: anExprNode ]
 		ifFalse: [ self visitJsonElement: (anExprNode at: 'contents') ]
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitExpression: aExpressionNode [
 	^self visitJsonElement: aExpressionNode
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitFalseLiteralValue: aString [
 	^aString
 ]
@@ -228,19 +229,19 @@ FortranAbstractJsonVisitor >> visitFunction: aFunctionNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitFunctionAsValue: aFunctionNode [
 
 	^{self visitSpan: (aFunctionNode at: 'span') .
 	 self visitFunctionCalledName: (aFunctionNode at: 'value' at: 'contents') }
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitFunctionCalledName: aString [
 	^aString
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitFunctionStatement: aFunctionStatementNode [
 	"'name' is an object, not a string so, cannot call #visitName: on it"
 	^{ self visitSpan: (aFunctionStatementNode at: 'span') .
@@ -254,13 +255,13 @@ FortranAbstractJsonVisitor >> visitFunctionWithBlocks: aFunctionNode [
 	^self visitJsonMap: aFunctionNode keys: #(span name type arguments blocks) "result subprograms"
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitFunction_call: aFunctionCallNode [
 
 	^self visitCallStatement: aFunctionCallNode
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitIf: anIfNode [
 	"The THEN-Part is in 'conditions', the ELSE-PART in 'blocks', if no ELSE-PART, then 'blocks' is nil'
 	 ignoring key: end_label"
@@ -269,12 +270,12 @@ FortranAbstractJsonVisitor >> visitIf: anIfNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitIfCondition: anIfConditionNode [
 	^self visitJsonElement: anIfConditionNode
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitImplicitStatement: anImpliciteStatementNode [
 ]
 
@@ -288,19 +289,19 @@ FortranAbstractJsonVisitor >> visitInitial: anInitialNode [
 	^self visitJsonElement: anInitialNode
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitInteger: anIntegerNode [
 	"for clarity Integer nodes are 'transformed' in IntegerLiteralValue nodes"
 	^self visitIntegerLiteralValue: (anIntegerNode at: 'contents')
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitIntegerBaseType: aString [
 	^aString
 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitIntegerLiteralValue: anIntegerLiteralValueNode [
 	^anIntegerLiteralValueNode first
 ]
@@ -368,12 +369,12 @@ FortranAbstractJsonVisitor >> visitJsonTaggedStatement: aStatementNode [
 	^self visitJsonNode: key , 'Statement' value: value
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitLabel: aLabelNode [
 	^self visitJsonElement: aLabelNode
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitLeft: aLeftNode [
 	^self visitJsonElement: aLeftNode
 ]
@@ -388,24 +389,19 @@ FortranAbstractJsonVisitor >> visitLimit: aLimitNode [
 	^self visitJsonElement: aLimitNode
 ]
 
-{ #category : #visiting }
-FortranAbstractJsonVisitor >> visitList: aListNode [
-	^self visitJsonElement: aListNode
-]
-
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitLogical: aLogicalNode [
 	"for clarity Logical nodes are 'transformed' in LogicalLiteralValue nodes"
 	^self visitLogicalLiteralValue: (aLogicalNode at: 'contents')
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitLogicalBaseType: aString [
 	^aString
 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitLogicalLiteralValue: aString [
 	"for clarity we create #visitTrueLiteralValue: and #visitFalseLiteralValue:"
 	^(aString = 'true')
@@ -418,7 +414,7 @@ FortranAbstractJsonVisitor >> visitMain: aProgramNode [
 	^self visitJsonMap: aProgramNode keys: #(span name blocks subprograms)
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitMessage: aStopMessageNode [
 	^self visitJsonElement: aStopMessageNode 
 ]
@@ -444,7 +440,7 @@ FortranAbstractJsonVisitor >> visitName: aString [
 	^aString
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitOp: anOpNode [
 	"should be a dictionnary with a 'tag' key and a string for value: 'multiplication', 'addition', ...
 	 May be should #visitMultiplication:, #visitAddition:, ... ? "
@@ -461,31 +457,31 @@ FortranAbstractJsonVisitor >> visitProgram_units: aNode [
 	^self visitJsonArray: aNode
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitReal: aRealNode [
 	"for clarity Real nodes are 'transformed' in RealLiteralValue nodes"
 	^self visitRealLiteralValue: (aRealNode at: 'contents')
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitRealBaseType: aString [
 	^aString
 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitRealLiteralValue: aRealLiteralValueNode [
 	self flag: #TODO.
 
 	^nil
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitReturn_spec: aReturn_specNode [
 	^self visitJsonMap: aReturn_specNode keys: #(span target)
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitRight: aRightNode [
 	^self visitJsonElement: aRightNode
 ]
@@ -520,7 +516,7 @@ FortranAbstractJsonVisitor >> visitStar: aStarNode [
 	^nil
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitStatement: aStatementNode [
 	^(self visitJsonMap: aStatementNode keys: #(span label))
 	 ,
@@ -529,18 +525,18 @@ FortranAbstractJsonVisitor >> visitStatement: aStatementNode [
 			ifFalse: [ self visitJsonElement: (aStatementNode at: 'statement') ]) }
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitStopStatement: aStopStatementNode [
 	^self visitJsonMap: aStopStatementNode keys: #(span message)
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitString: aString [
 	"for clarity String nodes are 'transformed' in StringLiteralValue nodes"
 	^self visitStringLiteralValue: aString
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitStringLiteralValue: aString [
 	^aString
 ]
@@ -555,17 +551,17 @@ FortranAbstractJsonVisitor >> visitSubroutine: aSubroutineNode [
 	^self visitJsonMap: aSubroutineNode keys: #(span name arguments blocks)
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitTarget: aTargetNode [
 	^self visitJsonElement: aTargetNode
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitThenPart: aThenPartNode [
 	^self visitJsonElement: aThenPartNode
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitTrueLiteralValue: aString [
 	^aString
 ]
@@ -577,28 +573,28 @@ FortranAbstractJsonVisitor >> visitType: aTypeNode [
 	^self visitJsonMap: aTypeNode keys: #(span base_type)
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitUnary: aUnaryNode [
 	^self visitJsonMap: aUnaryNode keys: #(span op expression)
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitValue: aValueNode [
 	^{ self visitSpan: (aValueNode at: 'span') .
 	 self visitJsonTaggedElement: (aValueNode at: 'value') }
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitVariable: aVariableNode [
 	^self visitVariableName: (aVariableNode at: 'contents')
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitVariableName: aString [
 	^aString
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitWriteStatement: aWriteStatementNode [
 	^self visitJsonMap: aWriteStatementNode keys: #(span format arguments)
 ]
