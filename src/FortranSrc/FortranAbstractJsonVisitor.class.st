@@ -204,6 +204,11 @@ FortranAbstractJsonVisitor >> visitDo_spec: aDoSpecNode [
 ]
 
 { #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitEq: anEqualtoOperatorNode [
+	^'eq'
+]
+
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitExpr: anExprNode [
 	^(anExprNode includesKey: 'tag')
 		ifTrue: [ self visitJsonTaggedElement: anExprNode ]
