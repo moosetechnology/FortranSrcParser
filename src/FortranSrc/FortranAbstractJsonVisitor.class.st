@@ -266,6 +266,11 @@ FortranAbstractJsonVisitor >> visitFunction_call: aFunctionCallNode [
 	^self visitCallStatement: aFunctionCallNode
 ]
 
+{ #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitGt: anGreaterthanOperatorNode [
+	^'gt'
+]
+
 { #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitIf: anIfNode [
 	"The THEN-Part is in 'conditions', the ELSE-PART in 'blocks', if no ELSE-PART, then 'blocks' is nil'
@@ -426,6 +431,11 @@ FortranAbstractJsonVisitor >> visitLogicalLiteralValue: aString [
 		ifFalse: [ self visitFalseLiteralValue: aString ]
 ]
 
+{ #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitLt: anLessthanOperatorNode [
+	^'lt'
+]
+
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitMain: aProgramNode [
 	^self visitJsonMap: aProgramNode keys: #(span name blocks subprograms)
@@ -450,6 +460,16 @@ FortranAbstractJsonVisitor >> visitMiFilename: aString [
 FortranAbstractJsonVisitor >> visitMiVersion: aString [
 	^aString
 		
+]
+
+{ #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitMinus: anMinusOperatorNode [
+	^'minus'
+]
+
+{ #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitMultiplication: anMultiplicationOperatorNode [
+	^'multiplication'
 ]
 
 { #category : #visiting }
@@ -565,6 +585,11 @@ FortranAbstractJsonVisitor >> visitSubprograms: aNode [
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitSubroutine: aSubroutineNode [
 	^self visitJsonMap: aSubroutineNode keys: #(span name arguments blocks)
+]
+
+{ #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitSubtraction: anSubtractionOperatorNode [
+	^'subtraction'
 ]
 
 { #category : #'visiting statement' }
