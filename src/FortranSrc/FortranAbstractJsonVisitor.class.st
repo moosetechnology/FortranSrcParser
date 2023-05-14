@@ -209,6 +209,11 @@ FortranAbstractJsonVisitor >> visitEq: anEqualtoOperatorNode [
 ]
 
 { #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitExponentiation: aExponentiationOperatorNode [
+	^'exponentiation'
+]
+
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitExpr: anExprNode [
 	^(anExprNode includesKey: 'tag')
 		ifTrue: [ self visitJsonTaggedElement: anExprNode ]
@@ -277,7 +282,7 @@ FortranAbstractJsonVisitor >> visitFunction_call: aFunctionCallNode [
 ]
 
 { #category : #'visiting expression' }
-FortranAbstractJsonVisitor >> visitGt: anGreaterthanOperatorNode [
+FortranAbstractJsonVisitor >> visitGt: aGreaterthanOperatorNode [
 	^'gt'
 ]
 
@@ -442,7 +447,7 @@ FortranAbstractJsonVisitor >> visitLogicalLiteralValue: aString [
 ]
 
 { #category : #'visiting expression' }
-FortranAbstractJsonVisitor >> visitLt: anLessthanOperatorNode [
+FortranAbstractJsonVisitor >> visitLt: aLessthanOperatorNode [
 	^'lt'
 ]
 
