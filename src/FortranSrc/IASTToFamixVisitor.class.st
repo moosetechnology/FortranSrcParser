@@ -203,6 +203,7 @@ IASTToFamixVisitor >> visitIASTFunction: aFunction [
 IASTToFamixVisitor >> visitIASTImplicit: anImplicit [
 
 	self flag: #TODO.
+	"put implicit info into the FamixFortranProgramFile"
 ]
 
 { #category : #visiting }
@@ -211,7 +212,7 @@ IASTToFamixVisitor >> visitIASTInvocation: anInvocation [
 
 	invocation := (self newEntity: FamixFortran77Invocation)
 		sourceAnchor: (self visitIndexedFileAnchor: anInvocation sourceAnchor);
-		attributeAt: 'iast' put: anInvocation;
+		attributeAt: #iast put: anInvocation;
 		yourself.
 	^ invocation
 ]
@@ -246,13 +247,10 @@ IASTToFamixVisitor >> visitIASTMainProgram: aMainProgram [
 IASTToFamixVisitor >> visitIASTParameter: aParameter [
 
 	| parameter |
-	self flag: #TODO. "relation between parameter and localVariable declaration"
 	parameter := (self newEntity: FamixFortran77Parameter)
 		             sourceAnchor: (self visitIndexedFileAnchor: aParameter sourceAnchor);
 		             name: aParameter entityName;
 		             yourself.
-	"declaredParam := self searchInLocalSymbolTable: aParameter entityName.
-	declaredParam ifNotNil: [ parameter variable: declaredParam ]."
 	^ parameter
 ]
 
@@ -275,32 +273,40 @@ IASTToFamixVisitor >> visitIASTProgramFile: aProgramFile [
 ]
 
 { #category : #visiting }
+IASTToFamixVisitor >> visitIASTProgramUnit: aProgramUnit toFamix: aFamixFortranClass [
+
+	| progUnit |
+
+	progUnit := (self newEntity: aFamixFortranClass)
+		        sourceAnchor: (self visitIndexedFileAnchor: aProgramUnit sourceAnchor);
+		        name: aProgramUnit entityName;
+		        yourself.
+	stack push: progUnit.
+
+	aProgramUnit localVariables do: [ :localVariable | 
+		progUnit addLocalVariable: (localVariable accept: self) ].
+
+	aProgramUnit accesses do: [ :access | 
+		progUnit addAccess: (access accept: self) ].
+	
+	aProgramUnit invocations do: [ :invocation | 
+		progUnit addOutgoingInvocation: (invocation accept: self) ].
+	
+	aProgramUnit localComments do: [ :comment | 
+		progUnit addComment: (comment accept: self) ].
+	stack pop.
+	^ progUnit
+]
+
+{ #category : #visiting }
 IASTToFamixVisitor >> visitIASTSubroutine: aSubroutine [
 
 	| subroutine |
 
-	subroutine := (self newEntity: FamixFortran77PUSubroutine)
-		              sourceAnchor: (self visitIndexedFileAnchor: aSubroutine sourceAnchor) ;
-		              name: aSubroutine entityName;
-		              yourself.
-	stack push: subroutine.
-	"prossess localVariables"
-	aSubroutine localVariables do: [ :localVariable | 
-		subroutine addLocalVariable: (localVariable accept: self) ].
-	"prossess parameters"
+	subroutine := self visitIASTProgramUnit: aSubroutine toFamix: FamixFortran77PUSubroutine.
 	aSubroutine parameters do: [ :parameter | 
 		subroutine addParameter: (parameter accept: self) ].
-	"prossess accesses"
-	aSubroutine accesses do: [ :access | 
-		subroutine addAccess: (access accept: self) ].
-	"prossess invocations"
-	aSubroutine invocations do: [ :invocation | 
-		subroutine addOutgoingInvocation: (invocation accept: self) ].
-	"prossess the comments inside this progUnit"
-	aSubroutine localComments do: [ :comment | 
-		subroutine addComment: (comment accept: self) ].
 
-	stack pop.
 	^ subroutine
 ]
 
@@ -311,7 +317,6 @@ IASTToFamixVisitor >> visitIASTTypeRef: aType [
 	self flag: #TODO. "How to deal with length and kind for example character*20 name produce aType object like:
 	- sourceAnchor: ...
 	- entityName: TypeCharacter
-	- length: 20
 	- kind: nil"
 	type := (self newEntity: FamixFortran77FType)
 		        sourceAnchor: (self visitIndexedFileAnchor: aType sourceAnchor);

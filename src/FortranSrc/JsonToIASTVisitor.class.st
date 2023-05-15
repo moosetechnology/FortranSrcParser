@@ -86,7 +86,7 @@ JsonToIASTVisitor >> visitArguments: anArgumentList [
 		reject: #isNil
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 JsonToIASTVisitor >> visitAssign_expression: anAssignExpressionNode [
 	| data |
 	data := super visitAssign_expression: anAssignExpressionNode.
@@ -100,7 +100,7 @@ JsonToIASTVisitor >> visitAssign_expression: anAssignExpressionNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 JsonToIASTVisitor >> visitBinary: aBinaryExpressionNode [
 	| data |
 	data := super visitBinary: aBinaryExpressionNode.
@@ -119,7 +119,7 @@ JsonToIASTVisitor >> visitBlock_data: aBlockDataNode [
 		yourself
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitCallStatement: aCallNode [
 	| astNode data |
 	
@@ -136,14 +136,14 @@ JsonToIASTVisitor >> visitCallStatement: aCallNode [
 
 ]
 
-{ #category : #'private - parsing' }
+{ #category : #visiting }
 JsonToIASTVisitor >> visitCode: aString [
 	self astJSON: aString.
 	^'./fortran77.f.json' asFileReference readStreamDo: [ :st |
 			self visitProgramFile: (NeoJSONReader fromString: st contents) ]
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitComment: aCommentNode [
 	| data |
 	data := super visitComment: aCommentNode.
@@ -153,7 +153,7 @@ JsonToIASTVisitor >> visitComment: aCommentNode [
 		yourself
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitCommonGroup: aCommonGroupNode [
 	| data |
 	data := self visitCommonGroupName: (aCommonGroupNode at: 'name').
@@ -163,7 +163,7 @@ JsonToIASTVisitor >> visitCommonGroup: aCommonGroupNode [
 		yourself
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitCommonStatement: aCommonStatementNode [
 	^self visitCommon_groups: (aCommonStatementNode at: 'common_groups')
 ]
@@ -174,7 +174,7 @@ JsonToIASTVisitor >> visitData: aDataNode [
 	self shouldBeImplemented
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitDeclarationStatement: aDeclarationStatementNode [
 	| data |
 
@@ -184,15 +184,16 @@ JsonToIASTVisitor >> visitDeclarationStatement: aDeclarationStatementNode [
 	
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitDeclarator: aDeclaratorNode [
 	^self visitDeclaratorVariable: (aDeclaratorNode at: 'variable')
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitDeclaratorVariable: aDeclaratorVariableNode [
 	| data |
 	data := super visitDeclaratorVariable: aDeclaratorVariableNode.
+
 	^IASTVariable new
 		sourceAnchor: (self makeIndexedAnchor: data first) ;
 		entityName: data second ;
@@ -201,12 +202,12 @@ JsonToIASTVisitor >> visitDeclaratorVariable: aDeclaratorVariableNode [
 	
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitDeclarators: aDeclaratorsList [
 	^(super visitDeclarators: aDeclaratorsList) second
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitDo: aDoNode [
 	| data |
 	data := (super visitDo: aDoNode).
@@ -214,7 +215,7 @@ JsonToIASTVisitor >> visitDo: aDoNode [
 	 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitDo_spec: aDoSpecNode [
 	| data |
 	data := (super visitDo_spec: aDoSpecNode).
@@ -222,14 +223,14 @@ JsonToIASTVisitor >> visitDo_spec: aDoSpecNode [
 	 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 JsonToIASTVisitor >> visitFunctionAsValue: aFunctionNode [
 	^(super visitFunctionAsValue: aFunctionNode)
 		second
 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitFunctionStatement: aFunctionNode [
 	"for now assuming this is an ESOat/ar/sl function"
 	| data esoFct |
@@ -260,7 +261,7 @@ JsonToIASTVisitor >> visitFunctionWithBlocks: aFunctionNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitIf: aIfNode [
 	| data |
 	data := super visitIf: aIfNode.
@@ -268,7 +269,7 @@ JsonToIASTVisitor >> visitIf: aIfNode [
 	^(data allButFirst: 2) flattened reject: #isNil
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 JsonToIASTVisitor >> visitInteger: anIntegerNode [
 	^nil
 ]
@@ -305,7 +306,7 @@ JsonToIASTVisitor >> visitProgramFile: aProgramFileNode [
 		
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 JsonToIASTVisitor >> visitReal: aRealNode [
 	^nil
 ]
@@ -315,7 +316,7 @@ JsonToIASTVisitor >> visitSpanOf: aNode [
 	^self makeIndexedAnchor: (self visitSpan: (aNode at: 'span'))
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitStatement: aStatementNode [
 	"not interested in 'span' and 'label'
 	so overwrite completely the super method"
@@ -348,7 +349,7 @@ JsonToIASTVisitor >> visitType: aTypeNode [
 		yourself
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 JsonToIASTVisitor >> visitUnary: aUnaryNode [
 	| data |
 	data := super visitUnary: aUnaryNode.
@@ -356,7 +357,7 @@ JsonToIASTVisitor >> visitUnary: aUnaryNode [
 	^data third ifNil: [ nil ] ifNotNil: #yourself
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 JsonToIASTVisitor >> visitValue: aValueNode [
 	| data |
 
@@ -370,7 +371,7 @@ JsonToIASTVisitor >> visitValue: aValueNode [
 				yourself ]
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting expression' }
 JsonToIASTVisitor >> visitVariable: aVariableNode [
 	| data |
 	data := super visitVariable: aVariableNode.
