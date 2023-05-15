@@ -68,6 +68,7 @@ FortranProjectImporter >> annotatedFortranFiles [
 FortranProjectImporter >> astJSON: sourceCode [
 
 	| filename option |
+
 	option := 'serialize -t json -v77l encode'.
 	filename := './fortran77.f'.
 	filename asFileReference writeStreamDo: [ :stream | 

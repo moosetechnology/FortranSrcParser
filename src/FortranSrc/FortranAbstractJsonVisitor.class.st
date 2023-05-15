@@ -181,6 +181,12 @@ FortranAbstractJsonVisitor >> visitDo_spec: aDoSpecNode [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitExitStatement: aExitNode [
+	self flag: #TODO.
+	^nil
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitExpr: anExprNode [
 	^(anExprNode includesKey: 'tag')
 		ifTrue: [ self visitJsonTaggedElement: anExprNode ]
@@ -190,6 +196,12 @@ FortranAbstractJsonVisitor >> visitExpr: anExprNode [
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitExpression: aExpressionNode [
 	^self visitJsonElement: aExpressionNode
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitExternalStatement: anExternalStatementNode [
+	self flag: #TODO.
+	^nil
 ]
 
 { #category : #visiting }
@@ -367,6 +379,12 @@ FortranAbstractJsonVisitor >> visitList: aListNode [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitLogical: aLogicalNode [
+	self flag: #TODO.
+	^nil
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitMain: aProgramNode [
 	^self visitJsonMap: aProgramNode keys: #(span name blocks subprograms)
 ]
@@ -422,6 +440,12 @@ FortranAbstractJsonVisitor >> visitRealLiteralValue: aRealLiteralValueNode [
 ]
 
 { #category : #visiting }
+FortranAbstractJsonVisitor >> visitReturnStatement: aReturnStatementNode [
+	self flag: #TODO.
+	^nil
+]
+
+{ #category : #visiting }
 FortranAbstractJsonVisitor >> visitRight: aRightNode [
 	^self visitJsonElement: aRightNode
 ]
@@ -463,6 +487,12 @@ FortranAbstractJsonVisitor >> visitStatement: aStatementNode [
 	{ ((self isTaggedStatement: aStatementNode)
 			ifTrue: [ self visitJsonTaggedStatement: aStatementNode ]
 			ifFalse: [ self visitJsonElement: (aStatementNode at: 'statement') ]) }
+]
+
+{ #category : #visiting }
+FortranAbstractJsonVisitor >> visitString: aStringNode [
+	self flag: #TODO.
+	^nil
 ]
 
 { #category : #visiting }

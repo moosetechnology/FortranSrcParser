@@ -22,7 +22,7 @@ JsonToIASTVisitor >> f77sourcefile [
 { #category : #'private - parsing' }
 JsonToIASTVisitor >> fortranSrcPath [
 
-	^ '/home/anquetil/.cabal/bin/fortran-src-extras'
+	^ 'fortran-src-extras'
 ]
 
 { #category : #initialization }
@@ -385,6 +385,7 @@ JsonToIASTVisitor >> visitVariable: aVariableNode [
 JsonToIASTVisitor >> visitWriteStatement: aWriteStatementNode [
 	| data |
 	data := super visitWriteStatement: aWriteStatementNode.
+	self flag: #FIXME. "Write is not an invocation"
 
 	^{ IASTInvocation new
 		sourceAnchor: (self makeIndexedAnchor: data first) ;

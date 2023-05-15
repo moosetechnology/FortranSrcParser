@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'iastProgFile',
 		'refVisitor',
-		'defVisitor'
+		'defVisitor',
+		'iastProgFile2'
 	],
 	#category : #'FortranSrc-Tests-Visitor'
 }
@@ -63,6 +64,7 @@ FamixFortran77SRVisitorTest >> setUp [
 	super setUp.
 	
 	iastProgFile := IASTProgramFile new filename: 'fortran77.f' ; yourself.
+	iastProgFile2 := IASTProgramFile new filename: 'fortran77.1.f' ; yourself.
 	defVisitor := IASTToFamixVisitor new.
 	refVisitor := FamixFortran77SRVisitor newFrom: defVisitor model.
 ]
@@ -118,7 +120,7 @@ FamixFortran77SRVisitorTest >> testCreateFamixFortran77InvocationCalleeBeforeCal
 ]
 
 { #category : #running }
-FamixFortran77SRVisitorTest >> testCreateFamixFortran77InvocationInDifferentFiles [
+FamixFortran77SRVisitorTest >> testCreateFamixFortran77InvocationCallerBeforeCallee [
 	| entity invocation callee caller |
 	callee := IASTSubroutine new entityName: 'sub'; yourself.
 
@@ -136,6 +138,65 @@ FamixFortran77SRVisitorTest >> testCreateFamixFortran77InvocationInDifferentFile
 	
 	self assert: invocation class equals: FamixFortran77Invocation.
 	self assert: invocation sender equals: entity programUnits first.
+	
+	self assert: invocation candidates size equals: 1.
+	self assert: invocation candidates first equals: entity programUnits second.
+]
+
+{ #category : #running }
+FamixFortran77SRVisitorTest >> testCreateFamixFortran77InvocationInDifferentFiles [
+	| entity invocation callee caller |
+	callee := IASTSubroutine new entityName: 'sub'; yourself.
+	
+	caller := IASTMainProgram new
+			entityName: 'main';
+			body: { IASTInvocation new entityName: 'sub'; yourself };
+			yourself.
+	iastProgFile progUnits: { caller }.
+	iastProgFile2 progUnits: { caller }.
+	
+	({iastProgFile . iastProgFile2 } do: [ :pf | pf accept: defVisitor ]) accept: refVisitor.
+	1halt.
+	entity := (refVisitor model allWithSubTypesOf: FamixFortran77ProgramFile) first.
+
+	self assert: entity programUnits first outgoingInvocations size equals: 1.
+	invocation := entity programUnits first outgoingInvocations first.
+	
+	self assert: invocation class equals: FamixFortran77Invocation.
+	self assert: invocation sender equals: entity programUnits first.
+	
+	self assert: invocation candidates size equals: 1.
+	self assert: invocation candidates first equals: entity programUnits second.
+]
+
+{ #category : #running }
+FamixFortran77SRVisitorTest >> testCreateFamixFortran77InvocationMultipleCalleeBeforeCaller [
+	| entity invocation calleeSub calleeFct caller |
+	calleeSub := IASTSubroutine new entityName: 'sub'; yourself.
+	calleeFct := IASTFunction new entityName: 'f'; yourself.
+
+	caller := IASTMainProgram new
+			entityName: 'main';
+			body: { IASTInvocation new entityName: 'sub'; yourself. IASTInvocation new entityName: 'f'; yourself };
+			yourself.
+	iastProgFile progUnits: { calleeSub . calleeFct . caller }.
+	
+	(iastProgFile accept: defVisitor) accept: refVisitor.
+	entity := (refVisitor model allWithSubTypesOf: FamixFortran77ProgramFile) first.
+
+	self assert: entity programUnits third outgoingInvocations size equals: 2.
+	invocation := entity programUnits third outgoingInvocations first.
+	
+	self assert: invocation class equals: FamixFortran77Invocation.
+	self assert: invocation sender equals: entity programUnits third.
+	
+	self assert: invocation candidates size equals: 1.
+	self assert: invocation candidates first equals: entity programUnits first.
+	
+	invocation := entity programUnits third outgoingInvocations second.
+	
+	self assert: invocation class equals: FamixFortran77Invocation.
+	self assert: invocation sender equals: entity programUnits third.
 	
 	self assert: invocation candidates size equals: 1.
 	self assert: invocation candidates first equals: entity programUnits second.

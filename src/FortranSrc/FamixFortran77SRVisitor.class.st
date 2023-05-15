@@ -31,24 +31,13 @@ FamixFortran77SRVisitor class >> newFrom: aMooseModel [
 
 { #category : #'private - utility' }
 FamixFortran77SRVisitor >> defaultImplicitTyping: firstLetter [
-
-	"God is real . . . unless declared integer"
-
-	"{ 
-		($i -> #TypeInteger).
-		($j -> #TypeInteger).
-		($k -> #TypeInteger).
-		($l -> #TypeInteger).
-		($m -> #TypeInteger).
-		($n -> #TypeInteger) } asDictionary at: $b ifAbsent: [ #TypeReal ]"
-
 	^ ('ijklmn' includes: firstLetter)
 		  ifTrue: [ #TypeInteger ]
 		  ifFalse: [ #TypeReal ]
 ]
 
 { #category : #'reflective operations' }
-FamixFortran77SRVisitor >> doesNotUnderstand: aMessage [
+FamixFortran77SRVisitor >> doesNotUnderstandTmp: aMessage [
 	| code |
 	(aMessage selector beginsWith: 'visit') ifFalse: [ ^ self ].
 	code := aMessage selector asString , ' aFamixF77Entity
@@ -99,9 +88,8 @@ FamixFortran77SRVisitor >> retrieveProgramUnit: anInvocation [
 
 { #category : #visiting }
 FamixFortran77SRVisitor >> visitFamixF77Invocation: aFamixF77Entity [
-	| invocation |
-	invocation := self retrieveProgramUnit: (aFamixF77Entity entityAttributes first value).
-	aFamixF77Entity target: invocation.
+	self flag: #FIXME. "aFamixF77Entity attributeAt: 'iast' ifAbsent: '' does not work"
+	aFamixF77Entity target: (self retrieveProgramUnit: (aFamixF77Entity entityAttributes first value)).
 ]
 
 { #category : #visiting }
