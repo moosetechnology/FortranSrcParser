@@ -212,7 +212,7 @@ IASTToFamixVisitor >> visitIASTInvocation: anInvocation [
 
 	invocation := (self newEntity: FamixFortran77Invocation)
 		sourceAnchor: (self visitIndexedFileAnchor: anInvocation sourceAnchor);
-		attributeAt: 'iast' put: anInvocation;
+		attributeAt: #iast put: anInvocation;
 		yourself.
 	^ invocation
 ]
