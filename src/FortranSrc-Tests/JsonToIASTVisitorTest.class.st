@@ -1,3 +1,6 @@
+"
+An IASTVisitorJSONTest is a test class for testing the behavior of IASTVisitorJSON
+"
 Class {
 	#name : #JsonToIASTVisitorTest,
 	#superclass : #TestCase,
