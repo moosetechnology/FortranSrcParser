@@ -203,6 +203,7 @@ IASTToFamixVisitor >> visitIASTFunction: aFunction [
 IASTToFamixVisitor >> visitIASTImplicit: anImplicit [
 
 	self flag: #TODO.
+	"put implicit info into the FamixFortranProgramFile"
 ]
 
 { #category : #visiting }
@@ -246,13 +247,10 @@ IASTToFamixVisitor >> visitIASTMainProgram: aMainProgram [
 IASTToFamixVisitor >> visitIASTParameter: aParameter [
 
 	| parameter |
-	self flag: #TODO. "relation between parameter and localVariable declaration"
 	parameter := (self newEntity: FamixFortran77Parameter)
 		             sourceAnchor: (self visitIndexedFileAnchor: aParameter sourceAnchor);
 		             name: aParameter entityName;
 		             yourself.
-	"declaredParam := self searchInLocalSymbolTable: aParameter entityName.
-	declaredParam ifNotNil: [ parameter variable: declaredParam ]."
 	^ parameter
 ]
 
@@ -311,7 +309,6 @@ IASTToFamixVisitor >> visitIASTTypeRef: aType [
 	self flag: #TODO. "How to deal with length and kind for example character*20 name produce aType object like:
 	- sourceAnchor: ...
 	- entityName: TypeCharacter
-	- length: 20
 	- kind: nil"
 	type := (self newEntity: FamixFortran77FType)
 		        sourceAnchor: (self visitIndexedFileAnchor: aType sourceAnchor);
