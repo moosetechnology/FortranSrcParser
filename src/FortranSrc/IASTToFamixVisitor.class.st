@@ -273,32 +273,40 @@ IASTToFamixVisitor >> visitIASTProgramFile: aProgramFile [
 ]
 
 { #category : #visiting }
+IASTToFamixVisitor >> visitIASTProgramUnit: aProgramUnit toFamix: aFamixFortranClass [
+
+	| progUnit |
+
+	progUnit := (self newEntity: aFamixFortranClass)
+		        sourceAnchor: (self visitIndexedFileAnchor: aProgramUnit sourceAnchor);
+		        name: aProgramUnit entityName;
+		        yourself.
+	stack push: progUnit.
+
+	aProgramUnit localVariables do: [ :localVariable | 
+		progUnit addLocalVariable: (localVariable accept: self) ].
+
+	aProgramUnit accesses do: [ :access | 
+		progUnit addAccess: (access accept: self) ].
+	
+	aProgramUnit invocations do: [ :invocation | 
+		progUnit addOutgoingInvocation: (invocation accept: self) ].
+	
+	aProgramUnit localComments do: [ :comment | 
+		progUnit addComment: (comment accept: self) ].
+	stack pop.
+	^ progUnit
+]
+
+{ #category : #visiting }
 IASTToFamixVisitor >> visitIASTSubroutine: aSubroutine [
 
 	| subroutine |
 
-	subroutine := (self newEntity: FamixFortran77PUSubroutine)
-		              sourceAnchor: (self visitIndexedFileAnchor: aSubroutine sourceAnchor) ;
-		              name: aSubroutine entityName;
-		              yourself.
-	stack push: subroutine.
-	"prossess localVariables"
-	aSubroutine localVariables do: [ :localVariable | 
-		subroutine addLocalVariable: (localVariable accept: self) ].
-	"prossess parameters"
+	subroutine := self visitIASTProgramUnit: aSubroutine toFamix: FamixFortran77PUSubroutine.
 	aSubroutine parameters do: [ :parameter | 
 		subroutine addParameter: (parameter accept: self) ].
-	"prossess accesses"
-	aSubroutine accesses do: [ :access | 
-		subroutine addAccess: (access accept: self) ].
-	"prossess invocations"
-	aSubroutine invocations do: [ :invocation | 
-		subroutine addOutgoingInvocation: (invocation accept: self) ].
-	"prossess the comments inside this progUnit"
-	aSubroutine localComments do: [ :comment | 
-		subroutine addComment: (comment accept: self) ].
 
-	stack pop.
 	^ subroutine
 ]
 
