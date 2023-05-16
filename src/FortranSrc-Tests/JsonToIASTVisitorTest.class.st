@@ -613,7 +613,7 @@ JsonToIASTVisitorTest >> testProgramWithSimpleIfStatementWithoutBody [
 ]
 
 { #category : #'tests-esope' }
-JsonToIASTVisitorTest >> testSegmentDeclaration [
+JsonToIASTVisitorTest >> testSegmentDeclarationEmpty [
 	| programFile seg |
 	programFile := visitor visitCode: '      subroutine hello
 cESO  segment, user
@@ -626,14 +626,37 @@ cESO  end segment
 
 	self assert: seg class equals: IASTEsopeSegment.
 	self assert: seg entityName equals: 'user'.
-	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
 	self assert: seg declarations size equals: 0.
 
 	self assert: seg sourceAnchor isNotNil.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
 	self assert: seg sourceAnchor startLine equals: 2.
 	self assert: seg sourceAnchor startColumn equals: 1.
 	self assert: seg sourceAnchor endLine equals: 3.
 	self assert: seg sourceAnchor endColumn equals: 18
+]
+
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testSegmentDeclarationWithContent [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  segment, user
+        character*40 uname
+        integer uid
+cESO  end segment
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopeSegment.
+	self assert: seg entityName equals: 'user'.
+	self assert: seg declarations size equals: 2.
+
+	self assert: seg declarations first entityName equals: 'uname'.
+	self assert: seg declarations second entityName equals: 'uid'.
+
 ]
 
 { #category : #'tests-statement' }
