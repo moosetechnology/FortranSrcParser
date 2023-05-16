@@ -1,3 +1,7 @@
+"
+An abstrat visitor for the JSON output of camfor/fortran-src
+Defines all the needed `#visitXYZ:` methods and go to the JSON tree
+"
 Class {
 	#name : #FortranAbstractJsonVisitor,
 	#superclass : #Object,
