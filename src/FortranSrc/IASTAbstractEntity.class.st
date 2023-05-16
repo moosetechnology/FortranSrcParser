@@ -7,7 +7,7 @@ Class {
 	#category : #'FortranSrc-intrermediateAST'
 }
 
-{ #category : #accessing }
+{ #category : #visiting }
 IASTAbstractEntity >> accept: aVisitor [
 
 	self subclassResponsibility
