@@ -15,10 +15,22 @@ Class {
 	#category : #'FortranSrc-intrermediateAST'
 }
 
-{ #category : #accessing }
+{ #category : #visiting }
 IASTEsopeSegment >> accept: aVisitor [
 
 	^ aVisitor visitIASTEsopeSegment: self.
+]
+
+{ #category : #accessing }
+IASTEsopeSegment >> addAllDeclarations: aCollection [
+
+	declarations addAll: aCollection
+]
+
+{ #category : #accessing }
+IASTEsopeSegment >> addDeclaration: anObject [
+
+	declarations add: anObject
 ]
 
 { #category : #accessing }

@@ -182,8 +182,14 @@ JsonToIASTVisitor >> visitDeclarationStatement: aDeclarationStatementNode [
 
 	data := super visitDeclarationStatement: aDeclarationStatementNode.
 	data fourth do: [ :iastVar | iastVar typeSpec: data second ].
-	^data fourth
 	
+	^entityStack
+		ifNotEmpty: [
+			entityStack top addAllDeclarations: data fourth.
+			nil
+		]
+		ifEmpty: [ nil ]
+
 ]
 
 { #category : #'visiting statement' }
@@ -312,6 +318,12 @@ JsonToIASTVisitor >> visitIf: aIfNode [
 { #category : #'visiting expression' }
 JsonToIASTVisitor >> visitInteger: anIntegerNode [
 	^nil
+]
+
+{ #category : #'visiting reflectivity' }
+JsonToIASTVisitor >> visitJsonArray: aNode [
+	^(super visitJsonArray: aNode)
+		reject: #isNil
 ]
 
 { #category : #visiting }
