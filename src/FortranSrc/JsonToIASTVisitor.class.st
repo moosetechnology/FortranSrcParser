@@ -3,7 +3,8 @@ Class {
 	#superclass : #FortranAbstractJsonVisitor,
 	#instVars : [
 		'f77sourcefile',
-		'model'
+		'model',
+		'entityStack'
 	],
 	#category : #'FortranSrc-Visitor'
 }
@@ -12,6 +13,13 @@ Class {
 JsonToIASTVisitor >> astJSON: sourceCode [
 	FortranProjectImporter new
 		astJSON: sourceCode
+]
+
+{ #category : #accessing }
+JsonToIASTVisitor >> currentEsopeSegment [
+	^entityStack top isEsopeSegment
+		ifTrue: [ entityStack top ]
+		ifFalse: [ nil ]
 ]
 
 { #category : #accessing }
@@ -29,6 +37,7 @@ JsonToIASTVisitor >> fortranSrcPath [
 JsonToIASTVisitor >> initialize [
 	super initialize.
 	model := OrderedCollection new.
+	entityStack := Stack new
 ]
 
 { #category : #testing }
@@ -144,16 +153,6 @@ JsonToIASTVisitor >> visitCode: aString [
 ]
 
 { #category : #'visiting statement' }
-JsonToIASTVisitor >> visitComment: aCommentNode [
-	| data |
-	data := super visitComment: aCommentNode.
-	^IASTComment new
-		sourceAnchor: (self makeIndexedAnchor: data first) ;
-		text: data second ;
-		yourself
-]
-
-{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitCommonGroup: aCommonGroupNode [
 	| data |
 	data := self visitCommonGroupName: (aCommonGroupNode at: 'name').
@@ -221,6 +220,44 @@ JsonToIASTVisitor >> visitDo_spec: aDoSpecNode [
 	data := (super visitDo_spec: aDoSpecNode).
 	^data allButFirst flattened reject: #isNil
 	 
+]
+
+{ #category : #'visiting esope' }
+JsonToIASTVisitor >> visitEsopeEndsegmentComment: anEsopeCommentNode [
+	"updates end of current Esope segment"
+	| span |
+	span := (super visitEsopeEndsegmentComment: anEsopeCommentNode) first.
+
+	entityStack pop sourceAnchor
+		endLine: (span second x) ;
+		endColumn: (span second y).
+	^nil
+]
+
+{ #category : #'visiting esope' }
+JsonToIASTVisitor >> visitEsopeSegmentComment: anEsopeCommentNode [
+	"Source anchor for the segment is wrong,
+	 endLine/endColumn will be updated in #visitEsopeEndsegmentComment:"
+	| data seg |
+	data := super visitEsopeSegmentComment: anEsopeCommentNode.
+	seg := IASTEsopeSegment new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		entityName: data third ;
+		declarations: (OrderedCollection new: 5) ;
+		yourself.
+
+	entityStack push: seg.
+	^seg
+]
+
+{ #category : #'visiting statement' }
+JsonToIASTVisitor >> visitFortranComment: aFortranCommentNode [
+	| data |
+	data := super visitFortranComment: aFortranCommentNode.
+	^IASTComment new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		text: data second ;
+		yourself
 ]
 
 { #category : #'visiting expression' }
@@ -334,7 +371,7 @@ JsonToIASTVisitor >> visitSubroutine: aSubroutineNode [
 		sourceAnchor: (self makeIndexedAnchor: data first) ;
 		entityName: data second ;
 		parameters: data third ;
-		body: data fourth ;
+		body: (data fourth reject: #isNil) ;
 		yourself
 ]
 
