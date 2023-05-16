@@ -513,6 +513,26 @@ JsonToIASTVisitorTest >> testMultipleStatements [
 
 ]
 
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testPointeurDeclaration [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  pointeur lib.pstr
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopePointer.
+	self assert: seg entityName equals: 'lib.pstr'.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: seg sourceAnchor startLine equals: 2.
+	self assert: seg sourceAnchor startColumn equals: 1.
+	self assert: seg sourceAnchor endLine equals: 2.
+	self assert: seg sourceAnchor endColumn equals: 24
+]
+
 { #category : #'tests-statement' }
 JsonToIASTVisitorTest >> testProgramWithEmptyDoStatement [
 	| prog programFile |
