@@ -662,7 +662,7 @@ JsonToIASTVisitorTest >> testSegmentDeclarationWithContent [
 	programFile := visitor visitCode: '      subroutine hello
 cESO  segment, user
         character*40 uname
-        integer uid
+        integer uid, age
 cESO  end segment
       end
 '.
@@ -672,10 +672,11 @@ cESO  end segment
 
 	self assert: seg class equals: IASTEsopeSegment.
 	self assert: seg entityName equals: 'user'.
-	self assert: seg declarations size equals: 2.
+	self assert: seg declarations size equals: 3.
 
 	self assert: seg declarations first entityName equals: 'uname'.
 	self assert: seg declarations second entityName equals: 'uid'.
+	self assert: seg declarations third entityName equals: 'age'.
 
 ]
 
