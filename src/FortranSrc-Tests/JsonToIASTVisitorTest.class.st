@@ -621,13 +621,19 @@ cESO  end segment
       end
 '.
 
-	self assert: programFile progUnits first body first size equals: 1.
-	seg := programFile progUnits first body first first.
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
 
 	self assert: seg class equals: IASTEsopeSegment.
 	self assert: seg entityName equals: 'user'.
 	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
-	self assert: seg declarations size equals: 0
+	self assert: seg declarations size equals: 0.
+
+	self assert: seg sourceAnchor isNotNil.
+	self assert: seg sourceAnchor startLine equals: 2.
+	self assert: seg sourceAnchor startColumn equals: 1.
+	self assert: seg sourceAnchor endLine equals: 3.
+	self assert: seg sourceAnchor endColumn equals: 18
 ]
 
 { #category : #'tests-statement' }
