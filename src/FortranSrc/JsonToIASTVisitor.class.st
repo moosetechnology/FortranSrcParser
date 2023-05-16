@@ -1,3 +1,6 @@
+"
+A visitor for JSON output of camfor/fortran-src to build an intermediary representation
+"
 Class {
 	#name : #JsonToIASTVisitor,
 	#superclass : #FortranAbstractJsonVisitor,
