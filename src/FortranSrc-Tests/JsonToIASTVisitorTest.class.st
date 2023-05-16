@@ -625,6 +625,24 @@ JsonToIASTVisitorTest >> testProgramWithSimpleIfStatementWithoutBody [
 
 ]
 
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testSegmentDeclaration [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  segment, user
+cESO  end segment
+      end
+'.
+
+	self assert: programFile progUnits first body first size equals: 1.
+	seg := programFile progUnits first body first first.
+
+	self assert: seg class equals: IASTEsopeSegment.
+	self assert: seg entityName equals: 'user'.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: seg declarations size equals: 0
+]
+
 { #category : #tests }
 JsonToIASTVisitorTest >> testStringVariableDeclaration [
 	| programFile var |
