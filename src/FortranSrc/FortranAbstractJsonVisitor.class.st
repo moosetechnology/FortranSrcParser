@@ -10,23 +10,38 @@ Class {
 
 { #category : #'private - helpers' }
 FortranAbstractJsonVisitor >> esopeCommand: anEsopeCommentString [
-	"first word after cESO marker is the 'command', after come the 'argument'
-	 command must starts at column 7 or more"
+	"first word after cESO marker is the 'command', after come the 'argument'"
 
-	| cmdBeg cmdEnd argBeg argEnd|
-	cmdBeg := 6.
-	[ (anEsopeCommentString at: cmdBeg) isLetter ]
-		whileFalse: [ cmdBeg := cmdBeg+1 ].
-	cmdEnd := cmdBeg+1.
-	[ (anEsopeCommentString at: cmdEnd) isLetter ]
-		whileTrue: [ cmdEnd := cmdEnd+1 ].
+	| i inWord indices |
+	indices := OrderedCollection new: 6.
+	i := 1.
+	inWord := false.
 
-	argBeg := cmdEnd.
-	[ (anEsopeCommentString at: argBeg) isLetter ]
-		whileFalse: [ argBeg  := argBeg+1 ].
-	argEnd :=anEsopeCommentString size.
-	^{ (anEsopeCommentString copyFrom: cmdBeg to: cmdEnd-1) .
-	  (anEsopeCommentString copyFrom: argBeg to: argEnd) .}
+	anEsopeCommentString do: [ :char |
+		"for now, treat . as a letter: lb.pstr"
+		(char isLetter or: [ char = $. ])
+		ifTrue: [
+			inWord ifFalse:[ "begining of a word"
+				indices add: i.
+				inWord := true
+			]
+		]
+		ifFalse: [
+			inWord ifTrue: [ "end of a word"
+				indices add: i - 1.
+				inWord := false
+			]
+		].
+		i := i+1
+	].
+	indices add: i-1.
+
+	^(indices size > 4)
+		ifTrue: [
+			{ (anEsopeCommentString copyFrom: indices third to: indices fourth) .
+			  (anEsopeCommentString copyFrom: indices fifth to: indices sixth) }
+		]
+		ifFalse: [ { anEsopeCommentString copyFrom: indices third to: indices fourth } ]
 ]
 
 { #category : #testing }
