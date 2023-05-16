@@ -374,7 +374,7 @@ JsonToIASTVisitor >> visitSubroutine: aSubroutineNode [
 		sourceAnchor: (self makeIndexedAnchor: data first) ;
 		entityName: data second ;
 		parameters: data third ;
-		body: (data fourth reject: #isNil) ;
+		body: data fourth ;
 		yourself
 ]
 
