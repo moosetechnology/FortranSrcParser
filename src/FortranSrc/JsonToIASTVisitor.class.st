@@ -188,7 +188,7 @@ JsonToIASTVisitor >> visitDeclarationStatement: aDeclarationStatementNode [
 			entityStack top addAllDeclarations: data fourth.
 			nil
 		]
-		ifEmpty: [ nil ]
+		ifEmpty: [ data fourth ]
 
 ]
 
@@ -254,6 +254,61 @@ JsonToIASTVisitor >> visitEsopePointeurComment: anEsopeCommentNode [
 ]
 
 { #category : #'visiting esope' }
+JsonToIASTVisitor >> visitEsopeSegactComment: anEsopeCommentNode [
+	| data |
+	data := super visitEsopeSegactComment: anEsopeCommentNode.
+	^IASTEsopeSegCommand new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		esopeCommand: data second ;
+		entityName: data third ;
+		yourself
+]
+
+{ #category : #'visiting esope' }
+JsonToIASTVisitor >> visitEsopeSegadjComment: anEsopeCommentNode [
+	| data |
+	data := super visitEsopeSegadjComment: anEsopeCommentNode.
+	^IASTEsopeSegCommand new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		esopeCommand: data second ;
+		entityName: data third ;
+		yourself
+]
+
+{ #category : #'visiting esope' }
+JsonToIASTVisitor >> visitEsopeSegdefComment: anEsopeCommentNode [
+	| data |
+	data := super visitEsopeSegdefComment: anEsopeCommentNode.
+	^IASTEsopeSegCommand new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		esopeCommand: data second ;
+		entityName: data third ;
+		yourself
+]
+
+{ #category : #'visiting esope' }
+JsonToIASTVisitor >> visitEsopeSegdesComment: anEsopeCommentNode [
+	| data |
+	data := super visitEsopeSegdesComment: anEsopeCommentNode.
+	^IASTEsopeSegCommand new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		esopeCommand: data second ;
+		entityName: data third ;
+		yourself
+]
+
+{ #category : #'visiting esope' }
+JsonToIASTVisitor >> visitEsopeSeginiComment: anEsopeCommentNode [
+	| data |
+	data := super visitEsopeSeginiComment: anEsopeCommentNode.
+	^IASTEsopeSegCommand new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		esopeCommand: data second ;
+		entityName: data third ;
+		yourself
+]
+
+{ #category : #'visiting esope' }
 JsonToIASTVisitor >> visitEsopeSegmentComment: anEsopeCommentNode [
 	"Source anchor for the segment is wrong,
 	 endLine/endColumn will be updated in #visitEsopeEndsegmentComment:"
@@ -267,6 +322,17 @@ JsonToIASTVisitor >> visitEsopeSegmentComment: anEsopeCommentNode [
 
 	entityStack push: seg.
 	^seg
+]
+
+{ #category : #'visiting esope' }
+JsonToIASTVisitor >> visitEsopeSegsupComment: anEsopeCommentNode [
+	| data |
+	data := super visitEsopeSegsupComment: anEsopeCommentNode.
+	^IASTEsopeSegCommand new
+		sourceAnchor: (self makeIndexedAnchor: data first) ;
+		esopeCommand: data second ;
+		entityName: data third ;
+		yourself
 ]
 
 { #category : #'visiting statement' }

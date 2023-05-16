@@ -633,10 +633,94 @@ JsonToIASTVisitorTest >> testProgramWithSimpleIfStatementWithoutBody [
 ]
 
 { #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testSegactCommand [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  segact, lb
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopeSegCommand.
+	self assert: seg entityName equals: 'lb'.
+	self assert: seg esopeCommand equals: 'segact'.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: seg sourceAnchor startLine equals: 2.
+	self assert: seg sourceAnchor startColumn equals: 1.
+	self assert: seg sourceAnchor endLine equals: 2.
+	self assert: seg sourceAnchor endColumn equals: 17
+]
+
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testSegadjCommand [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  segadj,lb
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopeSegCommand.
+	self assert: seg entityName equals: 'lb'.
+	self assert: seg esopeCommand equals: 'segadj'.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: seg sourceAnchor startLine equals: 2.
+	self assert: seg sourceAnchor startColumn equals: 1.
+	self assert: seg sourceAnchor endLine equals: 2.
+	self assert: seg sourceAnchor endColumn equals: 16
+]
+
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testSegdefCommand [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  segdef, lb
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopeSegCommand.
+	self assert: seg entityName equals: 'lb'.
+	self assert: seg esopeCommand equals: 'segdef'.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: seg sourceAnchor startLine equals: 2.
+	self assert: seg sourceAnchor startColumn equals: 1.
+	self assert: seg sourceAnchor endLine equals: 2.
+	self assert: seg sourceAnchor endColumn equals: 17
+]
+
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testSeginiCommand [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  segini,lb
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopeSegCommand.
+	self assert: seg entityName equals: 'lb'.
+	self assert: seg esopeCommand equals: 'segini'.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: seg sourceAnchor startLine equals: 2.
+	self assert: seg sourceAnchor startColumn equals: 1.
+	self assert: seg sourceAnchor endLine equals: 2.
+	self assert: seg sourceAnchor endColumn equals: 16
+]
+
+{ #category : #'tests-esope' }
 JsonToIASTVisitorTest >> testSegmentDeclarationEmpty [
 	| programFile seg |
 	programFile := visitor visitCode: '      subroutine hello
-cESO  segment, user
+cESO  segment,user
 cESO  end segment
       end
 '.
@@ -678,6 +762,27 @@ cESO  end segment
 	self assert: seg declarations second entityName equals: 'uid'.
 	self assert: seg declarations third entityName equals: 'age'.
 
+]
+
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testSegsupCommand [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  segsup, lb
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopeSegCommand.
+	self assert: seg entityName equals: 'lb'.
+	self assert: seg esopeCommand equals: 'segsup'.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: seg sourceAnchor startLine equals: 2.
+	self assert: seg sourceAnchor startColumn equals: 1.
+	self assert: seg sourceAnchor endLine equals: 2.
+	self assert: seg sourceAnchor endColumn equals: 17
 ]
 
 { #category : #'tests-statement' }

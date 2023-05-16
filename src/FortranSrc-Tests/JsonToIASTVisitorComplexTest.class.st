@@ -35,10 +35,10 @@ cESO  segsup,baz
 	prog := programFile progUnits first.
 	self assert: prog class equals: IASTSubroutine.
 	
-	self assert: prog body size equals: 11.
-	self assert: prog comments size equals: 5.
+	self assert: prog body size equals: 9.
+	self assert: prog comments size equals: 0.
 	self assert: prog accesses size equals: 4.
-	self assert: prog localVariables size equals: 3.
+	self assert: prog localVariables size equals: 2
 	
 
 	
@@ -69,10 +69,10 @@ cESO  segsup ptr1
 	prog := programFile progUnits first.
 	self assert: prog class equals: IASTMainProgram.
 	
-	self assert: prog body size equals: 10.
-	self assert: prog comments size equals: 5.
+	self assert: prog body size equals: 8.
+	self assert: prog comments size equals: 0.
 	self assert: prog accesses size equals: 9.
-	self assert: prog localVariables size equals: 2.
+	self assert: prog localVariables size equals: 0
 	
 
 	
