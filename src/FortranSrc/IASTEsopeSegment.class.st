@@ -44,3 +44,8 @@ IASTEsopeSegment >> entityName: anObject [
 
 	entityName := anObject
 ]
+
+{ #category : #testing }
+IASTEsopeSegment >> isEsopeSegment [
+	^true
+]

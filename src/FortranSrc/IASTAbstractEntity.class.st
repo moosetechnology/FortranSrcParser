@@ -13,6 +13,11 @@ IASTAbstractEntity >> accept: aVisitor [
 	self subclassResponsibility
 ]
 
+{ #category : #testing }
+IASTAbstractEntity >> isEsopeSegment [
+	^false
+]
+
 { #category : #accessing }
 IASTAbstractEntity >> sourceAnchor [
 
