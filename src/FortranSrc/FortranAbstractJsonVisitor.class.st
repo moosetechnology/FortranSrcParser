@@ -355,19 +355,19 @@ FortranAbstractJsonVisitor >> visitItems: anImplicitItemsNode [
 
 ]
 
-{ #category : #'visiting - reflectivity' }
+{ #category : #'visiting reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonArray: aNode [
 	^aNode collect: [ :each | self visitJsonElement: each ]
 ]
 
-{ #category : #'visiting - reflectivity' }
+{ #category : #'visiting reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonElement: aNode [
 	aNode ifNil: [ ^nil ].
 	aNode isDictionary  ifTrue: [ ^self visitJsonMap: aNode ].
 	aNode isArray  ifTrue: [ ^self visitJsonArray: aNode ].
 ]
 
-{ #category : #'visiting - reflectivity' }
+{ #category : #'visiting reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonMap: jsonDictionary [
 	"If dicionary contains key 'tag', performs a visit of the whole node for this tag,
 	otherwise, perform a visit of each value for their key
@@ -383,7 +383,7 @@ FortranAbstractJsonVisitor >> visitJsonMap: jsonDictionary [
 
 ]
 
-{ #category : #'visiting - reflectivity' }
+{ #category : #'visiting reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonMap: jsonDictionary keys: aCollection [
 	"visit only the keys listed in aCollection in the jsonDictionary"
 
@@ -391,7 +391,7 @@ FortranAbstractJsonVisitor >> visitJsonMap: jsonDictionary keys: aCollection [
 
 ]
 
-{ #category : #'visiting - reflectivity' }
+{ #category : #'visiting reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonNode: key value: aValue [
 	| selector |
 	selector := ('visit' , key capitalized , ':') asSymbol.
@@ -399,7 +399,7 @@ FortranAbstractJsonVisitor >> visitJsonNode: key value: aValue [
 
 ]
 
-{ #category : #'visiting - reflectivity' }
+{ #category : #'visiting reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonTaggedElement: jsonDictionary [
 	"similar to #visitJsonNode: , but removes first the 'tag' key from the JsonDisctionary
 	 so that it is not visited again (not sure this is needed ...?)"
@@ -408,7 +408,7 @@ FortranAbstractJsonVisitor >> visitJsonTaggedElement: jsonDictionary [
 	^self visitJsonNode: key value: jsonDictionary
 ]
 
-{ #category : #'visiting - reflectivity' }
+{ #category : #'visiting reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonTaggedStatement: aStatementNode [
 	"a statementNode containing a tagged element
 	 Similar to #visitJsonTaggedElement: on the tagged element, but adds 'Statement' to the selector"
