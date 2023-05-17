@@ -109,6 +109,7 @@ IASTToFamixVisitorTest >> testCreateFamixFortran77Comment [
 	comment := entity programUnits first comments first.
 	self assert: comment class equals: FamixFortran77Comment.
 	self assert: comment content equals: 'a normal comment'.
+	self deny: comment isEsope.
 	
 	self assert: comment commentedEntity equals: entity programUnits first.
 ]
