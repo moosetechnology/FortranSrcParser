@@ -162,7 +162,7 @@ IASTToFamixVisitor >> visitIASTComment: aComment [
 
 	comment := aComment isProgUnit
 		           ifTrue:  [ self newEntity: FamixFortran77PUComment ]
-		           ifFalse: [ self newEntity: FamixFortran77Comment ].
+		           ifFalse: [ (self newEntity: FamixFortran77Comment) isEsope: aComment isEsope ].
 	^ comment
 		  sourceAnchor: (self visitIndexedFileAnchor: aComment sourceAnchor);
 		  content: aComment text;
