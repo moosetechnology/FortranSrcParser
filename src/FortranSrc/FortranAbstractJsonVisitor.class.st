@@ -1,8 +1,53 @@
+"
+An abstrat visitor for the JSON output of camfor/fortran-src
+Defines all the needed `#visitXYZ:` methods and go to the JSON tree
+"
 Class {
 	#name : #FortranAbstractJsonVisitor,
 	#superclass : #Object,
 	#category : #'FortranSrc-Visitor'
 }
+
+{ #category : #'private - helpers' }
+FortranAbstractJsonVisitor >> esopeCommand: anEsopeCommentString [
+	"first word after cESO marker is the 'command', after come the 'argument'"
+
+	| i inWord indices |
+	indices := OrderedCollection new: 6.
+	i := 1.
+	inWord := false.
+
+	anEsopeCommentString do: [ :char |
+		"for now, treat . as a letter: lb.pstr"
+		(char isLetter or: [ char = $. ])
+		ifTrue: [
+			inWord ifFalse:[ "begining of a word"
+				indices add: i.
+				inWord := true
+			]
+		]
+		ifFalse: [
+			inWord ifTrue: [ "end of a word"
+				indices add: i - 1.
+				inWord := false
+			]
+		].
+		i := i+1
+	].
+	indices add: i-1.
+
+	^(indices size > 4)
+		ifTrue: [
+			{ (anEsopeCommentString copyFrom: indices third to: indices fourth) .
+			  (anEsopeCommentString copyFrom: indices fifth to: indices sixth) }
+		]
+		ifFalse: [ { anEsopeCommentString copyFrom: indices third to: indices fourth } ]
+]
+
+{ #category : #testing }
+FortranAbstractJsonVisitor >> isEsopeComment: aCommentString [
+	^aCommentString asLowercase beginsWith: 'eso' 
+]
 
 { #category : #testing }
 FortranAbstractJsonVisitor >> isTaggedStatement: aStatementNode [
@@ -101,10 +146,14 @@ FortranAbstractJsonVisitor >> visitCharacterBaseType: aString [
 
 { #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitComment: aCommentNode [
-	"cannot call visitJsonMap: because contains a key 'comment' that would recursively loop on this method"
+	"Separates comments that are genuine fortran comments and the one that contain Esope commands"
+	| content |
+	content := aCommentNode at: 'comment'.
 
-	^{self visitSpan: (aCommentNode at: 'span') .
-	 aCommentNode at: 'comment'}
+	^(self isEsopeComment: content)
+		ifTrue: [  self visitEsopeComment: aCommentNode ]
+		ifFalse: [ self visitFortranComment: aCommentNode ]
+	
 ]
 
 { #category : #'visiting statement' }
@@ -208,6 +257,110 @@ FortranAbstractJsonVisitor >> visitEq: anEqualtoOperatorNode [
 	^'eq'
 ]
 
+{ #category : #'visiting reflectivity' }
+FortranAbstractJsonVisitor >> visitEsopeComment: anEsopeCommentNode [
+	| key esopeCommand |
+	esopeCommand := self esopeCommand: (anEsopeCommentNode at: 'comment').
+	key := 'Esope' ,
+		(esopeCommand first asLowercase capitalized) ,
+		'Comment'.
+	^self visitJsonNode: key value: anEsopeCommentNode
+]
+
+{ #category : #'visiting esope' }
+FortranAbstractJsonVisitor >> visitEsopeEndComment: anEsopeCommentNode [
+	^self visitEsopeEndsegmentComment: anEsopeCommentNode 
+]
+
+{ #category : #'visiting esope' }
+FortranAbstractJsonVisitor >> visitEsopeEndsegmentComment: anEsopeCommentNode [
+	| esopeCommand |
+	esopeCommand := self esopeCommand: (anEsopeCommentNode at: 'comment').
+	^{ self visitSpan: (anEsopeCommentNode at: 'span') .
+	  esopeCommand first } 
+
+]
+
+{ #category : #'visiting esope' }
+FortranAbstractJsonVisitor >> visitEsopePointeurComment: anEsopeCommentNode [
+	| esopeCommand |
+	esopeCommand := self esopeCommand: (anEsopeCommentNode at: 'comment').
+	^{ self visitSpan: (anEsopeCommentNode at: 'span') .
+	  esopeCommand first .
+	  esopeCommand second } 
+
+]
+
+{ #category : #'visiting esope' }
+FortranAbstractJsonVisitor >> visitEsopeSegactComment: anEsopeCommentNode [
+	| esopeCommand |
+	esopeCommand := self esopeCommand: (anEsopeCommentNode at: 'comment').
+	^{ self visitSpan: (anEsopeCommentNode at: 'span') .
+	  esopeCommand first .
+	  esopeCommand second } 
+
+]
+
+{ #category : #'visiting esope' }
+FortranAbstractJsonVisitor >> visitEsopeSegadjComment: anEsopeCommentNode [
+	| esopeCommand |
+	esopeCommand := self esopeCommand: (anEsopeCommentNode at: 'comment').
+	^{ self visitSpan: (anEsopeCommentNode at: 'span') .
+	  esopeCommand first .
+	  esopeCommand second } 
+
+]
+
+{ #category : #'visiting esope' }
+FortranAbstractJsonVisitor >> visitEsopeSegdefComment: anEsopeCommentNode [
+	| esopeCommand |
+	esopeCommand := self esopeCommand: (anEsopeCommentNode at: 'comment').
+	^{ self visitSpan: (anEsopeCommentNode at: 'span') .
+	  esopeCommand first .
+	  esopeCommand second } 
+
+]
+
+{ #category : #'visiting esope' }
+FortranAbstractJsonVisitor >> visitEsopeSegdesComment: anEsopeCommentNode [
+	| esopeCommand |
+	esopeCommand := self esopeCommand: (anEsopeCommentNode at: 'comment').
+	^{ self visitSpan: (anEsopeCommentNode at: 'span') .
+	  esopeCommand first .
+	  esopeCommand second } 
+
+]
+
+{ #category : #'visiting esope' }
+FortranAbstractJsonVisitor >> visitEsopeSeginiComment: anEsopeCommentNode [
+	| esopeCommand |
+	esopeCommand := self esopeCommand: (anEsopeCommentNode at: 'comment').
+	^{ self visitSpan: (anEsopeCommentNode at: 'span') .
+	  esopeCommand first .
+	  esopeCommand second } 
+
+]
+
+{ #category : #'visiting esope' }
+FortranAbstractJsonVisitor >> visitEsopeSegmentComment: anEsopeCommentNode [
+	| esopeCommand |
+	esopeCommand := self esopeCommand: (anEsopeCommentNode at: 'comment').
+	^{ self visitSpan: (anEsopeCommentNode at: 'span') .
+	  esopeCommand first .
+	  esopeCommand second } 
+
+]
+
+{ #category : #'visiting esope' }
+FortranAbstractJsonVisitor >> visitEsopeSegsupComment: anEsopeCommentNode [
+	| esopeCommand |
+	esopeCommand := self esopeCommand: (anEsopeCommentNode at: 'comment').
+	^{ self visitSpan: (anEsopeCommentNode at: 'span') .
+	  esopeCommand first .
+	  esopeCommand second } 
+
+]
+
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitExitStatement: aExitNode [
 	self flag: #TODO.
@@ -251,6 +404,16 @@ FortranAbstractJsonVisitor >> visitFormat: aFormatNode [
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitFormatArgument: aFormatArgumentNode [
 	^self visitArgument: aFormatArgumentNode
+]
+
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitFortranComment: aFortranCommentNode [
+	"A reaf Fortran comment as opposed to a comment that contains an Esope command
+	cannot call visitJsonMap: because contains a key 'comment' that would recursively loop on this method"
+
+	^{ self visitSpan: (aFortranCommentNode at: 'span') .
+	  aFortranCommentNode at: 'comment' }
+	
 ]
 
 { #category : #visiting }
@@ -355,19 +518,19 @@ FortranAbstractJsonVisitor >> visitItems: anImplicitItemsNode [
 
 ]
 
-{ #category : #'visiting - reflectivity' }
+{ #category : #'visiting reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonArray: aNode [
 	^aNode collect: [ :each | self visitJsonElement: each ]
 ]
 
-{ #category : #'visiting - reflectivity' }
+{ #category : #'visiting reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonElement: aNode [
 	aNode ifNil: [ ^nil ].
 	aNode isDictionary  ifTrue: [ ^self visitJsonMap: aNode ].
 	aNode isArray  ifTrue: [ ^self visitJsonArray: aNode ].
 ]
 
-{ #category : #'visiting - reflectivity' }
+{ #category : #'visiting reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonMap: jsonDictionary [
 	"If dicionary contains key 'tag', performs a visit of the whole node for this tag,
 	otherwise, perform a visit of each value for their key
@@ -383,7 +546,7 @@ FortranAbstractJsonVisitor >> visitJsonMap: jsonDictionary [
 
 ]
 
-{ #category : #'visiting - reflectivity' }
+{ #category : #'visiting reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonMap: jsonDictionary keys: aCollection [
 	"visit only the keys listed in aCollection in the jsonDictionary"
 
@@ -391,7 +554,7 @@ FortranAbstractJsonVisitor >> visitJsonMap: jsonDictionary keys: aCollection [
 
 ]
 
-{ #category : #'visiting - reflectivity' }
+{ #category : #'visiting reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonNode: key value: aValue [
 	| selector |
 	selector := ('visit' , key capitalized , ':') asSymbol.
@@ -399,7 +562,7 @@ FortranAbstractJsonVisitor >> visitJsonNode: key value: aValue [
 
 ]
 
-{ #category : #'visiting - reflectivity' }
+{ #category : #'visiting reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonTaggedElement: jsonDictionary [
 	"similar to #visitJsonNode: , but removes first the 'tag' key from the JsonDisctionary
 	 so that it is not visited again (not sure this is needed ...?)"
@@ -408,7 +571,7 @@ FortranAbstractJsonVisitor >> visitJsonTaggedElement: jsonDictionary [
 	^self visitJsonNode: key value: jsonDictionary
 ]
 
-{ #category : #'visiting - reflectivity' }
+{ #category : #'visiting reflectivity' }
 FortranAbstractJsonVisitor >> visitJsonTaggedStatement: aStatementNode [
 	"a statementNode containing a tagged element
 	 Similar to #visitJsonTaggedElement: on the tagged element, but adds 'Statement' to the selector"

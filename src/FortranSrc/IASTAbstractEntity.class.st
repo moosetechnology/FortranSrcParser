@@ -7,10 +7,15 @@ Class {
 	#category : #'FortranSrc-intrermediateAST'
 }
 
-{ #category : #accessing }
+{ #category : #visiting }
 IASTAbstractEntity >> accept: aVisitor [
 
 	self subclassResponsibility
+]
+
+{ #category : #testing }
+IASTAbstractEntity >> isEsopeSegment [
+	^false
 ]
 
 { #category : #accessing }
