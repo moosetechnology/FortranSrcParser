@@ -158,6 +158,29 @@ FamixFortran77SRVisitorTest >> testCreateFamixFortran77Access [
 ]
 
 { #category : #running }
+FamixFortran77SRVisitorTest >> testCreateFamixFortran77AccessNonDeclaredVariable [
+	| entity access accessor famixProgFile |
+
+	accessor := (self defaultMain)
+		addAccess: self defaultAccess;
+		yourself.
+
+	famixProgFile  := self defaultProgramFile: './main.f'.
+	famixProgFile programUnits: { accessor }.
+
+ 	resolver resolve.
+	self assert: (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) size equals: 1.
+	
+	entity := (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) first.
+
+	self assert: entity accesses size equals: 1.
+	access := entity accesses first.
+	
+	self assert: access class equals: FamixFortran77Access.
+	self assert: access variable equals: entity localVariables first.
+]
+
+{ #category : #running }
 FamixFortran77SRVisitorTest >> testCreateFamixFortran77InvocationCalleeBeforeCaller [
 	| entity invocation callee caller famixProgFile |
 	
