@@ -21,92 +21,158 @@ FamixFortran77SRVisitorTest >> anchorFrom: startPoint to: endPoint [
 ]
 
 { #category : #running }
-FamixFortran77SRVisitorTest >> defaultAnchor [
+FamixFortran77SRVisitorTest >> defaultAccess [
+	^(self newEntity: FamixFortran77Access)
+		attributeAt: #entity put: self defaultIASTVarAccess;
+		sourceAnchor: self defaultAnchor;
+		yourself
+]
 
-	^ self anchorFrom: 1 @ 7 to: 2 @ 10
+{ #category : #running }
+FamixFortran77SRVisitorTest >> defaultAnchor [
+	^self anchorFrom: 1 @ 7 to: 2 @ 10
+]
+
+{ #category : #running }
+FamixFortran77SRVisitorTest >> defaultFunction [
+	^self newNamedEntity: 'fct' toFamix: FamixFortran77PUFunction
+]
+
+{ #category : #running }
+FamixFortran77SRVisitorTest >> defaultIASTInvocation: name [
+	^IASTInvocation new
+		entityName: name;
+		yourself
+]
+
+{ #category : #running }
+FamixFortran77SRVisitorTest >> defaultIASTVarAccess [
+	^IASTVarAccess new
+		isWrite: false;
+		entityName: 'var';
+		yourself
+]
+
+{ #category : #running }
+FamixFortran77SRVisitorTest >> defaultInvocation: name [
+	^(self newEntity: FamixFortran77Invocation)
+		attributeAt: #entity put: (self defaultIASTInvocation: name);
+		sourceAnchor: self defaultAnchor;
+		yourself
+]
+
+{ #category : #running }
+FamixFortran77SRVisitorTest >> defaultMain [
+	^self newNamedEntity: 'main' toFamix: FamixFortran77PUMain
+]
+
+{ #category : #running }
+FamixFortran77SRVisitorTest >> defaultProgramFile: aFilename [
+	^(self newEntity: FamixFortran77ProgramFile)
+		name: aFilename;
+		filename: aFilename;
+		yourself
+]
+
+{ #category : #running }
+FamixFortran77SRVisitorTest >> defaultSubroutine [
+	^self newNamedEntity: 'sub' toFamix: FamixFortran77PUSubroutine
+]
+
+{ #category : #running }
+FamixFortran77SRVisitorTest >> defaultType: anIntrinsicFortranType [
+	^FamixFortran77Type new
+		name: anIntrinsicFortranType;
+		sourceAnchor: self defaultAnchor;
+		yourself
 ]
 
 { #category : #running }
 FamixFortran77SRVisitorTest >> defaultTypeCharacter [
-	^IASTTypeRef new
-		entityName: 'character';
-		sourceAnchor: self defaultAnchor;
-		yourself
+	^self defaultType: 'character'
 ]
 
 { #category : #running }
 FamixFortran77SRVisitorTest >> defaultTypeInteger [
-	^IASTTypeRef new
-		entityName: 'integer';
-		sourceAnchor: self defaultAnchor;
-		yourself
+	^self defaultType: 'integer'
 ]
 
 { #category : #running }
 FamixFortran77SRVisitorTest >> defaultTypeReal [
-	^IASTTypeRef new
-		entityName: 'real';
+	^self defaultType: 'real'
+]
+
+{ #category : #running }
+FamixFortran77SRVisitorTest >> defaultVariable [
+	^(self newNamedEntity: 'var' toFamix: FamixFortran77Variable)
+		declaredType: self defaultTypeInteger;
+		yourself 
+]
+
+{ #category : #running }
+FamixFortran77SRVisitorTest >> newEntity: aFamixClass [
+	^aFamixClass new
+		mooseModel: mooseModel;
+		yourself
+]
+
+{ #category : #running }
+FamixFortran77SRVisitorTest >> newNamedEntity: aName toFamix: aFamixClass [
+	^(self newEntity: aFamixClass)
+		name: aName;
 		sourceAnchor: self defaultAnchor;
 		yourself
 ]
 
 { #category : #running }
-FamixFortran77SRVisitorTest >> defaultVariable [
-	^ IASTVariable new
-		   entityName: 'aVar';
-			typeSpec: self defaultTypeInteger;
-		 	yourself
-]
-
-{ #category : #running }
 FamixFortran77SRVisitorTest >> setUp [
+
 	super setUp.
-	
-	iastProgFile := IASTProgramFile new filename: 'fortran77.f' ; yourself.
-	iastProgFile2 := IASTProgramFile new filename: 'fortran77.1.f' ; yourself.
-	defVisitor := IASTToFamixVisitor new.
-	refVisitor := FamixFortran77SRVisitor newFrom: defVisitor model.
+
+	mooseModel := FamixFortran77Model new name: 'mooseModel-tests'; yourself.
+	resolver := FamixFortran77SRVisitor newFrom: mooseModel
 ]
 
 { #category : #running }
 FamixFortran77SRVisitorTest >> testCreateFamixFortran77Access [
-	| entity access accessor |
+	| entity access accessor famixProgFile |
 
-	accessor := IASTMainProgram new
-			entityName: 'main';
-			body: { 
-				self defaultVariable .
-				IASTVarAccess new
-					entityName: 'aVar'; 
-					yourself 
-			};
-			yourself.
+	accessor := (self defaultMain)
+		addLocalVariable: self defaultVariable;
+		addAccess: self defaultAccess;
+		yourself.
 
-	iastProgFile progUnits: { accessor }.
+	famixProgFile  := self defaultProgramFile: './main.f'.
+	famixProgFile programUnits: { accessor }.
+
+ 	resolver resolve.
+	self assert: (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) size equals: 1.
 	
- 	(iastProgFile accept: defVisitor) accept: refVisitor.
-	entity := (refVisitor model allWithSubTypesOf: FamixFortran77ProgramFile) first.
+	entity := (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) first.
 
-	self assert: entity programUnits first accesses size equals: 1.
-	access := entity programUnits first accesses first.
+	self assert: entity accesses size equals: 1.
+	access := entity accesses first.
 	
 	self assert: access class equals: FamixFortran77Access.
-	self assert: access variable equals: entity programUnits first localVariables first.
+	self assert: access variable equals: entity localVariables first.
 ]
 
 { #category : #running }
 FamixFortran77SRVisitorTest >> testCreateFamixFortran77InvocationCalleeBeforeCaller [
-	| entity invocation callee caller |
-	callee := IASTSubroutine new entityName: 'sub'; yourself.
-
-	caller := IASTMainProgram new
-			entityName: 'main';
-			body: { IASTInvocation new entityName: 'sub'; yourself };
-			yourself.
-	iastProgFile progUnits: { callee . caller }.
+	| entity invocation callee caller famixProgFile |
 	
-	(iastProgFile accept: defVisitor) accept: refVisitor.
-	entity := (refVisitor model allWithSubTypesOf: FamixFortran77ProgramFile) first.
+	caller := (self defaultMain)
+		addOutgoingInvocation: (self defaultInvocation: 'sub');
+		yourself.
+		
+	callee := self defaultSubroutine.
+
+	famixProgFile  := self defaultProgramFile: './main.f'.
+	famixProgFile programUnits: { callee . caller }.
+
+ 	resolver resolve.
+
+	entity := (resolver model allWithSubTypesOf: FamixFortran77ProgramFile) first.
 
 	self assert: entity programUnits second outgoingInvocations size equals: 1.
 	invocation := entity programUnits second outgoingInvocations first.
@@ -120,17 +186,18 @@ FamixFortran77SRVisitorTest >> testCreateFamixFortran77InvocationCalleeBeforeCal
 
 { #category : #running }
 FamixFortran77SRVisitorTest >> testCreateFamixFortran77InvocationCallerBeforeCallee [
-	| entity invocation callee caller |
-	callee := IASTSubroutine new entityName: 'sub'; yourself.
+	| entity invocation callee caller famixProgFile |
+	caller := (self defaultMain)
+		addOutgoingInvocation: (self defaultInvocation: 'sub');
+		yourself.
+		
+	callee := self defaultSubroutine.
 
-	caller := IASTMainProgram new
-			entityName: 'main';
-			body: { IASTInvocation new entityName: 'sub'; yourself };
-			yourself.
-	iastProgFile progUnits: { caller . callee }.
-	
-	(iastProgFile accept: defVisitor) accept: refVisitor.
-	entity := (refVisitor model allWithSubTypesOf: FamixFortran77ProgramFile) first.
+	famixProgFile  := self defaultProgramFile: './main.f'.
+	famixProgFile programUnits: { caller . callee }.
+
+ 	resolver resolve.
+	entity := (resolver model allWithSubTypesOf: FamixFortran77ProgramFile) first.
 
 	self assert: entity programUnits first outgoingInvocations size equals: 1.
 	invocation := entity programUnits first outgoingInvocations first.
@@ -144,44 +211,53 @@ FamixFortran77SRVisitorTest >> testCreateFamixFortran77InvocationCallerBeforeCal
 
 { #category : #running }
 FamixFortran77SRVisitorTest >> testCreateFamixFortran77InvocationInDifferentFiles [
-	| entity invocation callee caller |
-	callee := IASTSubroutine new entityName: 'sub'; yourself.
+	| invocation callee caller famixProgFile1 famixProgFile2 main sub |
 	
-	caller := IASTMainProgram new
-			entityName: 'main';
-			body: { IASTInvocation new entityName: 'sub'; yourself };
-			yourself.
-	iastProgFile progUnits: { caller }.
-	iastProgFile2 progUnits: { caller }.
+	famixProgFile1  := self defaultProgramFile: './main.f'.
+	famixProgFile2  := self defaultProgramFile: './sub.f'.
 	
-	({iastProgFile . iastProgFile2 } do: [ :pf | pf accept: defVisitor ]) accept: refVisitor.
-	1halt.
-	entity := (refVisitor model allWithSubTypesOf: FamixFortran77ProgramFile) first.
+	caller := (self defaultMain)
+		addOutgoingInvocation: (self defaultInvocation: 'sub');
+		yourself.
+		
+	callee := self defaultSubroutine.
 
-	self assert: entity programUnits first outgoingInvocations size equals: 1.
-	invocation := entity programUnits first outgoingInvocations first.
+	famixProgFile1 programUnits: { caller }.	
+
+	famixProgFile2 programUnits: { callee }.
+	
+	resolver resolve.
+	
+	main := (resolver model allWithType: FamixFortran77PUMain) anyOne.
+	sub := (resolver model allWithType: FamixFortran77PUSubroutine) anyOne.
+
+	self assert: main outgoingInvocations size equals: 1.
+	invocation := main outgoingInvocations first.
 	
 	self assert: invocation class equals: FamixFortran77Invocation.
-	self assert: invocation sender equals: entity programUnits first.
+	self assert: invocation sender equals: main.
 	
 	self assert: invocation candidates size equals: 1.
-	self assert: invocation candidates first equals: entity programUnits second.
+	self assert: invocation candidates first equals: sub.
 ]
 
 { #category : #running }
 FamixFortran77SRVisitorTest >> testCreateFamixFortran77InvocationMultipleCalleeBeforeCaller [
-	| entity invocation calleeSub calleeFct caller |
-	calleeSub := IASTSubroutine new entityName: 'sub'; yourself.
-	calleeFct := IASTFunction new entityName: 'f'; yourself.
+	| entity invocation calleeSub calleeFct caller famixProgFile |
+	caller := (self defaultMain)
+		addOutgoingInvocation: (self defaultInvocation: 'sub');
+		addOutgoingInvocation: (self defaultInvocation: 'fct');
+		yourself.
+		
+	calleeSub := self defaultSubroutine.
+	calleeFct := self defaultFunction.
 
-	caller := IASTMainProgram new
-			entityName: 'main';
-			body: { IASTInvocation new entityName: 'sub'; yourself. IASTInvocation new entityName: 'f'; yourself };
-			yourself.
-	iastProgFile progUnits: { calleeSub . calleeFct . caller }.
+	famixProgFile  := self defaultProgramFile: './main.f'.
+	famixProgFile programUnits: { calleeSub . calleeFct . caller }.
 	
-	(iastProgFile accept: defVisitor) accept: refVisitor.
-	entity := (refVisitor model allWithSubTypesOf: FamixFortran77ProgramFile) first.
+	resolver resolve.
+
+	entity := (resolver model allWithSubTypesOf: FamixFortran77ProgramFile) first.
 
 	self assert: entity programUnits third outgoingInvocations size equals: 2.
 	invocation := entity programUnits third outgoingInvocations first.
