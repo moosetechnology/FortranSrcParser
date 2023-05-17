@@ -65,6 +65,57 @@ FamixFortran77SRVisitor >> model: anObject [
 	model := anObject
 ]
 
+{ #category : #'symbols resolution' }
+FamixFortran77SRVisitor >> resolve [
+
+	| programUnits |
+	programUnits := self model allWithSubTypesOf: FamixFortran77ProgramUnit.
+	programUnits
+		select: [ :programUnit | (programUnit class = FamixFortran77PUComment) not ]
+		thenDo: [ :programUnit | self resolveFor: programUnit ]
+]
+
+{ #category : #visiting }
+FamixFortran77SRVisitor >> resolveAccess: anAccess [
+	anAccess target: (self retrieveVariable:
+		(anAccess attributeAt: #entity ifAbsent: [ nil ]))
+]
+
+{ #category : #'symbols resolution' }
+FamixFortran77SRVisitor >> resolveAccesses: anAccesses [
+	anAccesses do: [ :access | self resolveAccess: access ]
+]
+
+{ #category : #'symbols resolution' }
+FamixFortran77SRVisitor >> resolveFor: aProgramUnit [
+	self resolveAccesses: aProgramUnit accesses.
+	self resolveInvocations: aProgramUnit outgoingInvocations.
+]
+
+{ #category : #visiting }
+FamixFortran77SRVisitor >> resolveInvocation: aFamixF77Entity [
+	aFamixF77Entity target: (self retrieveInvocable:
+		(aFamixF77Entity attributeAt: #entity ifAbsent: [ nil ]))
+]
+
+{ #category : #'symbols resolution' }
+FamixFortran77SRVisitor >> resolveInvocations: anInvocations [
+	anInvocations do: [ :invoke | self resolveInvocation: invoke ]
+]
+
+{ #category : #'private-creation' }
+FamixFortran77SRVisitor >> retrieveInvocable: anInvocation [
+
+	self flag: #TODO.
+	"- Search in the known programunits for the one whose name matches the aName"
+	"- Process arguments too: their numbers, their type ?"
+
+	^ (model allWithSubTypesOf: FamixFortran77PUProcedure) select: [ 
+		  :procedure | 
+		  procedure name = anInvocation entityName and: [ 
+			  procedure parameters size = anInvocation arguments size ] ]
+]
+
 { #category : #'private-creation' }
 FamixFortran77SRVisitor >> retrieveProgramUnit: anInvocation [
 
@@ -74,6 +125,16 @@ FamixFortran77SRVisitor >> retrieveProgramUnit: anInvocation [
 		  :procedure | 
 		  procedure name = anInvocation entityName and: [ 
 			   procedure parameters size = anInvocation arguments size ] ]
+]
+
+{ #category : #'private-creation' }
+FamixFortran77SRVisitor >> retrieveVariable: anAccess [
+
+	self flag: #TODO.
+	"- Search in the known variables for the one whose name matches the anAccess name"
+	"- compare their type also ?"
+	^ ((model allWithType: FamixFortran77Variable) select: [ :variable | 
+		   variable name = anAccess entityName ]) anyOne
 ]
 
 { #category : #visiting }
