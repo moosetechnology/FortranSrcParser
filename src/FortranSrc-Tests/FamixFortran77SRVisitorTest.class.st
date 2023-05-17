@@ -2,17 +2,16 @@ Class {
 	#name : #FamixFortran77SRVisitorTest,
 	#superclass : #TestCase,
 	#instVars : [
-		'iastProgFile',
-		'refVisitor',
-		'defVisitor',
-		'iastProgFile2'
+		'mooseModel',
+		'resolver'
 	],
 	#category : #'FortranSrc-Tests-Visitor'
 }
 
 { #category : #running }
 FamixFortran77SRVisitorTest >> anchorFrom: startPoint to: endPoint [
-	^IASTIndexedFileAnchor new
+	^FamixFortran77IndexedFileAnchor new
+		mooseModel: mooseModel;
 		startLine: startPoint x ;
 		startColumn: startPoint y;
 		endLine: endPoint x ;
