@@ -159,6 +159,8 @@ IASTToFamixVisitorTest >> testCreateFamixFortran77LocalVariable [
 	var := entity programUnits first localVariables first.
 	self assert: var class equals: FamixFortran77Variable.
 	self assert: var name equals: 'aVar'.
+	self assert: var declaredType class equals: FamixFortran77Type.
+	self assert: var declaredType name equals: 'integer'.
 	self assert: var parentBehaviouralEntity isNotNil.
 	self
 		assert: var parentBehaviouralEntity
