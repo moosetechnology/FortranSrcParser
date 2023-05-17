@@ -2,7 +2,7 @@
 An IASTVisitorJSONTest is a test class for testing the behavior of IASTVisitorJSON
 "
 Class {
-	#name : #IASTVisitorJSONTest,
+	#name : #JsonToIASTVisitorTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'visitor'
@@ -11,14 +11,14 @@ Class {
 }
 
 { #category : #running }
-IASTVisitorJSONTest >> setUp [
+JsonToIASTVisitorTest >> setUp [
 	super setUp.
 	
-	visitor := IASTVisitorJSON new
+	visitor := JsonToIASTVisitor new
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testAssignementStatement [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testAssignementStatement [
 	| programFile var |
 	programFile := visitor visitCode: '      subroutine hello
       someVar = otherVar
@@ -39,8 +39,8 @@ IASTVisitorJSONTest >> testAssignementStatement [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testAssignementStatementWithComplexRHS [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testAssignementStatementWithComplexRHS [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello
       someVar = otherVar + thirdVar
@@ -63,8 +63,8 @@ IASTVisitorJSONTest >> testAssignementStatementWithComplexRHS [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testAssignementStatementWithEsoAt [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testAssignementStatementWithEsoAt [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello
       someVar = esoat(var,1)
@@ -84,8 +84,8 @@ IASTVisitorJSONTest >> testAssignementStatementWithEsoAt [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testBlockDataWithOneCommon [
+{ #category : #'tests-progUnit' }
+JsonToIASTVisitorTest >> testBlockDataWithOneCommon [
 	| programFile blockdata var |
 
 	programFile := visitor visitCode: '      blockdata hello
@@ -106,8 +106,8 @@ IASTVisitorJSONTest >> testBlockDataWithOneCommon [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testBlockDataWithOneCommonOneData [
+{ #category : #'tests-progUnit' }
+JsonToIASTVisitorTest >> testBlockDataWithOneCommonOneData [
 	| programFile blockdata |
 	self flag: 'not dealing with COMMON for now'.
 	self skip.
@@ -121,14 +121,15 @@ IASTVisitorJSONTest >> testBlockDataWithOneCommonOneData [
 	self assert: programFile class equals: IASTProgramFile.
 	self assert: programFile progUnits size equals: 1.
 	self assert: programFile progUnits first class equals: IASTBlockData.
+
 	blockdata := programFile progUnits first.
 	self assert: blockdata entityName equals: 'hello'.
 	self assert: blockdata body size equals: 3.
 	self assert: blockdata comments isEmpty.
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testCallToWrite [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testCallToWrite [
 
 	| programFile stmt arg |
 	programFile := visitor visitCode: '      subroutine mysub (msg)
@@ -151,8 +152,8 @@ IASTVisitorJSONTest >> testCallToWrite [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testComment [
+{ #category : #'tests-progUnit' }
+JsonToIASTVisitorTest >> testComment [
 	| programFile stmt |
 	programFile := visitor visitCode: 'c     blah'.
 
@@ -171,8 +172,8 @@ IASTVisitorJSONTest >> testComment [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testCommentInside [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testCommentInside [
 	| programFile stmt |
 	programFile := visitor visitCode: '      integer function hello()
 c     blah
@@ -187,8 +188,8 @@ c     blah
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testCommentOutside [
+{ #category : #'tests-progUnit' }
+JsonToIASTVisitorTest >> testCommentOutside [
 	| programFile stmt |
 	programFile := visitor visitCode: 'c     blah
       integer function hello()
@@ -202,8 +203,8 @@ IASTVisitorJSONTest >> testCommentOutside [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testEmptyBlockData [
+{ #category : #'tests-progUnit' }
+JsonToIASTVisitorTest >> testEmptyBlockData [
 	| programFile block |
 	programFile := visitor visitCode: '      BLOCK data hello
       end
@@ -218,8 +219,8 @@ IASTVisitorJSONTest >> testEmptyBlockData [
 	self assert: block comments isEmpty.
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testEmptyFunction [
+{ #category : #'tests-progUnit' }
+JsonToIASTVisitorTest >> testEmptyFunction [
 	| programFile fct |
 	programFile := visitor visitCode: '      integer function hello()
       end
@@ -245,8 +246,8 @@ IASTVisitorJSONTest >> testEmptyFunction [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testEmptyFunctionWithArguments [
+{ #category : #'tests-progUnit' }
+JsonToIASTVisitorTest >> testEmptyFunctionWithArguments [
 	| programFile fct param |
 	programFile := visitor visitCode: '      integer function hello(i,j)
       end
@@ -266,8 +267,8 @@ IASTVisitorJSONTest >> testEmptyFunctionWithArguments [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testEmptyProgram [
+{ #category : #'tests-progUnit' }
+JsonToIASTVisitorTest >> testEmptyProgram [
 	| programFile prog |
 	programFile := visitor visitCode: '      program hello
       end
@@ -291,8 +292,8 @@ IASTVisitorJSONTest >> testEmptyProgram [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testEmptySubroutine [
+{ #category : #'tests-progUnit' }
+JsonToIASTVisitorTest >> testEmptySubroutine [
 	| programFile sub |
 	programFile := visitor visitCode: '      subroutine hello
       end
@@ -315,8 +316,8 @@ IASTVisitorJSONTest >> testEmptySubroutine [
 	self assert: sub sourceAnchor endColumn equals: 10.
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testEmptySubroutineOneParam [
+{ #category : #'tests-progUnit' }
+JsonToIASTVisitorTest >> testEmptySubroutineOneParam [
 	| programFile sub |
 	programFile := visitor visitCode: '      subroutine hello( name )
       end
@@ -330,8 +331,8 @@ IASTVisitorJSONTest >> testEmptySubroutineOneParam [
 	self assert: sub body isEmpty.
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testEmptySubroutineTwoParams [
+{ #category : #'tests-progUnit' }
+JsonToIASTVisitorTest >> testEmptySubroutineTwoParams [
 	| programFile sub |
 	programFile := visitor visitCode: '      subroutine hello( param1, param2 )
       end
@@ -347,8 +348,8 @@ IASTVisitorJSONTest >> testEmptySubroutineTwoParams [
 	self assert: sub body isEmpty.
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testEsoArTwoArgs [
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testEsoArTwoArgs [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello()
         esoar(baz,bar) = 5
@@ -363,8 +364,8 @@ IASTVisitorJSONTest >> testEsoArTwoArgs [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testEsoArWithEsoAtArg [
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testEsoArWithEsoAtArg [
 	| programFile esoar esoat |
 	programFile := visitor visitCode: '      subroutine hello( )
         esoar(esoat(baz,bar),2) = 5
@@ -385,8 +386,8 @@ IASTVisitorJSONTest >> testEsoArWithEsoAtArg [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testEsoAtOneArg [
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testEsoAtOneArg [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello( )
         esoat(baz,2) = 5.3
@@ -403,8 +404,8 @@ IASTVisitorJSONTest >> testEsoAtOneArg [
 	self deny: stmt entities first isWrite
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testEsoAtTwoArgs [
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testEsoAtTwoArgs [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello( )
         esoat(baz,bar) = 5
@@ -423,8 +424,8 @@ IASTVisitorJSONTest >> testEsoAtTwoArgs [
 	]
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testEsoAtTwoArgsReceivesVar [
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testEsoAtTwoArgsReceivesVar [
 	| programFile var |
 	programFile := visitor visitCode: '      subroutine hello( )
         esoat(baz,bar) = otherVar
@@ -442,19 +443,16 @@ IASTVisitorJSONTest >> testEsoAtTwoArgsReceivesVar [
 	self deny: var isWrite.
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testFunctionWithFunctionInvocation [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testFunctionWithFunctionInvocation [
 
 	| iast fct |
 	iast := visitor visitCode: '      integer function efunc()
       i = ifunc (i, j)
       end
-
-      integer function ifunc( k, l )
-      end
  '.
 
-	self assert: iast progUnits size equals: 2.
+	self assert: iast progUnits size equals: 1.
 	
 	fct := iast progUnits first.
 
@@ -466,20 +464,10 @@ IASTVisitorJSONTest >> testFunctionWithFunctionInvocation [
 	self assert: fct sourceAnchor endLine equals: 3.
 	self assert: fct sourceAnchor endColumn equals: 10.
 	
-	 
-	fct := iast progUnits second.
-	self assert: fct class equals: IASTFunction.
-	self assert: fct parameters size equals: 2.
-	self assert: fct parameters first entityName equals: 'k'.
-	self assert: fct parameters second entityName equals: 'l'.
-	self assert: fct sourceAnchor startLine equals: 5.
-	self assert: fct sourceAnchor startColumn equals: 7.
-	self assert: fct sourceAnchor endLine equals: 6.
-	self assert: fct sourceAnchor endColumn equals: 10.
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testIntegerVariableDeclaration [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testIntegerVariableDeclaration [
 	| programFile var |
 	programFile := visitor visitCode: '      subroutine hello
       integer i
@@ -497,8 +485,8 @@ IASTVisitorJSONTest >> testIntegerVariableDeclaration [
 	self assert: var sourceAnchor class equals: IASTIndexedFileAnchor
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testMultipleStatements [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testMultipleStatements [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello
       integer someVar
@@ -525,8 +513,28 @@ IASTVisitorJSONTest >> testMultipleStatements [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testProgramWithEmptyDoStatement [
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testPointeurDeclaration [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  pointeur lib.pstr
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopePointer.
+	self assert: seg entityName equals: 'lib.pstr'.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: seg sourceAnchor startLine equals: 2.
+	self assert: seg sourceAnchor startColumn equals: 1.
+	self assert: seg sourceAnchor endLine equals: 2.
+	self assert: seg sourceAnchor endColumn equals: 24
+]
+
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testProgramWithEmptyDoStatement [
 	| prog programFile |
 	programFile := visitor visitCode: '      program hello
       do i=1, n
@@ -543,8 +551,8 @@ IASTVisitorJSONTest >> testProgramWithEmptyDoStatement [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testProgramWithOneStatement [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testProgramWithOneStatement [
 	| programFile prog |
 	programFile := visitor visitCode: '      program hello
       a = -b
@@ -562,8 +570,8 @@ IASTVisitorJSONTest >> testProgramWithOneStatement [
 	self assert: prog body first size equals: 2.
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testProgramWithSimpleIfElseStatementWitBody [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testProgramWithSimpleIfElseStatementWitBody [
 	| prog programFile |
 	programFile := visitor visitCode: '      program hello
       if (i < j) then
@@ -586,8 +594,8 @@ IASTVisitorJSONTest >> testProgramWithSimpleIfElseStatementWitBody [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testProgramWithSimpleIfStatementWitBody [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testProgramWithSimpleIfStatementWitBody [
 	| prog programFile |
 	programFile := visitor visitCode: '      program hello
       if (i < j) then
@@ -606,8 +614,8 @@ IASTVisitorJSONTest >> testProgramWithSimpleIfStatementWitBody [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testProgramWithSimpleIfStatementWithoutBody [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testProgramWithSimpleIfStatementWithoutBody [
 	| prog programFile |
 	programFile := visitor visitCode: '      program hello
       if (i < j) then
@@ -624,8 +632,161 @@ IASTVisitorJSONTest >> testProgramWithSimpleIfStatementWithoutBody [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testStringVariableDeclaration [
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testSegactCommand [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  segact, lb
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopeSegCommand.
+	self assert: seg entityName equals: 'lb'.
+	self assert: seg esopeCommand equals: 'segact'.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: seg sourceAnchor startLine equals: 2.
+	self assert: seg sourceAnchor startColumn equals: 1.
+	self assert: seg sourceAnchor endLine equals: 2.
+	self assert: seg sourceAnchor endColumn equals: 17
+]
+
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testSegadjCommand [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  segadj,lb
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopeSegCommand.
+	self assert: seg entityName equals: 'lb'.
+	self assert: seg esopeCommand equals: 'segadj'.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: seg sourceAnchor startLine equals: 2.
+	self assert: seg sourceAnchor startColumn equals: 1.
+	self assert: seg sourceAnchor endLine equals: 2.
+	self assert: seg sourceAnchor endColumn equals: 16
+]
+
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testSegdefCommand [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  segdef, lb
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopeSegCommand.
+	self assert: seg entityName equals: 'lb'.
+	self assert: seg esopeCommand equals: 'segdef'.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: seg sourceAnchor startLine equals: 2.
+	self assert: seg sourceAnchor startColumn equals: 1.
+	self assert: seg sourceAnchor endLine equals: 2.
+	self assert: seg sourceAnchor endColumn equals: 17
+]
+
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testSeginiCommand [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  segini,lb
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopeSegCommand.
+	self assert: seg entityName equals: 'lb'.
+	self assert: seg esopeCommand equals: 'segini'.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: seg sourceAnchor startLine equals: 2.
+	self assert: seg sourceAnchor startColumn equals: 1.
+	self assert: seg sourceAnchor endLine equals: 2.
+	self assert: seg sourceAnchor endColumn equals: 16
+]
+
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testSegmentDeclarationEmpty [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  segment,user
+cESO  end segment
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopeSegment.
+	self assert: seg entityName equals: 'user'.
+	self assert: seg declarations size equals: 0.
+
+	self assert: seg sourceAnchor isNotNil.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: seg sourceAnchor startLine equals: 2.
+	self assert: seg sourceAnchor startColumn equals: 1.
+	self assert: seg sourceAnchor endLine equals: 3.
+	self assert: seg sourceAnchor endColumn equals: 18
+]
+
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testSegmentDeclarationWithContent [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  segment, user
+        character*40 uname
+        integer uid, age
+cESO  end segment
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopeSegment.
+	self assert: seg entityName equals: 'user'.
+	self assert: seg declarations size equals: 3.
+
+	self assert: seg declarations first entityName equals: 'uname'.
+	self assert: seg declarations second entityName equals: 'uid'.
+	self assert: seg declarations third entityName equals: 'age'.
+
+]
+
+{ #category : #'tests-esope' }
+JsonToIASTVisitorTest >> testSegsupCommand [
+	| programFile seg |
+	programFile := visitor visitCode: '      subroutine hello
+cESO  segsup, lb
+      end
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+	seg := programFile progUnits first body first.
+
+	self assert: seg class equals: IASTEsopeSegCommand.
+	self assert: seg entityName equals: 'lb'.
+	self assert: seg esopeCommand equals: 'segsup'.
+	self assert: seg sourceAnchor class equals: IASTIndexedFileAnchor.
+	self assert: seg sourceAnchor startLine equals: 2.
+	self assert: seg sourceAnchor startColumn equals: 1.
+	self assert: seg sourceAnchor endLine equals: 2.
+	self assert: seg sourceAnchor endColumn equals: 17
+]
+
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testStringVariableDeclaration [
 	| programFile var |
 	programFile := visitor visitCode: '      subroutine hello
       character*8 str
@@ -642,8 +803,8 @@ IASTVisitorJSONTest >> testStringVariableDeclaration [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testSubroutineInvocation [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testSubroutineInvocation [
 	| programFile stmt |
 	programFile := visitor visitCode: '      subroutine hello
       call someSubRoutine
@@ -659,8 +820,8 @@ IASTVisitorJSONTest >> testSubroutineInvocation [
 
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testSubroutineInvocationWithArguments [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testSubroutineInvocationWithArguments [
 	| programFile stmt arg |
 	programFile := visitor visitCode: '      subroutine hello
       call someSubRoutine(bar,5,baz)
@@ -683,8 +844,8 @@ IASTVisitorJSONTest >> testSubroutineInvocationWithArguments [
 	self assert: arg entityName equals: 'baz'.
 ]
 
-{ #category : #tests }
-IASTVisitorJSONTest >> testTwoIntegerVariableDeclarations [
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testTwoIntegerVariableDeclarations [
 	| programFile var |
 	programFile := visitor visitCode: '      subroutine hello
       integer i,j

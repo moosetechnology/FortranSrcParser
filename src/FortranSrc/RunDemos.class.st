@@ -129,23 +129,21 @@ RunDemos class >> runRelbk [
 RunDemos class >> runner: anEsopeSourceCode [
 
 	<script>
-	| rewriter parser ir irModel visitorForIr famixModel |
+	| rewriter defVisitor iast   jsonVisitor refVisitor |
 	rewriter := PPEsopeRewriter new.
 	rewriter parse: anEsopeSourceCode.
 
-	parser := PP2FortranSrcParser new.
-	ir := parser parse: rewriter output.
+	jsonVisitor := JsonToIASTVisitor new.
+   jsonVisitor visitCode: rewriter output.
+	iast := jsonVisitor visitCode:  rewriter output.
 
-	irModel := parser model.
-
-	visitorForIr := IASTVisitorToFamixDef new.
-	visitorForIr model
+	defVisitor := IASTToFamixVisitor new.
+	defVisitor model
 		rootFolder: FileSystem workingDirectory;
 		name: 'mooseModelF77-' , self counter asString.
+	refVisitor := FamixFortran77SRVisitor newFrom: defVisitor model.
 
-	irModel do: [ :cu | cu accept: visitorForIr ].
+	(iast accept: defVisitor) accept: refVisitor.
 
-	famixModel := visitorForIr model.
-
-	visitorForIr model inspect
+	refVisitor model inspect
 ]

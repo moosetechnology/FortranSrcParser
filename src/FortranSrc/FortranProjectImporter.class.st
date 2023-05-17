@@ -68,6 +68,7 @@ FortranProjectImporter >> annotatedFortranFiles [
 FortranProjectImporter >> astJSON: sourceCode [
 
 	| filename option |
+
 	option := 'serialize -t json -v77l encode'.
 	filename := './fortran77.f'.
 	filename asFileReference writeStreamDo: [ :stream | 
@@ -128,7 +129,7 @@ FortranProjectImporter >> esopeFiles [
 { #category : #fast }
 FortranProjectImporter >> fortranSrcPath [
 
-	^ '/home/anquetil/.cabal/bin/fortran-src-extras'
+	^ 'fortran-src-extras'
 ]
 
 { #category : #initialization }

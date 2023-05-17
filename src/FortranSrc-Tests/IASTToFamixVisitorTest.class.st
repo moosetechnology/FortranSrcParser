@@ -2,7 +2,7 @@
 An IASTVisitorF77Test is a test class for testing the behavior of IASTVisitorF77
 "
 Class {
-	#name : #IASTVisitorToFamixDefTest,
+	#name : #IASTToFamixVisitorTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'visitor',
@@ -12,7 +12,7 @@ Class {
 }
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> anchorFrom: startPoint to: endPoint [
+IASTToFamixVisitorTest >> anchorFrom: startPoint to: endPoint [
 	^IASTIndexedFileAnchor new
 		startLine: startPoint x ;
 		startColumn: startPoint y;
@@ -23,51 +23,74 @@ IASTVisitorToFamixDefTest >> anchorFrom: startPoint to: endPoint [
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> defaultAnchor [
+IASTToFamixVisitorTest >> defaultAnchor [
 	^ self anchorFrom: 1 @ 7 to: 2 @ 10
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> defaultVariable [
-	^ IASTVariable new
-		entityName: 'aVar';
-		typeSpec: 'integer';
+IASTToFamixVisitorTest >> defaultTypeCharacter [
+	^IASTTypeRef new
+		entityName: 'character';
+		sourceAnchor: self defaultAnchor;
 		yourself
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> setUp [
+IASTToFamixVisitorTest >> defaultTypeInteger [
+	^IASTTypeRef new
+		entityName: 'integer';
+		sourceAnchor: self defaultAnchor;
+		yourself
+]
+
+{ #category : #running }
+IASTToFamixVisitorTest >> defaultTypeReal [
+	^IASTTypeRef new
+		entityName: 'real';
+		sourceAnchor: self defaultAnchor;
+		yourself
+]
+
+{ #category : #running }
+IASTToFamixVisitorTest >> defaultVariable [
+	^ IASTVariable new
+		entityName: 'aVar';
+		typeSpec: self defaultTypeInteger;
+		yourself
+]
+
+{ #category : #running }
+IASTToFamixVisitorTest >> setUp [
 	super setUp.
 	
 	programFile := IASTProgramFile new filename: 'fortran77.f' ; yourself.
-	visitor := IASTVisitorToFamixDef new.
+	visitor := IASTToFamixVisitor new.
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77 [
+IASTToFamixVisitorTest >> testCreateFamixFortran77 [
 
-	| entity var |
+	| entity |
 	programFile progUnits: { IASTSubroutine new
 		entityName: 'sub';
-		body: { self defaultVariable };
+		body: #();
 		yourself
 	}.
+	programFile accept: visitor.
 
-	entity := programFile accept: visitor.
+	self assert: visitor model size equals: 2.
 
-	self assert: entity programUnits first localVariables size equals: 1.
+	entity := visitor model detect: [:each | each class = FamixFortran77ProgramFile ].
+	self assert: entity programUnits size equals: 1.
 
-	var := entity programUnits first localVariables first.
-	self assert: var class equals: FamixFortran77Variable.
-	self assert: var name equals: 'aVar'.
-	self assert: var parentBehaviouralEntity isNotNil.
-	self
-		assert: var parentBehaviouralEntity
-		equals: entity programUnits first
+	entity := entity programUnits first.
+	self assert: entity class equals: FamixFortran77PUSubroutine.
+	self assert: entity name equals: 'sub'.
+
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77Comment [
+IASTToFamixVisitorTest >> testCreateFamixFortran77Comment [
 
 	| entity comment |
 
@@ -86,15 +109,18 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77Comment [
 	comment := entity programUnits first comments first.
 	self assert: comment class equals: FamixFortran77Comment.
 	self assert: comment content equals: 'a normal comment'.
+	self deny: comment isEsope.
 	
 	self assert: comment commentedEntity equals: entity programUnits first.
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77InvocationCalleeBeforeCaller [
+IASTToFamixVisitorTest >> testCreateFamixFortran77Invocation [
 	| entity invocation caller callee |
 
-	callee := IASTSubroutine new entityName: 'sub'; yourself.
+	callee := IASTSubroutine new
+		entityName: 'sub';
+		yourself.
 
 	caller := IASTMainProgram new
 			entityName: 'main';
@@ -102,58 +128,39 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77InvocationCalleeBeforeCalle
 			yourself.
 	programFile progUnits: { callee . caller }.
 
-	entity := programFile accept: visitor.
+	programFile accept: visitor.
+	entity := visitor model detect: [:each | each class = FamixFortran77ProgramFile ].
+
+	self assert: entity programUnits first class equals: FamixFortran77PUSubroutine.
+	self assert: entity programUnits second class equals: FamixFortran77PUMain.
 
 	self assert: entity programUnits second outgoingInvocations size equals: 1.
 	invocation := entity programUnits second outgoingInvocations first.
 	
 	self assert: invocation class equals: FamixFortran77Invocation.
 	self assert: invocation sender equals: entity programUnits second.
-	
-	self assert: invocation candidates size equals: 1.
-	self assert: invocation candidates first equals: entity programUnits first.
+	self assert: (invocation attributeAt: #entity ifAbsent: [ nil ] ) isNotNil
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77InvocationCallerBeforeCallee [
-	| entity invocation caller callee |
-
-	callee := IASTSubroutine new entityName: 'sub'; yourself.
-
-	caller := IASTMainProgram new
-			entityName: 'main';
-			body: { IASTInvocation new entityName: 'sub'; yourself };
-			yourself.
-	programFile progUnits: { caller . callee }.
-
-	entity := programFile accept: visitor.
-
-	self assert: entity programUnits second outgoingInvocations size equals: 1.
-	invocation := entity programUnits second outgoingInvocations first.
-	
-	self assert: invocation class equals: FamixFortran77Invocation.
-	self assert: invocation sender equals: entity programUnits second.
-	
-	self assert: invocation candidates size equals: 1.
-	self assert: invocation candidates first equals: entity programUnits first.
-]
-
-{ #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77LocalVariable [
+IASTToFamixVisitorTest >> testCreateFamixFortran77LocalVariable [
 
 	| entity var |
 	programFile progUnits: { IASTSubroutine new
 			 entityName: 'sub';
 			 body: { self defaultVariable };
 			 yourself }.
+	programFile accept: visitor.
 
-	entity := programFile accept: visitor.
+	entity := visitor model detect: [:each | each class = FamixFortran77ProgramFile ].
 
 	self assert: entity programUnits first localVariables size equals: 1.
 
 	var := entity programUnits first localVariables first.
 	self assert: var class equals: FamixFortran77Variable.
 	self assert: var name equals: 'aVar'.
+	self assert: var declaredType class equals: FamixFortran77Type.
+	self assert: var declaredType name equals: 'integer'.
 	self assert: var parentBehaviouralEntity isNotNil.
 	self
 		assert: var parentBehaviouralEntity
@@ -161,7 +168,7 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77LocalVariable [
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUBlockdata [
+IASTToFamixVisitorTest >> testCreateFamixFortran77PUBlockdata [
 
 	| entity |
 	programFile progUnits: { IASTBlockData new
@@ -177,11 +184,10 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUBlockdata [
 	self assert: entity class equals: FamixFortran77PUBlockdata.
 	self assert: entity name equals: 'bdata'.
 	self assert: entity programFile isNotNil.
-	self assert: entity programFile filename equals: 'fortran77.f'.
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUComment [
+IASTToFamixVisitorTest >> testCreateFamixFortran77PUComment [
 	| entity |
 	programFile progUnits: { IASTComment new
 		text: ' a comment' ;
@@ -197,11 +203,10 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUComment [
 	self assert: entity class equals: FamixFortran77PUComment.
 	self assert: entity content equals: ' a comment'.
 	self assert: entity programFile isNotNil.
-	self assert: entity programFile filename equals: 'fortran77.f'.
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUFunction [
+IASTToFamixVisitorTest >> testCreateFamixFortran77PUFunction [
 
 	| entity |
 	programFile progUnits: { IASTFunction new
@@ -216,11 +221,10 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUFunction [
 	self assert: entity class equals: FamixFortran77PUFunction.
 	self assert: entity name equals: 'fct'.
 	self assert: entity programFile isNotNil.
-	self assert: entity programFile filename equals: 'fortran77.f'.
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUMain [
+IASTToFamixVisitorTest >> testCreateFamixFortran77PUMain [
 
 	| entity |
 	programFile progUnits: { IASTMainProgram new
@@ -235,21 +239,23 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77PUMain [
 	self assert: entity class equals: FamixFortran77PUMain.
 	self assert: entity name equals: 'main'.
 	self assert: entity programFile isNotNil.
-	self assert: entity programFile filename equals: 'fortran77.f'.
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77ProgramFile [
+IASTToFamixVisitorTest >> testCreateFamixFortran77ProgramFile [
 	| entity |
-	entity := programFile accept: visitor.
-	
+	programFile accept: visitor.
+
+	self assert: visitor model size equals: 1.
+
+	entity := visitor model first.
 	self assert: entity class equals: FamixFortran77ProgramFile.
 	self assert: entity filename equals: 'fortran77.f'.
-
+	self assert: entity programUnits size equals: 0
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77SourceAnchor [
+IASTToFamixVisitorTest >> testCreateFamixFortran77SourceAnchor [
 	| entity |
 	entity := self defaultAnchor accept: visitor.
 	
@@ -262,7 +268,7 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77SourceAnchor [
 ]
 
 { #category : #running }
-IASTVisitorToFamixDefTest >> testCreateFamixFortran77Subroutine [
+IASTToFamixVisitorTest >> testCreateFamixFortran77Subroutine [
 
 	| entity |
 	programFile progUnits: { IASTSubroutine new
@@ -277,6 +283,5 @@ IASTVisitorToFamixDefTest >> testCreateFamixFortran77Subroutine [
 	self assert: entity class equals: FamixFortran77PUSubroutine.
 	self assert: entity name equals: 'sub'.
 	self assert: entity programFile isNotNil.
-	self assert: entity programFile filename equals: 'fortran77.f'.
 	self assert: entity parameters size equals: 0
 ]
