@@ -36,16 +36,6 @@ FamixFortran77SRVisitor >> defaultImplicitTyping: firstLetter [
 		  ifFalse: [ #TypeReal ]
 ]
 
-{ #category : #'reflective operations' }
-FamixFortran77SRVisitor >> doesNotUnderstandTmp: aMessage [
-	| code |
-	(aMessage selector beginsWith: 'visit') ifFalse: [ ^ self ].
-	code := aMessage selector asString , ' aFamixF77Entity
-	self flag: #TODO.
-	self shouldBeImplemented'.
-	self class compile: code classified: 'visiting'
-]
-
 { #category : #'private - utility' }
 FamixFortran77SRVisitor >> findEntity: anEntity forType: aType [
 	^((self model allWithSubTypesOf:  aType) select: [ :each |
