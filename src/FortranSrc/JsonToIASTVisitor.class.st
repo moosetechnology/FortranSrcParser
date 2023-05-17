@@ -375,18 +375,17 @@ JsonToIASTVisitor >> visitValue: aValueNode [
 JsonToIASTVisitor >> visitVariable: aVariableNode [
 	| data |
 	data := super visitVariable: aVariableNode.
-
+	self flag: #FIXME. "Adding sourceAnchor ? "
 	^IASTVarAccess new
 		isWrite: false ;
 		entityName: data ;
 		yourself
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 JsonToIASTVisitor >> visitWriteStatement: aWriteStatementNode [
 	| data |
 	data := super visitWriteStatement: aWriteStatementNode.
-	self flag: #FIXME. "Write is not an invocation"
 
 	^{ IASTInvocation new
 		sourceAnchor: (self makeIndexedAnchor: data first) ;

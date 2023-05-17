@@ -260,14 +260,15 @@ IASTToFamixVisitor >> visitIASTProgramFile: aProgramFile [
 	| progFile |
 	self f77sourcefile: aProgramFile filename.
 	progFile := (self newEntity: FamixFortran77ProgramFile)
-		            filename: aProgramFile filename;
-		            version: aProgramFile version;
-		            name: (self class getBasename: aProgramFile filename);
-		            yourself.
+		filename: aProgramFile filename;
+		name: aProgramFile filename;
+		yourself.
+
 	stack push: progFile.
-	"process the programunits inside of this file"
+
 	aProgramFile progUnits do: [ :progUnit | 
 		progFile addProgramUnit: (progUnit accept: self) ].
+
 	stack pop.
 	^progFile
 ]
@@ -294,6 +295,7 @@ IASTToFamixVisitor >> visitIASTProgramUnit: aProgramUnit toFamix: aFamixFortranC
 	
 	aProgramUnit localComments do: [ :comment | 
 		progUnit addComment: (comment accept: self) ].
+
 	stack pop.
 	^ progUnit
 ]
@@ -313,18 +315,16 @@ IASTToFamixVisitor >> visitIASTSubroutine: aSubroutine [
 { #category : #visiting }
 IASTToFamixVisitor >> visitIASTTypeRef: aType [
 
-	| type |
 	self flag: #TODO. "How to deal with length and kind for example character*20 name produce aType object like:
 	- sourceAnchor: ...
 	- entityName: TypeCharacter
 	- kind: nil"
-	type := (self newEntity: FamixFortran77FType)
-		        sourceAnchor: (self visitIndexedFileAnchor: aType sourceAnchor);
-		        name: aType entityName;
-		        length: aType length;
-		        kind: aType kind;
-		        yourself.
-	^ type
+	^(self newEntity: FamixFortran77FType)
+		sourceAnchor: (self visitIndexedFileAnchor: aType sourceAnchor);
+		name: aType entityName;
+		length: aType length;
+		kind: aType kind;
+		yourself
 ]
 
 { #category : #visiting }
@@ -333,9 +333,10 @@ IASTToFamixVisitor >> visitIASTVarAccess: aVarAccess [
 	| access target |
 	self flag: #TODO. "refactoring and other"
 	access := (self newEntity: FamixFortran77Access)
-		          sourceAnchor: (self visitIndexedFileAnchor: aVarAccess sourceAnchor);
-		          isWrite: aVarAccess isWrite;
-		          yourself.
+		sourceAnchor: (self visitIndexedFileAnchor: aVarAccess sourceAnchor);
+		attributeAt: #entity put: aVarAccess;
+		isWrite: aVarAccess isWrite;
+		yourself.
 	target := self searchInLocalSymbolTable: aVarAccess entityName.
 	target
 		ifNil: [ 
@@ -343,9 +344,7 @@ IASTToFamixVisitor >> visitIASTVarAccess: aVarAccess [
 			var := (self newEntity: FamixFortran77Variable)
 				       name: aVarAccess entityName;
 				       fType: ((self newEntity: FamixFortran77FType)
-						        name:
-							        (self defaultImplicitTyping:
-									         aVarAccess entityName first);
+						        name: (self defaultImplicitTyping: aVarAccess entityName first);
 						        yourself);
 				       yourself.
 			access target: var ]
