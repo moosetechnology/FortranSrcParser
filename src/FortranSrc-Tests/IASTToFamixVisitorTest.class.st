@@ -139,7 +139,7 @@ IASTToFamixVisitorTest >> testCreateFamixFortran77Invocation [
 	
 	self assert: invocation class equals: FamixFortran77Invocation.
 	self assert: invocation sender equals: entity programUnits second.
-	self assert: (invocation attributeAt: #iast ifAbsent: [ nil ] ) isNotNil
+	self assert: (invocation attributeAt: #entity ifAbsent: [ nil ] ) isNotNil
 ]
 
 { #category : #running }
