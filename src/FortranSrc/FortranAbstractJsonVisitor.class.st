@@ -384,10 +384,9 @@ FortranAbstractJsonVisitor >> visitExpression: aExpressionNode [
 	^self visitJsonElement: aExpressionNode
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitExternalStatement: anExternalStatementNode [
-	self flag: #TODO.
-	^nil
+	^self visitJsonMap: anExternalStatementNode keys: #(span vars)
 ]
 
 { #category : #'visiting expression' }
@@ -835,6 +834,13 @@ FortranAbstractJsonVisitor >> visitVariable: aVariableNode [
 { #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitVariableName: aString [
 	^aString
+]
+
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitVars: anExternalStatementVarList [
+	"ignoring 'span' here"
+
+	^self visitJsonArray: (anExternalStatementVarList at: 'list')
 ]
 
 { #category : #'visiting statement' }
