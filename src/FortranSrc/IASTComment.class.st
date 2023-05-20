@@ -22,6 +22,12 @@ IASTComment >> initialize [
 ]
 
 { #category : #accessing }
+IASTComment >> isEsope [
+
+	^ text beginsWith: 'eso' caseSensitive: false 
+]
+
+{ #category : #accessing }
 IASTComment >> isProgUnit [
 
 	^ isProgUnit

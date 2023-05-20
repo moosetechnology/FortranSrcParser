@@ -12,11 +12,7 @@ Class {
 
 { #category : #accessing }
 IASTProgramUnit >> accesses [
-
-	^ body
-		  ifNil: [ #(  ) ]
-		  ifNotNil: [ 
-		  body flattened select: [ :entity | entity class = IASTVarAccess ] ]
+	^self filterBodyWith: [ :entity | entity class = IASTVarAccess ]
 ]
 
 { #category : #accessing }
@@ -45,8 +41,7 @@ IASTProgramUnit >> body: anObject [
 
 { #category : #accessing }
 IASTProgramUnit >> comments [
-
-	^ self localComments 
+	^self localComments 
 ]
 
 { #category : #accessing }
@@ -59,6 +54,13 @@ IASTProgramUnit >> entityName [
 IASTProgramUnit >> entityName: anObject [
 
 	entityName := anObject
+]
+
+{ #category : #accessing }
+IASTProgramUnit >> filterBodyWith: aFilterBlock [
+	^body
+		  ifNil:    [ #( ) ]
+		  ifNotNil: [ body flattened select: aFilterBlock ]
 ]
 
 { #category : #accessing }
@@ -75,27 +77,15 @@ IASTProgramUnit >> implicits: anObject [
 
 { #category : #accessing }
 IASTProgramUnit >> invocations [
-
-	^ body
-		  ifNil: [ #(  ) ]
-		  ifNotNil: [ 
-		  body flattened select: [ :entity | entity class = IASTInvocation ] ]
+	^self filterBodyWith: [ :entity | entity class = IASTInvocation ]
 ]
 
 { #category : #accessing }
 IASTProgramUnit >> localComments [
-
-	^ body
-		  ifNil: [ #(  ) ]
-		  ifNotNil: [ 
-		  body flattened select: [ :entity | entity class = IASTComment ] ]
+	^self filterBodyWith: [ :entity | entity class = IASTComment ]
 ]
 
 { #category : #accessing }
 IASTProgramUnit >> localVariables [
-
-	^ body
-		  ifNil: [ #(  ) ]
-		  ifNotNil: [ 
-		  body flattened select: [ :entity | entity class = IASTVariable ] ]
+	^self filterBodyWith: [ :entity | entity class = IASTVariable ]
 ]
