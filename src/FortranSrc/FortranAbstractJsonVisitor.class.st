@@ -707,10 +707,9 @@ FortranAbstractJsonVisitor >> visitRealLiteralValue: aRealLiteralValueNode [
 	^nil
 ]
 
-{ #category : #visiting }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitReturnStatement: aReturnStatementNode [
-	self flag: #TODO.
-	^nil
+	^self visitJsonMap: aReturnStatementNode keys: #(span target)
 ]
 
 { #category : #'visiting statement' }
