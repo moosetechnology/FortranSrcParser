@@ -467,8 +467,7 @@ FortranAbstractJsonVisitor >> visitFunction_call: aFunctionCallNode [
 { #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitGotoStatement: aGotoStatementNode [
 
-	"so far only unconditional case is processed"
-	self flag: #TODO.
+	^self visitJsonMap: aGotoStatementNode keys: #(span target)
 ]
 
 { #category : #'visiting expression' }
