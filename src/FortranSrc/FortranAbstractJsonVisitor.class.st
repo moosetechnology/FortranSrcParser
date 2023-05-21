@@ -380,6 +380,9 @@ FortranAbstractJsonVisitor >> visitExponentiation: aExponentiationOperatorNode [
 
 { #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitExpr: anExprNode [
+	"Typically a node contains a key 'expr' with value a dictionary containing a tag 'expr'
+	 therefore a 1st #visitExpr: will end up calling a 2nd #visitExpr:
+	 the 1st executes #ifTrue:, the 2nd executes #ifFalse:"
 	^(anExprNode includesKey: 'tag')
 		ifTrue: [ self visitJsonTaggedElement: anExprNode ]
 		ifFalse: [ self visitJsonElement: (anExprNode at: 'contents') ]
@@ -489,6 +492,19 @@ FortranAbstractJsonVisitor >> visitImplicitStatement: anImplicitstatementNode [
 { #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitIncrement: anIncrementNode [
 	^self visitJsonElement: anIncrementNode
+]
+
+{ #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitIndex: anArrayIndexNode [
+
+	^self visitJsonElement: anArrayIndexNode
+
+]
+
+{ #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitIndices: anArrayIndicesNode [
+	^self visitJsonArray: (anArrayIndicesNode at: 'list')
+
 ]
 
 { #category : #'visiting statement' }
@@ -736,6 +752,12 @@ FortranAbstractJsonVisitor >> visitSignificand: aRealLiteralSignificandNode [
 	^aRealLiteralSignificandNode
 ]
 
+{ #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitSingle: anArraySingleIndexNode [
+	^self visitJsonMap: anArraySingleIndexNode keys: #(span index)
+
+]
+
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitSpan: aSpanString [
 	"converts aSpanString (1:2)-(3:4) into two points {1@2 . 3@4}"
@@ -743,7 +765,7 @@ FortranAbstractJsonVisitor >> visitSpan: aSpanString [
 	| one two three four colon dash |
 	colon := aSpanString indexOf: $:.
 	one := aSpanString copyFrom: 2 to: colon-1.
-	
+
 	dash := aSpanString indexOf: $-.
 	two := aSpanString copyFrom: colon+1 to: dash-2.
 	
@@ -751,7 +773,7 @@ FortranAbstractJsonVisitor >> visitSpan: aSpanString [
 	three := aSpanString copyFrom: dash+2 to: colon-1.
 	
 	four := aSpanString copyFrom: colon+1 to: aSpanString size-1.
-	
+
 	^ {one asInteger @ two asInteger .
 		three asInteger @ (four asInteger + 1) }
 ]
@@ -794,6 +816,13 @@ FortranAbstractJsonVisitor >> visitSubprograms: aNode [
 { #category : #'visiting prog-unit' }
 FortranAbstractJsonVisitor >> visitSubroutine: aSubroutineNode [
 	^self visitJsonMap: aSubroutineNode keys: #(span name arguments blocks)
+]
+
+{ #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitSubscript: aSubscriptNode [
+
+	^self visitJsonMap: aSubscriptNode keys: #(span expression indices)
+
 ]
 
 { #category : #'visiting expression' }
