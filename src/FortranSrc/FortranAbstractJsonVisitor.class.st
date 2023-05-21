@@ -363,8 +363,7 @@ FortranAbstractJsonVisitor >> visitEsopeSegsupComment: anEsopeCommentNode [
 
 { #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitExitStatement: anExitNode [
-	self flag: #TODO.
-	^nil
+	^self visitJsonMap: anExitNode keys: #(span var)
 ]
 
 { #category : #'visiting expression' }
@@ -867,6 +866,12 @@ FortranAbstractJsonVisitor >> visitUnary: aUnaryNode [
 FortranAbstractJsonVisitor >> visitValue: aValueNode [
 	^{ self visitSpan: (aValueNode at: 'span') .
 	 self visitJsonTaggedElement: (aValueNode at: 'value') }
+]
+
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitVar: anExittatementVarNode [
+	self flag: #TODO.
+	^nil
 ]
 
 { #category : #'visiting expression' }
