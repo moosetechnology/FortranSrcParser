@@ -362,7 +362,7 @@ FortranAbstractJsonVisitor >> visitEsopeSegsupComment: anEsopeCommentNode [
 ]
 
 { #category : #'visiting statement' }
-FortranAbstractJsonVisitor >> visitExitStatement: aExitNode [
+FortranAbstractJsonVisitor >> visitExitStatement: anExitNode [
 	self flag: #TODO.
 	^nil
 ]
@@ -448,9 +448,9 @@ FortranAbstractJsonVisitor >> visitFunctionCalledName: aString [
 FortranAbstractJsonVisitor >> visitFunctionStatement: aFunctionStatementNode [
 	"'name' is an object, not a string so, cannot call #visitName: on it"
 	^{ self visitSpan: (aFunctionStatementNode at: 'span') .
-	 self visitJsonElement: (aFunctionStatementNode at: 'name') .
-	 self visitArguments: (aFunctionStatementNode at: 'arguments') .
-	 self visitBody: (aFunctionStatementNode at: 'body') }
+	 self visitJsonElement: (aFunctionStatementNode at: 'name') }
+	,
+	(self visitJsonMap: aFunctionStatementNode keys:  #(arguments body))
 ]
 
 { #category : #'visiting prog-unit' }
@@ -462,6 +462,13 @@ FortranAbstractJsonVisitor >> visitFunctionWithBlocks: aFunctionNode [
 FortranAbstractJsonVisitor >> visitFunction_call: aFunctionCallNode [
 
 	^self visitCallStatement: aFunctionCallNode
+]
+
+{ #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitGotoStatement: aGotoStatementNode [
+
+	"so far only unconditional case is processed"
+	self flag: #TODO.
 ]
 
 { #category : #'visiting expression' }
@@ -653,8 +660,8 @@ FortranAbstractJsonVisitor >> visitLt: aLessthanOperatorNode [
 ]
 
 { #category : #'visiting prog-unit' }
-FortranAbstractJsonVisitor >> visitMain: aProgramNode [
-	^self visitJsonMap: aProgramNode keys: #(span name blocks subprograms)
+FortranAbstractJsonVisitor >> visitMain: aMainProgramNode [
+	^self visitJsonMap: aMainProgramNode keys: #(span name blocks subprograms)
 ]
 
 { #category : #'visiting statement' }
