@@ -368,6 +368,12 @@ FortranAbstractJsonVisitor >> visitExitStatement: aExitNode [
 ]
 
 { #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitExponent: aRealLiteralExponentNode [
+	self flag: #TODO.
+	^nil
+]
+
+{ #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitExponentiation: aExponentiationOperatorNode [
 	^'exponentiation'
 ]
@@ -492,7 +498,7 @@ FortranAbstractJsonVisitor >> visitInitial: anInitialNode [
 
 { #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitInteger: anIntegerNode [
-	"for clarity Integer nodes are 'transformed' in IntegerLiteralValue nodes"
+	"to be more explicit, Integer nodes are 'transformed' in IntegerLiteralValue nodes"
 	^self visitIntegerLiteralValue: (anIntegerNode at: 'contents')
 ]
 
@@ -607,7 +613,7 @@ FortranAbstractJsonVisitor >> visitList: aListNode [
 
 { #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitLogical: aLogicalNode [
-	"for clarity Logical nodes are 'transformed' in LogicalLiteralValue nodes"
+	"to be more explicit, Logical nodes are 'transformed' in LogicalLiteralValue nodes"
 	^self visitLogicalLiteralValue: (aLogicalNode at: 'contents')
 ]
 
@@ -619,7 +625,7 @@ FortranAbstractJsonVisitor >> visitLogicalBaseType: aString [
 
 { #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitLogicalLiteralValue: aString [
-	"for clarity we create #visitTrueLiteralValue: and #visitFalseLiteralValue:"
+	"to be more explicit, we create #visitTrueLiteralValue: and #visitFalseLiteralValue:"
 	^(aString = 'true')
 		ifTrue: [ self visitTrueLiteralValue: aString ]
 		ifFalse: [ self visitFalseLiteralValue: aString ]
@@ -690,7 +696,7 @@ FortranAbstractJsonVisitor >> visitProgram_units: aNode [
 
 { #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitReal: aRealNode [
-	"for clarity Real nodes are 'transformed' in RealLiteralValue nodes"
+	"to be more explicit, Real nodes are 'transformed' in RealLiteralValue nodes"
 	^self visitRealLiteralValue: (aRealNode at: 'contents')
 ]
 
@@ -702,9 +708,7 @@ FortranAbstractJsonVisitor >> visitRealBaseType: aString [
 
 { #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitRealLiteralValue: aRealLiteralValueNode [
-	self flag: #TODO.
-
-	^nil
+	^self visitJsonMap: aRealLiteralValueNode first keys: #(exponent significand)
 ]
 
 { #category : #'visiting statement' }
@@ -725,6 +729,11 @@ FortranAbstractJsonVisitor >> visitRight: aRightNode [
 { #category : #visiting }
 FortranAbstractJsonVisitor >> visitSelector: anObject [
 	^nil
+]
+
+{ #category : #'visiting expression' }
+FortranAbstractJsonVisitor >> visitSignificand: aRealLiteralSignificandNode [
+	^aRealLiteralSignificandNode
 ]
 
 { #category : #visiting }
@@ -767,14 +776,14 @@ FortranAbstractJsonVisitor >> visitStopStatement: aStopStatementNode [
 ]
 
 { #category : #'visiting expression' }
-FortranAbstractJsonVisitor >> visitString: aString [
-	"for clarity String nodes are 'transformed' in StringLiteralValue nodes"
-	^self visitStringLiteralValue: aString
+FortranAbstractJsonVisitor >> visitString: aStringLiteralNode [
+	"to be more explicit, String nodes are 'transformed' in StringLiteralValue nodes"
+	^self visitStringLiteralValue: aStringLiteralNode
 ]
 
 { #category : #'visiting expression' }
-FortranAbstractJsonVisitor >> visitStringLiteralValue: aString [
-	^aString
+FortranAbstractJsonVisitor >> visitStringLiteralValue: aStringLiteralNode [
+	^aStringLiteralNode at: 'contents'
 ]
 
 { #category : #'visiting prog-unit' }
