@@ -514,6 +514,7 @@ FortranAbstractJsonVisitor >> visitIndices: anArrayIndicesNode [
 
 { #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitInitial: anInitialNode [
+	"DO statement initialization, a tagged JSon entity that will redirect to #visitAssign_expression:"
 	^self visitJsonElement: anInitialNode
 ]
 
