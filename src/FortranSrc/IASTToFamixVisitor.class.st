@@ -319,7 +319,7 @@ IASTToFamixVisitor >> visitIASTTypeRef: aType [
 	- sourceAnchor: ...
 	- entityName: TypeCharacter
 	- kind: nil"
-	^(self newEntity: FamixFortran77FType)
+	^(self newEntity: FamixFortran77Type)
 		sourceAnchor: (self visitIndexedFileAnchor: aType sourceAnchor);
 		name: aType entityName;
 		length: aType length;
