@@ -65,6 +65,13 @@ FamixFortran77SRVisitor >> model: anObject [
 	model := anObject
 ]
 
+{ #category : #visiting }
+FamixFortran77SRVisitor >> newEntity: aFamixClass [
+	^aFamixClass new
+		mooseModel: model;
+		yourself
+]
+
 { #category : #'symbols resolution' }
 FamixFortran77SRVisitor >> resolve [
 
@@ -77,8 +84,22 @@ FamixFortran77SRVisitor >> resolve [
 
 { #category : #visiting }
 FamixFortran77SRVisitor >> resolveAccess: anAccess [
-	anAccess target: (self retrieveVariable:
-		(anAccess attributeAt: #entity ifAbsent: [ nil ]))
+	| target varAcceded |
+	self flag: #FIXME. "how to build sourceAnchor for newly created var?"
+	varAcceded := anAccess attributeAt: #entity ifAbsent: [ nil ].
+	target := self retrieveVariable: varAcceded.
+	target
+		ifNil: [ 
+			| var |
+			var := ((self newEntity: FamixFortran77Variable)
+				name: varAcceded entityName;
+				declaredType: ((self newEntity: FamixFortran77Type)
+					name: (self defaultImplicitTyping: varAcceded entityName first);
+					yourself);
+				yourself).
+			anAccess accessor addLocalVariable: var.
+			anAccess target: var ]
+		ifNotNil: [ anAccess target: target ]
 ]
 
 { #category : #'symbols resolution' }
@@ -130,11 +151,15 @@ FamixFortran77SRVisitor >> retrieveProgramUnit: anInvocation [
 { #category : #'private-creation' }
 FamixFortran77SRVisitor >> retrieveVariable: anAccess [
 
+	| target |
 	self flag: #TODO.
 	"- Search in the known variables for the one whose name matches the anAccess name"
 	"- compare their type also ?"
-	^ ((model allWithType: FamixFortran77Variable) select: [ :variable | 
-		   variable name = anAccess entityName ]) anyOne
+	target := (model allWithType: FamixFortran77Variable) select: [ :variable | 
+		   variable name = anAccess entityName ].
+	^ target isNotEmpty
+		ifTrue: [ target anyOne ]
+		ifFalse: [ nil ]
 ]
 
 { #category : #visiting }
