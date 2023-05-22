@@ -475,7 +475,7 @@ FortranAbstractJsonVisitor >> visitFunction_call: aFunctionCallNode [
 	^self visitCallStatement: aFunctionCallNode
 ]
 
-{ #category : #'visiting expression' }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitGotoStatement: aGotoStatementNode [
 
 	^self visitJsonMap: aGotoStatementNode keys: #(span target)
