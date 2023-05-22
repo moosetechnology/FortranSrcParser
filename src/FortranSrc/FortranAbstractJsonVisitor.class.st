@@ -409,12 +409,6 @@ FortranAbstractJsonVisitor >> visitFalseLiteralValue: aString [
 ]
 
 { #category : #'visiting statement' }
-FortranAbstractJsonVisitor >> visitFormat: aFormatNode [
-	^{ self visitSpan: (aFormatNode at: 'span') .
-	  (aFormatNode at: 'list') collect: [ :each | self visitFormatArgument: each ] }
-]
-
-{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitFormatArgument: aFormatArgumentNode [
 	^self visitArgument: aFormatArgumentNode
 ]
@@ -725,6 +719,22 @@ FortranAbstractJsonVisitor >> visitOp: anOpNode [
 	^self visitJsonTaggedElement: anOpNode
 ]
 
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitPrintFormat: aPrintFormatNode [
+
+	^self visitJsonElement: aPrintFormatNode
+]
+
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitPrintStatement: aPrintStatementNode [
+	"format for WRITE and PRINT statements can be quite different, so we created
+	 two different visit rules"
+
+	^{ self visitSpan: (aPrintStatementNode at: 'span') .
+	 self visitPrintFormat: (aPrintStatementNode at: 'format') .
+	 self visitArguments: (aPrintStatementNode at: 'arguments') }
+]
+
 { #category : #'visiting prog-unit' }
 FortranAbstractJsonVisitor >> visitProgramFile: aProgramFileNode [
 	^self visitJsonMap: aProgramFileNode keys: #(meta program_units)
@@ -897,7 +907,7 @@ FortranAbstractJsonVisitor >> visitValue: aValueNode [
 ]
 
 { #category : #'visiting statement' }
-FortranAbstractJsonVisitor >> visitVar: anExittatementVarNode [
+FortranAbstractJsonVisitor >> visitVar: anExitStatementVarNode [
 	self flag: #TODO.
 	^nil
 ]
@@ -920,6 +930,18 @@ FortranAbstractJsonVisitor >> visitVars: anExternalStatementVarList [
 ]
 
 { #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitWriteFormat: aWriteFormatNode [
+	^{ self visitSpan: (aWriteFormatNode at: 'span') .
+	  (aWriteFormatNode at: 'list')
+		collect: [ :each | self visitFormatArgument: each ] }
+]
+
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitWriteStatement: aWriteStatementNode [
-	^self visitJsonMap: aWriteStatementNode keys: #(span format arguments)
+	"format for WRITE and PRINT statements can be quite different, so we created
+	 two different visit rules"
+
+	^{ self visitSpan: (aWriteStatementNode at: 'span') .
+	 self visitWriteFormat: (aWriteStatementNode at: 'format') .
+	 self visitArguments: (aWriteStatementNode at: 'arguments') }
 ]
