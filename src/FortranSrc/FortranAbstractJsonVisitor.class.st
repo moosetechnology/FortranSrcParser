@@ -252,6 +252,12 @@ FortranAbstractJsonVisitor >> visitDo_spec: aDoSpecNode [
 	^self visitJsonMap: aDoSpecNode keys: #(span initial limit increment)
 ]
 
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitElements: anImplicitElementsNode [
+	^(anImplicitElementsNode at: 'list')
+		collect: [ :each | self visitImplicitStatementRange: each ]
+]
+
 { #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitEq: anEqualtoOperatorNode [
 	^'eq'
@@ -423,6 +429,12 @@ FortranAbstractJsonVisitor >> visitFortranComment: aFortranCommentNode [
 	
 ]
 
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitFrom: aString [
+	"start of a range for an implicit statement: a string of one character"
+	^aString first
+]
+
 { #category : #'visiting prog-unit' }
 FortranAbstractJsonVisitor >> visitFunction: aFunctionNode [
 	^(aFunctionNode includesKey: 'blocks')
@@ -489,9 +501,14 @@ FortranAbstractJsonVisitor >> visitIfCondition: anIfConditionNode [
 ]
 
 { #category : #'visiting statement' }
-FortranAbstractJsonVisitor >> visitImplicitStatement: anImplicitstatementNode [
-	
-	^self visitJsonMap: anImplicitstatementNode keys:  #(span items)
+FortranAbstractJsonVisitor >> visitImplicitStatement: anImplicitStatementNode [
+
+	^self visitJsonMap: anImplicitStatementNode keys:  #(span items)
+]
+
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitImplicitStatementRange: anImplicitStatementRangeNode [
+	^self visitJsonMap: anImplicitStatementRangeNode keys: #(span from to)
 ]
 
 { #category : #'visiting statement' }
@@ -541,8 +558,10 @@ FortranAbstractJsonVisitor >> visitItems: anImplicitItemsNode [
 
 	^anImplicitItemsNode
 		ifNil: [ nil ]
-		ifNotNil: [ self notYetImplemented ]
-
+		ifNotNil: [ | items |
+			items := (anImplicitItemsNode at: 'list') first.
+			self visitJsonMap: items keys: #(type elements)
+		]
 ]
 
 { #category : #'visiting reflectivity' }
@@ -844,6 +863,14 @@ FortranAbstractJsonVisitor >> visitTarget: aTargetNode [
 { #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitThenPart: aThenPartNode [
 	^self visitJsonElement: aThenPartNode
+]
+
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitTo: aString [
+	"end of a range for an implicit statement: a string of one character"
+	^aString
+		ifNil: [ nil ]
+		ifNotNil: [ aString first ]
 ]
 
 { #category : #'visiting expression' }
