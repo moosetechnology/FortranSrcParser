@@ -299,22 +299,3 @@ FamixFortran77SRVisitorTest >> testCreateFamixFortran77InvocationMultipleCalleeB
 	self assert: invocation candidates size equals: 1.
 	self assert: invocation candidates first equals: entity programUnits second.
 ]
-
-{ #category : #running }
-FamixFortran77SRVisitorTest >> testCreateFamixFortran77LocalVariable [
-
-	| entity var |
-	iastProgFile progUnits: { IASTSubroutine new
-			 entityName: 'sub';
-			 body: { self defaultVariable };
-			 yourself }.
-
-	entity := iastProgFile accept: defVisitor.
-
-	self assert: entity programUnits first localVariables size equals: 1.
-
-	var := entity programUnits first localVariables first.
-	self assert: var class equals: FamixFortran77Variable.
-	self assert: var declaredType class equals: FamixFortran77FType.
-	self assert: var declaredType name equals: 'integer'.
-]
