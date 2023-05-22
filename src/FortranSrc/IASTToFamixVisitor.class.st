@@ -177,7 +177,7 @@ IASTToFamixVisitor >> visitIASTFunction: aFunction [
 	function := (self newEntity: FamixFortran77PUFunction)
 		            sourceAnchor: (self visitIndexedFileAnchor: aFunction sourceAnchor);
 		            name: aFunction entityName;
-		            returnType: (aFunction returnType ifNotNil: [ aFunction returnType accept: self ]);
+		            declaredType: (aFunction returnType ifNotNil: [ aFunction returnType accept: self ]);
 		            yourself.
 	stack push: function.
 	"prossess localVariables inside this progUnit"
