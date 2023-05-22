@@ -329,28 +329,11 @@ IASTToFamixVisitor >> visitIASTTypeRef: aType [
 
 { #category : #visiting }
 IASTToFamixVisitor >> visitIASTVarAccess: aVarAccess [
-
-	| access target |
-	self flag: #TODO. "refactoring and other"
-	access := (self newEntity: FamixFortran77Access)
+	^(self newEntity: FamixFortran77Access)
 		sourceAnchor: (self visitIndexedFileAnchor: aVarAccess sourceAnchor);
 		attributeAt: #entity put: aVarAccess;
 		isWrite: aVarAccess isWrite;
 		yourself.
-	target := self searchInLocalSymbolTable: aVarAccess entityName.
-	target
-		ifNil: [ 
-			| var |
-			var := (self newEntity: FamixFortran77Variable)
-				       name: aVarAccess entityName;
-				       fType: ((self newEntity: FamixFortran77FType)
-						        name: (self defaultImplicitTyping: aVarAccess entityName first);
-						        yourself);
-				       yourself.
-			access target: var ]
-		ifNotNil: [ access target: target ].
-
-	^ access
 ]
 
 { #category : #visiting }
