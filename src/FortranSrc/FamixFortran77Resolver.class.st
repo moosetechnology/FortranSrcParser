@@ -7,6 +7,14 @@ Class {
 	#category : #'FortranSrc-Resolver'
 }
 
+{ #category : #'private-helper' }
+FamixFortran77Resolver class >> newFrom: aMooseModel [
+	"Answer an instance with same model as aMooseModel."
+	^self new
+		  model: aMooseModel;
+		  yourself
+]
+
 { #category : #'private - utility' }
 FamixFortran77Resolver >> defaultImplicitTyping: name [
 	^('ijklmn' includes: name first)
