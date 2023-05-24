@@ -7,6 +7,55 @@ Class {
 	#category : #'FortranSrc-Resolver'
 }
 
+{ #category : #'private - utility' }
+FamixFortran77Resolver >> defaultImplicitTyping: name [
+	^('ijklmn' includes: name first)
+		ifTrue: [ #integer ]
+		ifFalse: [ #real ]
+]
+
+{ #category : #'private - utility' }
+FamixFortran77Resolver >> findEntity: anEntity forType: aType [
+	^((self model allWithType:  aType) 
+		select: [ :each | each class = aType 
+			and: [ each name = anEntity entityName ]]) first.
+]
+
+{ #category : #initialization }
+FamixFortran77Resolver >> initialize [
+
+	super initialize
+	
+]
+
+{ #category : #accessing }
+FamixFortran77Resolver >> model [
+
+	^ model
+]
+
+{ #category : #accessing }
+FamixFortran77Resolver >> model: anObject [
+
+	model := anObject
+]
+
+{ #category : #'private-creation' }
+FamixFortran77Resolver >> newEntity: aFamixClass [
+	^aFamixClass new
+		mooseModel: model;
+		yourself
+]
+
+{ #category : #'symbols resolution' }
+FamixFortran77Resolver >> removeFromModel: entity [
+	"Set all pointers in the entity to nil beforehand, to make the work of the GarbageCollector easier."
+	entity declaredType: nil.
+	entity parentBehaviouralEntity: nil.
+	entity sourceAnchor: nil.
+	self model remove: entity.
+]
+
 { #category : #'symbols resolution' }
 FamixFortran77Resolver >> requalifyVariableDeclaration: variableDeclaration [
 	(self requalifyVariableDeclarationAsParameter: variableDeclaration) 
@@ -57,6 +106,76 @@ FamixFortran77Resolver >> resolve [
 ]
 
 { #category : #'symbols resolution' }
+FamixFortran77Resolver >> resolveAccess: anAccess [
+	| target varAccessed var |
+	
+	varAccessed := self retrieveStoredIast: anAccess.
+
+	target := self retrieveVariable: varAccessed fromProgramUnit: anAccess accessor.
+	target ifNotNil: [ ^ anAccess target: target ].
+	
+	var := self resolveAsImplicit: varAccessed.
+	anAccess accessor addLocalVariable: var.
+	^anAccess target: var
+]
+
+{ #category : #'symbols resolution' }
+FamixFortran77Resolver >> resolveAccesses [
+	(self model allWithSubTypesOf: FamixFortran77Access) 
+		do: [ :access | self resolveAccess: access ]
+]
+
+{ #category : #'symbols resolution' }
+FamixFortran77Resolver >> resolveAccesses: anAccesses [
+	anAccesses do: [ :access | self resolveAccess: access ]
+]
+
+{ #category : #'symbols resolution' }
+FamixFortran77Resolver >> resolveAsImplicit: anImplicitVariable [
+	| var type |
+	self flag: #FIXME. "how to build sourceAnchor for newly created var?"
+	type := self newEntity: FamixFortran77Type.
+	type name: (self defaultImplicitTyping: anImplicitVariable entityName).
+
+	var := self newEntity: FamixFortran77Variable.
+	var 
+		name: anImplicitVariable entityName;
+		declaredType: type.
+	^var
+	
+]
+
+{ #category : #'symbols resolution' }
+FamixFortran77Resolver >> resolveInvocation: anInvocation [
+	| invocated target |
+	invocated := self retrieveStoredIast: anInvocation.	
+	target := self retrieveInvocables: invocated entityName.
+	target ifNotNil: [ anInvocation addCandidate: target ]
+	
+]
+
+{ #category : #'symbols resolution' }
+FamixFortran77Resolver >> resolveInvocations: anInvocations [
+	anInvocations
+		do: [ :invocation | self resolveInvocation: invocation ]
+]
+
+{ #category : #'private-creation' }
+FamixFortran77Resolver >> retrieveEntity: entityName fromList: famixEntities [
+	^famixEntities 
+		detect: [ :entity | entity name = entityName ]
+		ifFound: [ :entity | entity ]
+		ifNone: [ nil ]
+]
+
+{ #category : #'private-creation' }
+FamixFortran77Resolver >> retrieveInvocables: name [
+	^self 
+		retrieveEntity: name
+		fromList: (model allWithSubTypesOf: FamixFortran77PUProcedure)
+]
+
+{ #category : #'symbols resolution' }
 FamixFortran77Resolver >> retrieveParameters: aProgramUnit [
 	^aProgramUnit isInvocable
 		ifTrue: [ aProgramUnit parameters ]
@@ -65,7 +184,30 @@ FamixFortran77Resolver >> retrieveParameters: aProgramUnit [
 		
 ]
 
+{ #category : #'private - utility' }
+FamixFortran77Resolver >> retrieveStoredIast: anEntity [
+	| entity |
+	entity := anEntity 
+		attributeAt: #entity 
+		ifAbsent: [ Notification signal: 'problem with generated entity' ].
+	anEntity attributeAt: #entity put: nil.
+	^entity
+]
+
 { #category : #'private-creation' }
 FamixFortran77Resolver >> retrieveVariable: variableName fromList: variables [
 	^self retrieveEntity: variableName fromList: variables
+]
+
+{ #category : #'private-creation' }
+FamixFortran77Resolver >> retrieveVariable: aVariable fromProgramUnit: programUnit [
+
+	"- Search in the known parameters and variables for the one whose name matches the anAccess name"
+	"- compare their type also ?"
+	| target |
+	target := programUnit isInvocable
+		ifTrue: [ self retrieveVariable: aVariable entityName fromList: programUnit parameters ]
+		ifFalse: [ nil ].
+	target ifNotNil: [ ^target ].	
+	^self retrieveVariable: aVariable entityName fromList: programUnit localVariables.
 ]
