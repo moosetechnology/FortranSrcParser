@@ -28,6 +28,14 @@ IASTToFamixVisitorTest >> defaultAnchor [
 ]
 
 { #category : #running }
+IASTToFamixVisitorTest >> defaultParameter [
+	^IASTParameter new
+		entityName: 'var';
+		sourceAnchor: self defaultAnchor;
+		yourself
+]
+
+{ #category : #running }
 IASTToFamixVisitorTest >> defaultTypeCharacter [
 	^IASTTypeRef new
 		entityName: 'character';
@@ -221,6 +229,31 @@ IASTToFamixVisitorTest >> testCreateFamixFortran77PUFunction [
 	self assert: entity class equals: FamixFortran77PUFunction.
 	self assert: entity name equals: 'fct'.
 	self assert: entity programFile isNotNil.
+]
+
+{ #category : #running }
+IASTToFamixVisitorTest >> testCreateFamixFortran77PUFunctionWithParameter [
+
+	| entity param |
+	programFile progUnits: { IASTFunction new
+			 entityName: 'fct';
+			 parameters: { self defaultParameter };
+			 yourself }.
+
+	entity := programFile accept: visitor.
+
+	self assert: entity programUnits size equals: 1.
+
+	entity := entity programUnits first.
+	self assert: entity class equals: FamixFortran77PUFunction.
+	self assert: entity name equals: 'fct'.
+	self assert: entity programFile isNotNil.
+
+	self assert: entity parameters size equals: 1.
+	param := entity parameters first.
+	self assert: param class equals: FamixFortran77Parameter.
+	self assert: param name equals: 'var'.
+	self assert: param parentBehaviouralEntity equals: entity.
 ]
 
 { #category : #running }
