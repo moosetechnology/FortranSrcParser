@@ -129,7 +129,7 @@ FortranProjectImporter >> esopeFiles [
 { #category : #fast }
 FortranProjectImporter >> fortranSrcPath [
 
-	^ '/home/anquetil/.cabal/bin/fortran-src-extras'
+	^ 'fortran-src-extras'
 ]
 
 { #category : #initialization }

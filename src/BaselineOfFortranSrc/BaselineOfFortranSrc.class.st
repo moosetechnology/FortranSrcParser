@@ -20,6 +20,7 @@ BaselineOfFortranSrc >> defineDependencies: spec [
 	spec
 		baseline: 'PetitParser2' with: [ spec repository: 'github://kursjan/petitparser2' ] ;
 		baseline: 'FamixFortran77' with: [ spec repository: 'github://uNouss/FortranMetamodelGenerator' ] ;
+		baseline: 'PPEsope' with: [ spec repository: 'github://uNouss/PPEsope' ] ;
 		baseline: 'NeoJSON' with: [ spec repository: 'github://svenvc/NeoJSON' ]
 ]
 
