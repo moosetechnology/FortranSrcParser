@@ -155,10 +155,9 @@ FamixFortran77Resolver >> resolveAsImplicit: anImplicitVariable [
 
 { #category : #'symbols resolution' }
 FamixFortran77Resolver >> resolveInvocation: anInvocation [
-	| invocated target |
-	invocated := self retrieveStoredIast: anInvocation.	
-	target := self retrieveInvocables: invocated entityName.
-	target ifNotNil: [ anInvocation addCandidate: target ]
+	| invocated |
+	invocated := self retrieveStoredIast: anInvocation.
+	anInvocation addCandidate: (self retrieveInvocables: invocated entityName)
 	
 ]
 
@@ -210,7 +209,7 @@ FamixFortran77Resolver >> retrieveVariable: variableName fromList: variables [
 { #category : #'private-creation' }
 FamixFortran77Resolver >> retrieveVariable: aVariable fromProgramUnit: programUnit [
 
-	"- Search in the known parameters and variables for the one whose name matches the anAccess name"
+	"- Search in the known parameters and variables for the one whose name matches the aVariable name"
 	"- compare their type also ?"
 	| target |
 	target := programUnit isInvocable
