@@ -391,6 +391,36 @@ JsonToIASTVisitor >> visitIf: aIfNode [
 	^(data allButFirst: 2) flattened reject: #isNil
 ]
 
+{ #category : #'visiting statement' }
+JsonToIASTVisitor >> visitImplicitStatement: anImplicitStatementNode [
+	| data implicit |
+	
+	data := super visitImplicitStatement: anImplicitStatementNode.
+
+	implicit := IASTImplicit new
+		flag: 'TODO: span = data first' ;
+		yourself.
+	data second
+		ifNotNil: [
+			implicit
+				forType: data second first ;
+				range: data second second
+		 ].
+
+	^implicit
+
+]
+
+{ #category : #'visiting statement' }
+JsonToIASTVisitor >> visitImplicitStatementRange: anImplicitStatementRangeNode [
+	| data |
+	data := super visitImplicitStatementRange: anImplicitStatementRangeNode.
+
+	^data third
+		ifNil: [ { data second . data second } ]
+		ifNotNil: [ { data second . data third } ]
+]
+
 { #category : #'visiting expression' }
 JsonToIASTVisitor >> visitInteger: anIntegerNode [
 	^nil

@@ -28,7 +28,7 @@ IASTImplicit >> forType: anObject [
 
 { #category : #accessing }
 IASTImplicit >> range [
-
+	"actually a collection of ranges, each range being an array {from . to}"
 	^ range
 ]
 

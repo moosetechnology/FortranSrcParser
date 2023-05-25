@@ -137,15 +137,15 @@ JsonToIASTVisitorTest >> testCallToWrite [
       end
 '.
 
-	self assert: programFile progUnits first body first size equals: 1.
+	self assert: programFile progUnits first body size equals: 1.
 
-	stmt := programFile progUnits first body first first.
-	self assert: stmt class equals: IASTInvocation.
-	self assert: stmt entityName equals: 'write'.
-	self assert: stmt arguments size equals: 1.
-	self assert: stmt sourceAnchor isNotNil.
+	stmt := programFile progUnits first body first.
+	self assert: stmt first class equals: IASTInvocation.
+	self assert: stmt first entityName equals: 'write'.
+	self assert: stmt first arguments size equals: 1.
+	self assert: stmt first sourceAnchor isNotNil.
 
-	arg := stmt arguments first.
+	arg := stmt first arguments first.
 	self assert: arg class equals: IASTVarAccess.
 	self assert: arg entityName equals: 'msg'.
 	self deny: arg isWrite
@@ -464,6 +464,99 @@ JsonToIASTVisitorTest >> testFunctionWithFunctionInvocation [
 	self assert: fct sourceAnchor endLine equals: 3.
 	self assert: fct sourceAnchor endColumn equals: 10.
 	
+]
+
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testImplicitNoneStatement [
+	
+	| programFile stmt |
+	programFile := visitor visitCode: '      PROGRAM MYPROG
+       implicit none
+      END
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+
+	stmt := programFile progUnits first body first.
+	self assert: stmt class equals: IASTImplicit.
+	self assert: stmt range isNil.
+	self assert: stmt forType isNil
+]
+
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testImplicitStatementSeveralRanges [
+	
+	| programFile stmt range |
+	programFile := visitor visitCode: '      PROGRAM MYPROG
+       implicit character (c-e, h, l-m)
+      END
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+
+	stmt := programFile progUnits first body first.
+	self assert: stmt class equals: IASTImplicit.
+	self assert: stmt range isCollection.
+	self assert: stmt range size equals: 3.
+
+	range := stmt range first.
+	self assert: range isCollection.
+	self assertCollection: range equals: { $c . $e }.
+
+	range := stmt range second.
+	self assert: range isCollection.
+	self assertCollection: range equals: { $h . $h }.
+
+	range := stmt range third.
+	self assert: range isCollection.
+	self assertCollection: range equals: { $l . $m }.
+
+]
+
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testImplicitStatementSimpleChar [
+	
+	| programFile stmt range |
+	programFile := visitor visitCode: '      PROGRAM MYPROG
+       implicit character (c)
+      END
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+
+	stmt := programFile progUnits first body first.
+	self assert: stmt class equals: IASTImplicit.
+	self assert: stmt range isCollection.
+	self assert: stmt range size equals: 1.
+
+	range := stmt range first.
+	self assert: range isCollection.
+	self assertCollection: range equals: { $c . $c }.
+
+	self assert: stmt forType class equals: IASTTypeRef.
+	self assert: stmt forType entityName equals: 'character'.
+]
+
+{ #category : #'tests-statement' }
+JsonToIASTVisitorTest >> testImplicitStatementSimpleRange [
+	
+	| programFile stmt range |
+	programFile := visitor visitCode: '      PROGRAM MYPROG
+       implicit character (c-e)
+      END
+'.
+
+	self assert: programFile progUnits first body size equals: 1.
+
+	stmt := programFile progUnits first body first.
+	self assert: stmt class equals: IASTImplicit.
+	self assert: stmt range isCollection.
+	self assert: stmt range size equals: 1.
+
+	range := stmt range first.
+	self assert: range isCollection.
+	self assertCollection: range equals: { $c . $e }.
+
 ]
 
 { #category : #'tests-statement' }

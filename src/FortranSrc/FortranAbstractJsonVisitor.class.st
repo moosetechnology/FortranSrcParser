@@ -252,6 +252,12 @@ FortranAbstractJsonVisitor >> visitDo_spec: aDoSpecNode [
 	^self visitJsonMap: aDoSpecNode keys: #(span initial limit increment)
 ]
 
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitElements: anImplicitElementsNode [
+	^(anImplicitElementsNode at: 'list')
+		collect: [ :each | self visitImplicitStatementRange: each ]
+]
+
 { #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitEq: anEqualtoOperatorNode [
 	^'eq'
@@ -403,12 +409,6 @@ FortranAbstractJsonVisitor >> visitFalseLiteralValue: aString [
 ]
 
 { #category : #'visiting statement' }
-FortranAbstractJsonVisitor >> visitFormat: aFormatNode [
-	^{ self visitSpan: (aFormatNode at: 'span') .
-	  (aFormatNode at: 'list') collect: [ :each | self visitFormatArgument: each ] }
-]
-
-{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitFormatArgument: aFormatArgumentNode [
 	^self visitArgument: aFormatArgumentNode
 ]
@@ -421,6 +421,12 @@ FortranAbstractJsonVisitor >> visitFortranComment: aFortranCommentNode [
 	^{ self visitSpan: (aFortranCommentNode at: 'span') .
 	  aFortranCommentNode at: 'comment' }
 	
+]
+
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitFrom: aString [
+	"start of a range for an implicit statement: a string of one character"
+	^aString first
 ]
 
 { #category : #'visiting prog-unit' }
@@ -463,7 +469,7 @@ FortranAbstractJsonVisitor >> visitFunction_call: aFunctionCallNode [
 	^self visitCallStatement: aFunctionCallNode
 ]
 
-{ #category : #'visiting expression' }
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitGotoStatement: aGotoStatementNode [
 
 	^self visitJsonMap: aGotoStatementNode keys: #(span target)
@@ -489,9 +495,14 @@ FortranAbstractJsonVisitor >> visitIfCondition: anIfConditionNode [
 ]
 
 { #category : #'visiting statement' }
-FortranAbstractJsonVisitor >> visitImplicitStatement: anImplicitstatementNode [
-	
-	^self visitJsonMap: anImplicitstatementNode keys:  #(span items)
+FortranAbstractJsonVisitor >> visitImplicitStatement: anImplicitStatementNode [
+
+	^self visitJsonMap: anImplicitStatementNode keys:  #(span items)
+]
+
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitImplicitStatementRange: anImplicitStatementRangeNode [
+	^self visitJsonMap: anImplicitStatementRangeNode keys: #(span from to)
 ]
 
 { #category : #'visiting statement' }
@@ -541,8 +552,10 @@ FortranAbstractJsonVisitor >> visitItems: anImplicitItemsNode [
 
 	^anImplicitItemsNode
 		ifNil: [ nil ]
-		ifNotNil: [ self notYetImplemented ]
-
+		ifNotNil: [ | items |
+			items := (anImplicitItemsNode at: 'list') first.
+			self visitJsonMap: items keys: #(type elements)
+		]
 ]
 
 { #category : #'visiting reflectivity' }
@@ -706,6 +719,22 @@ FortranAbstractJsonVisitor >> visitOp: anOpNode [
 	^self visitJsonTaggedElement: anOpNode
 ]
 
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitPrintFormat: aPrintFormatNode [
+
+	^self visitJsonElement: aPrintFormatNode
+]
+
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitPrintStatement: aPrintStatementNode [
+	"format for WRITE and PRINT statements can be quite different, so we created
+	 two different visit rules"
+
+	^{ self visitSpan: (aPrintStatementNode at: 'span') .
+	 self visitPrintFormat: (aPrintStatementNode at: 'format') .
+	 self visitArguments: (aPrintStatementNode at: 'arguments') }
+]
+
 { #category : #'visiting prog-unit' }
 FortranAbstractJsonVisitor >> visitProgramFile: aProgramFileNode [
 	^self visitJsonMap: aProgramFileNode keys: #(meta program_units)
@@ -846,6 +875,14 @@ FortranAbstractJsonVisitor >> visitThenPart: aThenPartNode [
 	^self visitJsonElement: aThenPartNode
 ]
 
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitTo: aString [
+	"end of a range for an implicit statement: a string of one character"
+	^aString
+		ifNil: [ nil ]
+		ifNotNil: [ aString first ]
+]
+
 { #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitTrueLiteralValue: aString [
 	^aString
@@ -870,7 +907,7 @@ FortranAbstractJsonVisitor >> visitValue: aValueNode [
 ]
 
 { #category : #'visiting statement' }
-FortranAbstractJsonVisitor >> visitVar: anExittatementVarNode [
+FortranAbstractJsonVisitor >> visitVar: anExitStatementVarNode [
 	self flag: #TODO.
 	^nil
 ]
@@ -893,6 +930,18 @@ FortranAbstractJsonVisitor >> visitVars: anExternalStatementVarList [
 ]
 
 { #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitWriteFormat: aWriteFormatNode [
+	^{ self visitSpan: (aWriteFormatNode at: 'span') .
+	  (aWriteFormatNode at: 'list')
+		collect: [ :each | self visitFormatArgument: each ] }
+]
+
+{ #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitWriteStatement: aWriteStatementNode [
-	^self visitJsonMap: aWriteStatementNode keys: #(span format arguments)
+	"format for WRITE and PRINT statements can be quite different, so we created
+	 two different visit rules"
+
+	^{ self visitSpan: (aWriteStatementNode at: 'span') .
+	 self visitWriteFormat: (aWriteStatementNode at: 'format') .
+	 self visitArguments: (aWriteStatementNode at: 'arguments') }
 ]
