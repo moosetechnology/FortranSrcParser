@@ -185,24 +185,21 @@ FamixFortran77ResolverTest >> setUp [
 
 { #category : #running }
 FamixFortran77ResolverTest >> testCreateFamixFortran77Access [
-	| entity access accessor |
+	| main access accessor |
 
 	accessor := (self defaultMain: 'main')
 		addLocalVariable: (self defaultVariable: 'var' withType: #integer);
 		addAccess: self defaultAccess;
 		yourself.
+		
+	main := (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) first.
 
  	resolver resolve.
 
-	self assert: (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) size equals: 1.
-	
-	entity := (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) first.
+	self assert: main accesses size equals: 1.
+	access := main accesses first.
 
-	self assert: entity accesses size equals: 1.
-	access := entity accesses first.
-	
-	self assert: access class equals: FamixFortran77Access.
-	self assert: access variable equals: entity localVariables first.
+	self assert: access variable equals: main localVariables first.
 ]
 
 { #category : #running }
@@ -218,17 +215,19 @@ FamixFortran77ResolverTest >> testCreateFamixFortran77AccessNonDeclaredVariable 
 		addAccess: self defaultAccess;
 		yourself.
 
- 	resolver resolve.
-
-	self assert: (resolver model allWithType: FamixFortran77PUMain) size equals: 1.
-	
 	main := (resolver model allWithType: FamixFortran77PUMain) first.
+
+	self assert: main localVariables size equals: 0.
+
+ 	resolver resolve.
+	
+	self assert: main localVariables size equals: 1.
 
 	self assert: main accesses size equals: 1.
 	access := main accesses first.
-	
-	self assert: access class equals: FamixFortran77Access.
+
 	self assert: access variable equals: main localVariables first.
+	self assert: access variable declaredType name equals: 'real'.
 ]
 
 { #category : #running }
@@ -345,7 +344,7 @@ FamixFortran77ResolverTest >> testCreateFamixFortran77InvocationMultipleCalleeBe
 
 { #category : #running }
 FamixFortran77ResolverTest >> testCreateFamixFortran77LocalVariableAsFunction [
-	| main fct famixMain famixFunction |
+	| famixMain famixFunction |
 	"
       program main
       real f
@@ -353,17 +352,19 @@ FamixFortran77ResolverTest >> testCreateFamixFortran77LocalVariableAsFunction [
       function f()
       end
 	"
-	main := (self defaultMain: 'main')
-		addLocalVariable: (self defaultVariable: 'f' withType: #real);
-		yourself.
+	(self defaultMain: 'main')
+		addLocalVariable: (self defaultVariable: 'f' withType: #real).
 		
-	fct := (self defaultFunction: 'f').
-
- 	resolver resolve.
+	self defaultFunction: 'f'.
 	
 	famixMain := (resolver model allWithType: FamixFortran77PUMain) first.
 	famixFunction := (resolver model allWithType: FamixFortran77PUFunction) first.
+
+	self assert: famixFunction declaredType isNil.
+	self assert: famixMain localVariables size equals: 1.
 	
+ 	resolver resolve.
+
 	self assert: famixMain localVariables isEmpty.
 	self assert: famixFunction declaredType class equals: FamixFortran77Type.
 	self assert: famixFunction declaredType name equals: 'real'.
@@ -371,54 +372,55 @@ FamixFortran77ResolverTest >> testCreateFamixFortran77LocalVariableAsFunction [
 
 { #category : #running }
 FamixFortran77ResolverTest >> testCreateFamixFortran77LocalVariableAsParameter [
-	| entity access accessor |
+	| subroutine access |
 
-	accessor := (self defaultSubroutine: 'sub')
+	(self defaultSubroutine: 'sub')
 		addParameter: (self defaultParameter: 'var');
 		addLocalVariable: (self defaultVariable: 'var' withType: #integer);
 		addAccess: self defaultAccess;
-		addAccess: self defaultAccess;
-		yourself.
+		addAccess: self defaultAccess.
+	
+	subroutine := (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) first.
+
+	self assert: subroutine localVariables size equals: 1.
 
  	resolver resolve.
-
-	self assert: (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) size equals: 1.
 	
-	entity := (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) first.
+	self assert: subroutine localVariables size equals: 0.
 
-	self assert: entity accesses size equals: 2.
-	access := entity accesses first.
+	self assert: subroutine accesses size equals: 2.
+	access := subroutine accesses first.
 	
 	self assert: access class equals: FamixFortran77Access.
-	self assert: access variable equals: entity parameters first.
+	self assert: access variable equals: subroutine parameters first.
 	
-	access := entity accesses second.
+	access := subroutine accesses second.
 	
 	self assert: access class equals: FamixFortran77Access.
-	self assert: access variable equals: entity parameters first.
+	self assert: access variable equals: subroutine parameters first.
 ]
 
 { #category : #running }
 FamixFortran77ResolverTest >> testCreateFamixFortran77ParameterWithLocalVariable [
-	| entity access accessor |
+	| subroutine access accessor |
 
 	accessor := (self defaultSubroutine: 'sub')
 		addParameter: (self defaultParameter: 'var');
 		addLocalVariable: (self defaultVariable: 'var' withType: 'integer');
 		addAccess: self defaultAccess;
 		yourself.
+	
+	subroutine := (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) first.
+	self assert: subroutine localVariables size equals: 1.
 
  	resolver resolve.
 
-	self assert: (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) size equals: 1.
-	
-	entity := (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) first.
-
-	self assert: entity accesses size equals: 1.
-	access := entity accesses first.
+	self assert: subroutine localVariables size equals: 0.
+	self assert: subroutine accesses size equals: 1.
+	access := subroutine accesses first.
 	
 	self assert: access class equals: FamixFortran77Access.
-	self assert: access variable equals: entity parameters first.
+	self assert: access variable equals: subroutine parameters first.
 ]
 
 { #category : #running }
