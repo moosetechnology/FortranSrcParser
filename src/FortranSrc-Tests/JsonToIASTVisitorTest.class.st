@@ -479,7 +479,7 @@ JsonToIASTVisitorTest >> testImplicitNoneStatement [
 
 	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTImplicit.
-	self assert: stmt range isNil.
+	self assert: stmt ranges isNil.
 	self assert: stmt forType isNil
 ]
 
@@ -496,18 +496,18 @@ JsonToIASTVisitorTest >> testImplicitStatementSeveralRanges [
 
 	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTImplicit.
-	self assert: stmt range isCollection.
-	self assert: stmt range size equals: 3.
+	self assert: stmt ranges isCollection.
+	self assert: stmt ranges size equals: 3.
 
-	range := stmt range first.
+	range := stmt ranges first.
 	self assert: range isCollection.
 	self assertCollection: range equals: { $c . $e }.
 
-	range := stmt range second.
+	range := stmt ranges second.
 	self assert: range isCollection.
 	self assertCollection: range equals: { $h . $h }.
 
-	range := stmt range third.
+	range := stmt ranges third.
 	self assert: range isCollection.
 	self assertCollection: range equals: { $l . $m }.
 
@@ -526,10 +526,10 @@ JsonToIASTVisitorTest >> testImplicitStatementSimpleChar [
 
 	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTImplicit.
-	self assert: stmt range isCollection.
-	self assert: stmt range size equals: 1.
+	self assert: stmt ranges isCollection.
+	self assert: stmt ranges size equals: 1.
 
-	range := stmt range first.
+	range := stmt ranges first.
 	self assert: range isCollection.
 	self assertCollection: range equals: { $c . $c }.
 
@@ -550,10 +550,10 @@ JsonToIASTVisitorTest >> testImplicitStatementSimpleRange [
 
 	stmt := programFile progUnits first body first.
 	self assert: stmt class equals: IASTImplicit.
-	self assert: stmt range isCollection.
-	self assert: stmt range size equals: 1.
+	self assert: stmt ranges isCollection.
+	self assert: stmt ranges size equals: 1.
 
-	range := stmt range first.
+	range := stmt ranges first.
 	self assert: range isCollection.
 	self assertCollection: range equals: { $c . $e }.
 
