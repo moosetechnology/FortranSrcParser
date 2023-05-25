@@ -245,13 +245,10 @@ IASTToFamixVisitor >> visitIASTMainProgram: aMainProgram [
 
 { #category : #visiting }
 IASTToFamixVisitor >> visitIASTParameter: aParameter [
-
-	| parameter |
-	parameter := (self newEntity: FamixFortran77Parameter)
-		             sourceAnchor: (self visitIndexedFileAnchor: aParameter sourceAnchor);
-		             name: aParameter entityName;
-		             yourself.
-	^ parameter
+	^(self newEntity: FamixFortran77Parameter)
+		sourceAnchor: (self visitIndexedFileAnchor: aParameter sourceAnchor);
+		name: aParameter entityName;
+		yourself.
 ]
 
 { #category : #visiting }
