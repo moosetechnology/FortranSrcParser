@@ -318,3 +318,22 @@ IASTToFamixVisitorTest >> testCreateFamixFortran77Subroutine [
 	self assert: entity programFile isNotNil.
 	self assert: entity parameters size equals: 0
 ]
+
+{ #category : #running }
+IASTToFamixVisitorTest >> testCreateFamixFortran77SubroutineWithSimpleImplicit [
+
+	| entity |
+	programFile progUnits: { IASTSubroutine new
+			 entityName: 'sub';
+			 yourself }.
+
+	entity := programFile accept: visitor.
+
+	self assert: entity programUnits size equals: 1.
+
+	entity := entity programUnits first.
+	self assert: entity class equals: FamixFortran77PUSubroutine.
+	self assert: entity name equals: 'sub'.
+	self assert: entity programFile isNotNil.
+	self assert: entity parameters size equals: 0
+]
