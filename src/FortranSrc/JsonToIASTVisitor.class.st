@@ -404,7 +404,7 @@ JsonToIASTVisitor >> visitImplicitStatement: anImplicitStatementNode [
 		ifNotNil: [
 			implicit
 				forType: data second first ;
-				range: data second second
+				ranges: data second second
 		 ].
 
 	^implicit
