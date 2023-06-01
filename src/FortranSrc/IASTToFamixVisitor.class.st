@@ -292,6 +292,8 @@ IASTToFamixVisitor >> visitIASTProgramUnit: aProgramUnit toFamix: aFamixFortranC
 	
 	aProgramUnit localComments do: [ :comment | 
 		progUnit addComment: (comment accept: self) ].
+	
+	progUnit attributeAt: #implicits put: aProgramUnit implicits.
 
 	stack pop.
 	^ progUnit
