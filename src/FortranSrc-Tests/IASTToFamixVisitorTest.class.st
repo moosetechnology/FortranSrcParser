@@ -36,34 +36,18 @@ IASTToFamixVisitorTest >> defaultParameter [
 ]
 
 { #category : #running }
-IASTToFamixVisitorTest >> defaultTypeCharacter [
+IASTToFamixVisitorTest >> defaultType: typeName [
 	^IASTTypeRef new
-		entityName: 'character';
+		entityName: typeName;
 		sourceAnchor: self defaultAnchor;
 		yourself
 ]
 
 { #category : #running }
-IASTToFamixVisitorTest >> defaultTypeInteger [
-	^IASTTypeRef new
-		entityName: 'integer';
-		sourceAnchor: self defaultAnchor;
-		yourself
-]
-
-{ #category : #running }
-IASTToFamixVisitorTest >> defaultTypeReal [
-	^IASTTypeRef new
-		entityName: 'real';
-		sourceAnchor: self defaultAnchor;
-		yourself
-]
-
-{ #category : #running }
-IASTToFamixVisitorTest >> defaultVariable [
+IASTToFamixVisitorTest >> defaultVariable: varName withType: typeName [
 	^ IASTVariable new
-		entityName: 'aVar';
-		typeSpec: self defaultTypeInteger;
+		entityName: varName;
+		typeSpec: (self defaultType: typeName);
 		yourself
 ]
 
