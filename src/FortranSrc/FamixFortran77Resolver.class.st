@@ -16,10 +16,11 @@ FamixFortran77Resolver class >> newFrom: aMooseModel [
 ]
 
 { #category : #'private - utility' }
-FamixFortran77Resolver >> defaultImplicitTyping: name [
-	^('ijklmn' includes: name first)
+FamixFortran77Resolver >> defaultImplicitTyping: name fromProgramUnit: programUnit [
+	^programUnit dicImplicit at: name first
+	"^('ijklmn' includes: name first)
 		ifTrue: [ #integer ]
-		ifFalse: [ #real ]
+		ifFalse: [ #real ]"
 ]
 
 { #category : #'private - utility' }
@@ -108,6 +109,7 @@ FamixFortran77Resolver >> requalifyVariableDeclarations: variableDeclarations [
 
 { #category : #'symbols resolution' }
 FamixFortran77Resolver >> resolve [
+	self resolveImplicitsDeclarations: (self model allWithSubTypesOf: FamixFortran77ProgramUnit).
 	self requalifyVariableDeclarations: (self model allWithType: FamixFortran77Variable).
 	self resolveAccesses: (self model allWithType: FamixFortran77Access).
 	self resolveInvocations: (self model allWithType: FamixFortran77Invocation)
@@ -122,7 +124,7 @@ FamixFortran77Resolver >> resolveAccess: anAccess [
 	target := self retrieveVariable: varAccessed fromProgramUnit: anAccess accessor.
 	target ifNotNil: [ ^ anAccess target: target ].
 	
-	var := self resolveAsImplicit: varAccessed.
+	var := self resolveAsImplicit: varAccessed fromProgramUnit: anAccess accessor.
 	anAccess accessor addLocalVariable: var.
 	^anAccess target: var
 ]
@@ -139,11 +141,13 @@ FamixFortran77Resolver >> resolveAccesses: anAccesses [
 ]
 
 { #category : #'symbols resolution' }
-FamixFortran77Resolver >> resolveAsImplicit: anImplicitVariable [
+FamixFortran77Resolver >> resolveAsImplicit: anImplicitVariable fromProgramUnit: progUnit [
 	| var type |
 	self flag: #FIXME. "how to build sourceAnchor for newly created var?"
 	type := self newEntity: FamixFortran77Type.
-	type name: (self defaultImplicitTyping: anImplicitVariable entityName).
+	type name: (self 
+		defaultImplicitTyping: anImplicitVariable entityName
+		fromProgramUnit: progUnit).
 
 	var := self newEntity: FamixFortran77Variable.
 	var 
@@ -151,6 +155,29 @@ FamixFortran77Resolver >> resolveAsImplicit: anImplicitVariable [
 		declaredType: type.
 	^var
 	
+]
+
+{ #category : #'symbols resolution' }
+FamixFortran77Resolver >> resolveImplicitsDeclarations: programUnits [
+	programUnits do: [ :programUnit | self resolveImplicitsFor: programUnit ]
+]
+
+{ #category : #'symbols resolution' }
+FamixFortran77Resolver >> resolveImplicitsFor: programUnit [
+
+	| implicits |
+	implicits := programUnit attributeAt: #implicits ifAbsent: [  ].
+	implicits ifNotNil: [ 
+		implicits do: [ :each | 
+			each ranges
+				ifNotNil: [ 
+					each ranges flattened do: [ :letter | 
+						programUnit dicImplicit
+							at: letter
+							put: each forType name asSymbol ] ]
+				ifNil: [ 
+					($a to: $z) do: [ :letter | 
+						programUnit dicImplicit at: letter put: nil ] ] ] ]
 ]
 
 { #category : #'symbols resolution' }
@@ -193,11 +220,16 @@ FamixFortran77Resolver >> retrieveParameters: aProgramUnit [
 
 { #category : #'private - utility' }
 FamixFortran77Resolver >> retrieveStoredIast: anEntity [
+	^self retrieveStoredIast: anEntity forSymbol: #entity
+]
+
+{ #category : #'private - utility' }
+FamixFortran77Resolver >> retrieveStoredIast: anEntity forSymbol: aSymbol [
 	| entity |
 	entity := anEntity 
-		attributeAt: #entity 
+		attributeAt: aSymbol 
 		ifAbsent: [ Notification signal: 'problem with generated entity' ].
-	anEntity attributeAt: #entity put: nil.
+	anEntity attributeAt: aSymbol put: nil.
 	^entity
 ]
 
