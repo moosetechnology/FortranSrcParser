@@ -69,10 +69,26 @@ FamixFortran77ResolverTest >> defaultIASTVarAccess: name writable: boolean [
 		yourself
 ]
 
+{ #category : #running }
+FamixFortran77ResolverTest >> defaultImplicit: ranges for: typeName [
+	^IASTImplicit new
+		forType: (self defaultType: typeName);
+		ranges: ranges;
+		yourself
+]
+
+{ #category : #running }
+FamixFortran77ResolverTest >> defaultImplicitNone [
+	^IASTImplicit new
+		forType: nil;
+		ranges: nil;
+		yourself
+]
+
 { #category : #'default values' }
 FamixFortran77ResolverTest >> defaultIntegerVariable: name [
 	^(self newNamedEntity: name toFamix: FamixFortran77Variable)
-		declaredType: self defaultTypeInteger
+		declaredType: (self defaultType: 'integer')
 ]
 
 { #category : #'default values' }
@@ -148,7 +164,7 @@ FamixFortran77ResolverTest >> defaultTypeReal [
 { #category : #'default values' }
 FamixFortran77ResolverTest >> defaultVariable [
 	^(self newNamedEntity: 'var' toFamix: FamixFortran77Variable)
-		declaredType: self defaultTypeInteger;
+		declaredType: (self defaultType: 'integer');
 		yourself 
 ]
 
@@ -421,6 +437,64 @@ FamixFortran77ResolverTest >> testCreateFamixFortran77ParameterWithLocalVariable
 	
 	self assert: access class equals: FamixFortran77Access.
 	self assert: access variable equals: subroutine parameters first.
+]
+
+{ #category : #running }
+FamixFortran77ResolverTest >> testCreateFamixFortran77ResolveImplicitNone [
+	| famixSubroutine types subroutine |
+
+	subroutine := (self defaultSubroutine: 'sub')
+		attributeAt: #implicits put: { self defaultImplicitNone };
+		addParameter: (self defaultParameter: 'var');
+		addAccess: self defaultAccess;
+		yourself.
+
+ 	resolver resolve.
+
+	self assert: (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) size equals: 1.
+	
+	famixSubroutine := (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) first.
+
+	self assert: famixSubroutine dicImplicit size equals: 26.
+	
+	types := ($a to: $z) collect: [:letter | famixSubroutine dicImplicit at: letter ].
+	self assert: types size equals: 26.
+	self assert: types asSet size equals: 1.
+	self assert: types asSet anyOne isNil
+]
+
+{ #category : #running }
+FamixFortran77ResolverTest >> testCreateFamixFortran77ResolveImplicits [
+	| famixSubroutine subroutine types |
+
+	subroutine := (self defaultSubroutine: 'sub')
+		attributeAt: #implicits put: { self defaultImplicit: { #($c $s) . #($v $m) } for: 'character' };
+		addParameter: (self defaultParameter: 'var');
+		addAccess: self defaultAccess;
+		yourself.
+
+ 	resolver resolve.
+
+	self assert: (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) size equals: 1.
+	
+	famixSubroutine := (resolver model allWithSubTypesOf: FamixFortran77ProgramUnit) first.
+
+	self assert: famixSubroutine dicImplicit size equals: 26.
+	
+	types := 'csvm' asArray collect: [:letter | famixSubroutine dicImplicit at: letter ].
+	self assert: types size equals: 4.
+	self assert: types asSet size equals: 1.
+	self assert: types asSet anyOne equals: 'character'.
+	
+	types := 'ijkln' asArray collect: [:letter | famixSubroutine dicImplicit at: letter ].
+	self assert: types size equals: 5.
+	self assert: types asSet size equals: 1.
+	self assert: types asSet anyOne equals: 'integer'.
+	
+	types := 'abdefghopqrtuwxyz' asArray collect: [:letter | famixSubroutine dicImplicit at: letter ].
+	self assert: types size equals: 17.
+	self assert: types asSet size equals: 1.
+	self assert: types asSet anyOne equals: 'real'
 ]
 
 { #category : #running }
