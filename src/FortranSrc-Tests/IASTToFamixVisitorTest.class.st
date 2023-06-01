@@ -28,6 +28,19 @@ IASTToFamixVisitorTest >> defaultAnchor [
 ]
 
 { #category : #running }
+IASTToFamixVisitorTest >> defaultImplicit: ranges for: typeName [
+	^IASTImplicit new
+		forType: (self defaultType: typeName);
+		ranges: ranges;
+		yourself
+]
+
+{ #category : #running }
+IASTToFamixVisitorTest >> defaultImplicitNone [
+	^IASTImplicit new
+]
+
+{ #category : #running }
 IASTToFamixVisitorTest >> defaultParameter [
 	^IASTParameter new
 		entityName: 'var';
@@ -140,7 +153,7 @@ IASTToFamixVisitorTest >> testCreateFamixFortran77LocalVariable [
 	| entity var |
 	programFile progUnits: { IASTSubroutine new
 			 entityName: 'sub';
-			 body: { self defaultVariable };
+			 body: { (self defaultVariable: 'aVar' withType: 'integer') };
 			 yourself }.
 	programFile accept: visitor.
 
@@ -306,18 +319,26 @@ IASTToFamixVisitorTest >> testCreateFamixFortran77Subroutine [
 { #category : #running }
 IASTToFamixVisitorTest >> testCreateFamixFortran77SubroutineWithSimpleImplicit [
 
-	| entity |
+	| entity sub |
 	programFile progUnits: { IASTSubroutine new
 			 entityName: 'sub';
+			 body: {
+			 	self defaultImplicit: { #($c $s) } for: 'character' .
+				self defaultImplicit: { #($i $j $k) } for: 'integer' .
+			 };
 			 yourself }.
 
 	entity := programFile accept: visitor.
 
 	self assert: entity programUnits size equals: 1.
 
-	entity := entity programUnits first.
-	self assert: entity class equals: FamixFortran77PUSubroutine.
-	self assert: entity name equals: 'sub'.
-	self assert: entity programFile isNotNil.
-	self assert: entity parameters size equals: 0
+	sub := entity programUnits first.
+	self assert: sub class equals: FamixFortran77PUSubroutine.
+	self assert: sub name equals: 'sub'.
+	self assert: sub programFile isNotNil.
+
+	self assert: sub implicits size equals: 2.
+	self assert: sub implicits first class equals: IASTImplicit.
+	self assert: sub implicits second class equals: IASTImplicit.
+	
 ]

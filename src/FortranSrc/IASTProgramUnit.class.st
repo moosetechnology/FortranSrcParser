@@ -65,8 +65,8 @@ IASTProgramUnit >> filterBodyWith: aFilterBlock [
 
 { #category : #accessing }
 IASTProgramUnit >> implicits [
-
-	^ implicits
+	^implicits ifNil: [ 
+		implicits := self filterBodyWith: [ :entity | entity class = IASTImplicit ] ]
 ]
 
 { #category : #accessing }
