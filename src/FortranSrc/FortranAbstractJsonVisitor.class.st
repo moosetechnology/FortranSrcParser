@@ -77,7 +77,7 @@ FortranAbstractJsonVisitor >> visitArguments: anArgumentList [
 
 { #category : #'visiting expression' }
 FortranAbstractJsonVisitor >> visitAssign_expression: anAssignExpressionNode [
-	^self visitJsonMap: anAssignExpressionNode keys: #(target expression)
+	^self visitJsonMap: anAssignExpressionNode keys: #(span target expression)
 
 ]
 
@@ -189,6 +189,11 @@ FortranAbstractJsonVisitor >> visitConditions: aConditionList [
 	^aConditionList collect: [ :aCondition |
 		{ self visitIfCondition: aCondition first .
 	     self visitThenPart: aCondition second } ]
+]
+
+{ #category : #'visiting statement' }
+FortranAbstractJsonVisitor >> visitContinueStatement: aContinueStatementNode [
+	^self visitSpan: (aContinueStatementNode at: 'span')
 ]
 
 { #category : #'visiting statement' }
@@ -525,7 +530,8 @@ FortranAbstractJsonVisitor >> visitIndices: anArrayIndicesNode [
 
 { #category : #'visiting statement' }
 FortranAbstractJsonVisitor >> visitInitial: anInitialNode [
-	"DO statement initialization, a tagged JSon entity that will redirect to #visitAssign_expression:"
+	"DO statement initialization, a tagged JSon entity that will redirect to #visitAssign_expression:
+	Also used in variable declaration"
 	^self visitJsonElement: anInitialNode
 ]
 
